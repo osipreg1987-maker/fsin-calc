@@ -4,7 +4,7 @@ import React from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { formatCurrency } from '../lib/helpers';
 
-export default function ResultsTable({ results }) {
+export default function ResultsTable({ results }: any) {
   if (results.length === 0) {
     return (
         <div className="text-center py-12 text-slate-500">

@@ -3,7 +3,7 @@
 import { useState, useRef, useEffect } from 'react';
 import { Search, ChevronDown, Check } from 'lucide-react';
 
-export default function SearchableSelect({ options, value, onChange, placeholder = "Выберите предмет..." }) {
+export default function SearchableSelect({ options, value, onChange, placeholder = "Выберите предмет..." }: any) {
     const [isOpen, setIsOpen] = useState(false);
     const [searchTerm, setSearchTerm] = useState("");
     const wrapperRef = useRef(null);

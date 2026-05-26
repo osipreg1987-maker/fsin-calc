@@ -2,7 +2,7 @@
 
 import React from 'react';
 
-export default function IssueLogTable({ groupedItems, itemTotals, setItemTotals, customPrices, setCustomPrices, results, dismissalGroup }) {
+export default function IssueLogTable({ groupedItems, itemTotals, setItemTotals, customPrices, setCustomPrices, results, dismissalGroup }: any) {
   return (
     <div className="overflow-x-auto w-full">
         <table className="w-full text-left border-collapse text-sm">

@@ -5,7 +5,7 @@ import { Plus, Trash2, Calculator } from 'lucide-react';
 import SearchableSelect from './SearchableSelect';
 import { ITEMS } from '../lib/constants';
 
-export default function ItemTable({ gender, periods, dismDate }) {
+export default function ItemTable({ gender, periods, dismDate }: any) {
   const [items, setItems] = useState([]);
   
   // Отфильтруем вещи по полу

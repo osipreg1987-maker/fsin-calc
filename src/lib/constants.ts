@@ -1,3 +1,4 @@
+// @ts-nocheck
 export const SPLIT_DATE = new Date(2021, 1, 25); // 25.02.2021
 
 

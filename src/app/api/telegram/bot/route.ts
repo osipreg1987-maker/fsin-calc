@@ -37,20 +37,26 @@ bot.start(async (ctx) => {
                 return ctx.reply("❌ Неверный или устаревший токен привязки.");
             }
 
-            const { error: updateErr } = await supabase
+            const { data: updateData, error: updateErr } = await supabase
                 .from('subscriptions')
                 .update({ 
                     telegram_id: ctx.from.id.toString(),
                     telegram_link_token: null 
                 })
-                .eq('user_id', sub.user_id);
+                .eq('user_id', sub.user_id)
+                .select();
 
-            if (updateErr) throw updateErr;
+            if (updateErr) {
+                return ctx.reply("❌ Ошибка обновления: " + JSON.stringify(updateErr));
+            }
+            if (!updateData || updateData.length === 0) {
+                return ctx.reply("❌ Права доступа (RLS) заблокировали запись. Проверьте SUPABASE_SERVICE_ROLE_KEY в Vercel.");
+            }
 
             ctx.reply("✅ Отлично! Ваш аккаунт успешно привязан. Теперь вы можете использовать команду /my_archive для просмотра своих расчетов.");
         } catch (e) {
             console.error(e);
-            ctx.reply("❌ Произошла ошибка при привязке аккаунта.");
+            ctx.reply("❌ Произошла ошибка: " + String(e));
         }
     } else {
         const webAppUrl = process.env.NEXT_PUBLIC_SITE_URL || 'https://fsin-calc.vercel.app';

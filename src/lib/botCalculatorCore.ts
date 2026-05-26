@@ -1,0 +1,200 @@
+import { ITEMS, SPLIT_DATE, parseDate } from './constants';
+import { getRoundedMonths, getItemCategory } from './helpers';
+
+export function calculateCore({ periods, gender, itemTotals, customPrices, dismissalGroup, dismissalDate }) {
+    
+    // 1. Формируем список активных норм и предметов
+    const activeNorms = new Set(periods.map((p: any) => p.norm));
+    const activeItemsList = ITEMS.filter(i =>
+        (i.gender === 'both' || i.gender === gender) &&
+        i.norms.some(n => activeNorms.has(n))
+    ).map(i => ({ ...i, category: getItemCategory(i.name) }));
+
+    const groupedItems: any = {};
+    activeItemsList.forEach(item => {
+        const cat = item.category;
+        if (!groupedItems[cat]) groupedItems[cat] = [];
+        groupedItems[cat].push(item);
+    });
+
+    // 2. Основной расчет результатов
+    const results: any[] = [];
+    if (!periods || periods.length === 0 || !periods[0].start || !periods[0].end) {
+        return { activeItemsList, groupedItems, results, totalComp: 0, totalDed: 0, finalBalance: 0, isPositive: true };
+    }
+
+    const processedPeriods: any[] = [];
+    periods.forEach((p: any, index: number) => {
+        if (!p.start || !p.end) return;
+        const startD = parseDate(p.start);
+        const endD = parseDate(p.end);
+        
+        if (!startD || isNaN(startD.getTime()) || !endD || isNaN(endD.getTime())) return;
+        if (startD > endD) return;
+
+        const pIndex = index + 1;
+
+        if (endD < SPLIT_DATE) {
+            processedPeriods.push({ ...p, type: '789', start: startD, end: endD, pIndex, isTail: false });
+        } else if (startD >= SPLIT_DATE) {
+            processedPeriods.push({ ...p, type: '150', start: startD, end: endD, pIndex, isTail: false });
+        } else {
+            processedPeriods.push({ ...p, type: '789', start: startD, end: new Date(SPLIT_DATE.getTime() - 86400000), pIndex, isTail: false });
+            processedPeriods.push({ ...p, type: '150', start: SPLIT_DATE, end: endD, pIndex, isTail: true });
+        }
+    });
+
+    activeItemsList.forEach(item => {
+        if (item.gender !== 'both' && item.gender !== gender) return;
+
+        // 1. Считаем Начислено (Компенсация за время службы)
+        let earnedQty = 0;
+        let earnedMoney = 0;
+        const periodDetails: any[] = [];
+
+        processedPeriods.forEach(pp => {
+            if (!item.norms.includes(pp.norm)) return;
+
+            const wearKey = pp.type === '789' ? 'wear_789' : 'wear_150';
+            const specificWearKey = `${wearKey}_norm${pp.norm}`;
+            let wearMonths = (item as any)[specificWearKey] || (item as any)[wearKey];
+
+            if (!wearMonths) return;
+
+            const months = getRoundedMonths(pp.start, pp.end);
+            const qty = months / wearMonths;
+            const money = qty * item.price;
+
+            earnedQty += qty;
+            earnedMoney += money;
+            periodDetails.push({ type: pp.type, norm: pp.norm, months, wearMonths, qty, money, pIndex: pp.pIndex, isTail: pp.isTail });
+        });
+
+        // 2. Считаем Выдано (Полная стоимость)
+        const issuedQty = Number(itemTotals[item.id]) || 0;
+        const issuedMoney = issuedQty * item.price;
+
+        // 3. Считаем Амортизацию (Удержание за неистекший срок)
+        let amortMoney = 0;
+        const amortDetails: any[] = [];
+        
+        const dismD = parseDate(dismissalDate);
+        const lastPeriod = periods.find((p: any) => {
+            const s = parseDate(p.start);
+            const e = parseDate(p.end);
+            return s && e && dismD && dismD >= s && dismD <= e;
+        }) || periods[periods.length - 1];
+
+        let wearMonthsForDed = 0;
+        if (lastPeriod) {
+            const targetDate = (dismD && !isNaN(dismD.getTime())) ? dismD : (parseDate(lastPeriod.end) || new Date());
+            const is789 = targetDate < SPLIT_DATE;
+            const wearKey = is789 ? 'wear_789' : 'wear_150';
+            const specificWearKey = `${wearKey}_norm${lastPeriod.norm}`;
+            
+            wearMonthsForDed = (item as any)[specificWearKey] || (item as any)[wearKey];
+            if (!wearMonthsForDed) {
+                const altWearKey = is789 ? 'wear_150' : 'wear_789';
+                const altSpecific = `${altWearKey}_norm${lastPeriod.norm}`;
+                wearMonthsForDed = (item as any)[altSpecific] || (item as any)[altWearKey] || 0;
+            }
+        }
+
+        const localDeductionLines: any[] = [];
+
+        if (wearMonthsForDed > 0 && issuedQty > earnedQty) {
+            let totalDeductionMonths = Math.round((issuedQty - earnedQty) * wearMonthsForDed);
+            const priceToUse = customPrices[item.id] || item.price;
+            
+            if (totalDeductionMonths > 0) {
+                let baseDateForDeduction = dismD;
+                if (!baseDateForDeduction || isNaN(baseDateForDeduction.getTime())) {
+                    baseDateForDeduction = parseDate(lastPeriod?.end) || new Date();
+                }
+
+                let remainingDeduction = totalDeductionMonths;
+                let n = 0;
+
+                while (remainingDeduction > 0) {
+                    let dedMonths = remainingDeduction % wearMonthsForDed;
+                    if (dedMonths === 0) dedMonths = wearMonthsForDed;
+                    
+                    const wornMonths = wearMonthsForDed - dedMonths;
+                    let issueDate = new Date(baseDateForDeduction);
+                    issueDate.setMonth(issueDate.getMonth() - wornMonths - (n * wearMonthsForDed));
+                    
+                    let issueDateStr = `${issueDate.getFullYear()}-${String(issueDate.getMonth() + 1).padStart(2, '0')}-${String(issueDate.getDate()).padStart(2, '0')}`;
+                    
+                    const pricePerMonth = priceToUse / wearMonthsForDed;
+                    const residualValue = dedMonths * pricePerMonth;
+                    
+                    localDeductionLines.push({
+                        name: item.name,
+                        qty: 1,
+                        wearMonths: wearMonthsForDed,
+                        issueDateStr: issueDateStr,
+                        monthsLeft: dedMonths,
+                        price: priceToUse,
+                        pricePerMonth: pricePerMonth,
+                        residualValue: residualValue
+                    });
+                    
+                    amortMoney += residualValue;
+                    
+                    const parts = issueDateStr.split('-');
+                    const formattedIssueDate = parts.length === 3 ? `${parts[1]}.${parts[0]}` : issueDateStr;
+                    
+                    const formattedVal = new Intl.NumberFormat('ru-RU', { style: 'currency', currency: 'RUB', minimumFractionDigits: 2 }).format(residualValue);
+                    amortDetails.push(`Недонос ${dedMonths} мес. (выдано: ${formattedIssueDate}) - ${formattedVal}`);
+                    
+                    remainingDeduction -= dedMonths;
+                    n++;
+                }
+            }
+        }
+
+        // 4. Логика Трех Групп
+        const baseComp = Math.max(0, earnedMoney - issuedMoney);
+        const baseDed = amortMoney;
+
+        let comp = 0;
+        let ded = 0;
+
+        if (dismissalGroup === 'A') {
+            comp = baseComp;
+            ded = 0; 
+        } else if (dismissalGroup === 'B') {
+            comp = 0; 
+            ded = baseDed;
+        } else if (dismissalGroup === 'V') {
+            comp = baseComp;
+            ded = baseDed;
+        }
+
+        const balance = comp - ded;
+
+        if (comp > 0 || ded > 0 || earnedMoney > 0 || issuedMoney > 0) {
+            results.push({
+                ...item,
+                earnedQty,
+                earnedMoney,
+                issuedMoney,
+                amortMoney,
+                comp,
+                ded,
+                balance,
+                periodDetails,
+                amortDetails,
+                issuedCount: issuedQty,
+                deductionLines: localDeductionLines
+            });
+        }
+    });
+
+    const totalComp = results.reduce((sum, r) => sum + r.comp, 0);
+    const totalDed = results.reduce((sum, r) => sum + r.ded, 0);
+    const finalBalance = totalComp - totalDed;
+    const isPositive = finalBalance >= 0;
+
+    return { activeItemsList, groupedItems, results, totalComp, totalDed, finalBalance, isPositive };
+}

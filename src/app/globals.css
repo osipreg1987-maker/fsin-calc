@@ -1,0 +1,65 @@
+@import "tailwindcss";
+@source "../**/*.tsx";
+
+:root {
+  --background: var(--tg-theme-bg-color, #f3f4f6);
+  --foreground: var(--tg-theme-text-color, #111827);
+  --tw-bg-base: var(--tg-theme-secondary-bg-color, #ffffff);
+  --tw-button-bg: var(--tg-theme-button-color, #4f46e5);
+  --tw-button-text: var(--tg-theme-button-text-color, #ffffff);
+  --tw-hint: var(--tg-theme-hint-color, #6b7280);
+  --tw-link: var(--tg-theme-link-color, #3b82f6);
+}
+
+@theme inline {
+  --color-background: var(--background);
+  --color-foreground: var(--foreground);
+  --font-sans: var(--font-geist-sans);
+  --font-mono: var(--font-geist-mono);
+}
+
+@media (prefers-color-scheme: dark) {
+  :root {
+    --background: var(--tg-theme-bg-color, #0f172a);
+    --foreground: var(--tg-theme-text-color, #f8fafc);
+    --tw-bg-base: var(--tg-theme-secondary-bg-color, #1e293b);
+  }
+}
+
+body {
+  background: var(--background);
+  color: var(--foreground);
+  font-family: Arial, Helvetica, sans-serif;
+  margin: 0;
+  padding: 0;
+  -webkit-font-smoothing: antialiased;
+}
+
+/* Glassmorphism utilities */
+.glass-panel {
+  background: rgba(255, 255, 255, 0.03);
+  backdrop-filter: blur(16px);
+  -webkit-backdrop-filter: blur(16px);
+  border: 1px solid rgba(255, 255, 255, 0.05);
+  box-shadow: 0 4px 30px rgba(0, 0, 0, 0.1);
+}
+
+@media (prefers-color-scheme: light) {
+  .glass-panel {
+    background: rgba(255, 255, 255, 0.7);
+    border: 1px solid rgba(0, 0, 0, 0.05);
+    box-shadow: 0 4px 30px rgba(0, 0, 0, 0.05);
+  }
+}
+
+/* Скрываем скроллбар для красоты */
+::-webkit-scrollbar {
+  width: 4px;
+}
+::-webkit-scrollbar-track {
+  background: transparent;
+}
+::-webkit-scrollbar-thumb {
+  background: var(--tw-hint);
+  border-radius: 10px;
+}

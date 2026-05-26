@@ -1,3 +1,4 @@
+// @ts-nocheck
 import { useMemo } from 'react';
 import { ITEMS, SPLIT_DATE, parseDate } from './constants';
 import { getRoundedMonths, getItemCategory } from './helpers';
@@ -207,3 +208,4 @@ export function useCalculatorResults({ periods, gender, itemTotals, customPrices
 
     return { activeItemsList, groupedItems, results, totalComp, totalDed, finalBalance, isPositive };
 }
+

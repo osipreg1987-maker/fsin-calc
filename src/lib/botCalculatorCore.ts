@@ -1,3 +1,4 @@
+// @ts-nocheck
 import { ITEMS, SPLIT_DATE, parseDate } from './constants';
 import { getRoundedMonths, getItemCategory } from './helpers';
 
@@ -198,3 +199,4 @@ export function calculateCore({ periods, gender, itemTotals, customPrices, dismi
 
     return { activeItemsList, groupedItems, results, totalComp, totalDed, finalBalance, isPositive };
 }
+

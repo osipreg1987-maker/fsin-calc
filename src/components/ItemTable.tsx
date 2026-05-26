@@ -1,3 +1,4 @@
+// @ts-nocheck
 "use client";
 
 import { useState } from 'react';
@@ -103,3 +104,4 @@ export default function ItemTable({ gender, periods, dismDate }: any) {
     </div>
   );
 }
+

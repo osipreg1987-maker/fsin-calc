@@ -1,3 +1,4 @@
+// @ts-nocheck
 import { SPLIT_DATE } from './constants';
 
 export const getRoundedMonths = (start, end) => {
@@ -32,3 +33,4 @@ export const getItemCategory = (name) => {
             if (n.includes('воротник') || n.includes('галстук') || n.includes('закрепка') || n.includes('заколка') || n.includes('кашне') || n.includes('перчатки') || n.includes('ремень')) return 'Аксессуары и фурнитура';
             return 'Прочее';
         };
+

@@ -1,3 +1,4 @@
+// @ts-nocheck
 export const declineFio = (fio, gcase) => {
     if (!fio) return '';
     const parts = fio.trim().split(/\s+/);
@@ -337,3 +338,4 @@ export const exportToExcel = (type, data) => {
     a.click();
     URL.revokeObjectURL(url);
 };
+

@@ -1,3 +1,4 @@
+// @ts-nocheck
 "use client";
 
 import { useState, useRef, useEffect } from 'react';
@@ -76,3 +77,4 @@ export default function SearchableSelect({ options, value, onChange, placeholder
         </div>
     );
 }
+

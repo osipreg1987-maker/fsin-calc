@@ -1,8 +1,9 @@
 // @ts-nocheck
-import { ITEMS, SPLIT_DATE, parseDate } from './constants';
+import { ITEMS, SPLIT_DATE, parseDate, NORMS_M, NORMS_F } from './constants';
 import { getRoundedMonths, getItemCategory } from './helpers';
 
 export function calculateCore({ periods, gender, itemTotals, customPrices, dismissalGroup, dismissalDate }) {
+    const normsList = gender === 'M' ? NORMS_M : NORMS_F;
     
     // 1. Формируем список активных норм и предметов
     const activeNorms = new Set(periods.map((p: any) => p.norm));
@@ -66,9 +67,14 @@ export function calculateCore({ periods, gender, itemTotals, customPrices, dismi
             const qty = months / wearMonths;
             const money = qty * item.price;
 
+            const normObj = normsList.find(n => n.id === pp.norm);
+            const normNameFull = normObj ? normObj.name : '';
+            const match = normNameFull.match(/\((.*?)\)/);
+            const normNameShort = match ? match[1] : `Период ${pp.pIndex}`;
+
             earnedQty += qty;
             earnedMoney += money;
-            periodDetails.push({ type: pp.type, norm: pp.norm, months, wearMonths, qty, money, pIndex: pp.pIndex, isTail: pp.isTail });
+            periodDetails.push({ type: pp.type, norm: pp.norm, normName: normNameShort, months, wearMonths, qty, money, pIndex: pp.pIndex, isTail: pp.isTail });
         });
 
         // 2. Считаем Выдано (Полная стоимость)

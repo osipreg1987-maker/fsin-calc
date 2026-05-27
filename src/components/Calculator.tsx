@@ -504,7 +504,9 @@ export default function Calculator() {
                           className="p-4 bg-[var(--tw-bg-base)] rounded-xl border border-[var(--tw-hint)]/20 space-y-3 relative group shadow-sm"
                       >
                           <div className="flex justify-between items-center">
-                              <span className="text-sm font-bold text-[var(--tw-hint)]">Период {index + 1}</span>
+                              <span className="text-sm font-bold text-[var(--tw-hint)]">
+                                  Период службы ({activeNorms.find(n => n.id === period.norm)?.name?.match(/\((.*?)\)/)?.[1] || `№${index + 1}`})
+                              </span>
                               {periods.length > 1 && (
                                   <button onClick={() => removePeriod(period.id)} className="text-rose-400 hover:text-rose-500 p-1">
                                       <Trash2 size={18} />
@@ -536,7 +538,7 @@ export default function Calculator() {
                           <div>
                               <label className="block text-[10px] uppercase font-bold text-[var(--tw-hint)] mb-1">Норма</label>
                               <select 
-                                  className="w-full bg-transparent border border-[var(--tw-hint)]/30 rounded-lg p-2 text-sm text-[var(--foreground)] outline-none focus:border-[var(--tw-link)]"
+                                  className="w-full bg-[var(--tw-bg-base)] border border-[var(--tw-hint)]/30 rounded-lg p-2 text-sm text-[var(--foreground)] outline-none focus:border-[var(--tw-link)]"
                                   value={period.norm}
                                   onChange={(e) => updatePeriod(period.id, 'norm', parseInt(e.target.value))}
                               >

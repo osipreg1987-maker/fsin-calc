@@ -43,7 +43,7 @@ export default function ResultsTable({ results }: any) {
                             <td className="py-3 px-2">
                                 {r.periodDetails.map((pd, idx) => (
                                     <div key={idx} className="text-xs text-slate-400 mb-1">
-                                        Период {pd.pIndex} [ПП №{pd.type}] ({pd.months} мес. н. {pd.wearMonths}м): {pd.qty.toFixed(2)} шт. = {formatCurrency(pd.money)}
+                                        Период службы ({pd.normName}) [ПП №{pd.type}] ({pd.months} мес. н. {pd.wearMonths}м): {pd.qty.toFixed(2)} шт. = {formatCurrency(pd.money)}
                                     </div>
                                 ))}
                                 <div className="text-sm text-slate-300 font-medium border-t border-slate-700/50 pt-1 mt-1">

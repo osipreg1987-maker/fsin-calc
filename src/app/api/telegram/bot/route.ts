@@ -115,7 +115,15 @@ const handleArchive = async (ctx: any) => {
         let msg = `Ваши последние расчеты (Найдено: ${data.length}):\n\n`;
         for (let i = 0; i < data.length; i++) {
             const r = data[i];
-            const sum = r.item_totals && r.item_totals.comp ? r.item_totals.comp : 0;
+            const calculated = calculateCore({
+                periods: r.periods || [],
+                gender: r.gender || 'M',
+                itemTotals: r.item_totals || {},
+                customPrices: r.custom_prices || {},
+                dismissalGroup: r.dismissal_group || 'V',
+                dismissalDate: r.dism_date || ''
+            });
+            const sum = calculated.totalComp || 0;
             const text = `${i+1}. 👤 ФИО: ${r.employee_fio}\nЗвание: ${r.employee_rank}\n💰 Компенсация: ${sum.toLocaleString('ru-RU')} руб.`;
             
             if (sub.is_pro) {

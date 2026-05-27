@@ -2,12 +2,18 @@
 
 import { useState } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
+import { useAuth } from '../context/AuthContext';
+import { useRouter } from 'next/navigation';
+import { ShieldAlert } from 'lucide-react';
 import Calculator from '../components/Calculator';
-// import { NORMS_M, NORMS_F } from '../lib/constants'; // will add later
 
 export default function CalculatorPage() {
   const [employeeFio, setEmployeeFio] = useState('');
   const [gender, setGender] = useState('M');
+  const { user } = useAuth();
+  const router = useRouter();
+  
+  const isAdmin = user?.email === 'osipreg.1987@gmail.com';
 
   return (
     <div className="min-h-screen bg-slate-900 text-slate-200 p-4 md:p-8 font-sans selection:bg-blue-500/30">
@@ -27,6 +33,15 @@ export default function CalculatorPage() {
               </h1>
               <p className="text-slate-400">Вещевое довольствие и компенсации</p>
             </div>
+            {isAdmin && (
+              <button 
+                onClick={() => router.push('/admin')}
+                className="flex items-center gap-2 bg-indigo-600/20 text-indigo-400 hover:bg-indigo-600/30 px-4 py-2 rounded-xl transition-colors font-medium border border-indigo-500/30 shadow-lg shadow-indigo-500/10"
+              >
+                <ShieldAlert size={18} />
+                Админ-панель
+              </button>
+            )}
           </div>
         </motion.div>
 

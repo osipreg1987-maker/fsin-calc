@@ -66,6 +66,11 @@ bot.start(async (ctx) => {
         }
     } else {
         const webAppUrl = process.env.NEXT_PUBLIC_SITE_URL || 'https://fsin-calc.vercel.app';
+        const mainMenu = Markup.keyboard([
+            [Markup.button.webApp('🧮 Открыть калькулятор', webAppUrl)],
+            ['📂 Мои расчеты', '🎧 Поддержка']
+        ]).resize();
+        
         ctx.reply(
             "Привет! Я бот FSIN Calc 🧮.\n\n" +
             "Я помогу вам быстро получать доступ к вашим расчетам прямо из мессенджера.\n" +
@@ -73,15 +78,13 @@ bot.start(async (ctx) => {
             "Команды:\n" +
             "/my_archive - Показать последние расчеты\n" +
             "/calc - Открыть калькулятор",
-            Markup.keyboard([
-                [Markup.button.webApp('🧮 Открыть калькулятор', webAppUrl)]
-            ]).resize()
+            mainMenu
         );
     }
 });
 
-// Команда /my_archive
-bot.command('my_archive', async (ctx) => {
+// Команда /my_archive и кнопка
+const handleArchive = async (ctx: any) => {
     ctx.reply("⏳ Ищу ваши расчеты в облачной базе данных Supabase...");
     try {
         const telegramId = ctx.from.id.toString();
@@ -131,14 +134,46 @@ bot.command('my_archive', async (ctx) => {
         console.error(e);
         ctx.reply("❌ Произошла ошибка при доступе к базе данных.");
     }
+};
+
+bot.command('my_archive', handleArchive);
+bot.hears('📂 Мои расчеты', handleArchive);
+
+// Кнопка поддержки
+bot.hears('🎧 Поддержка', (ctx) => {
+    ctx.reply("Напишите ваш вопрос прямо в этот чат, и наши специалисты ответят вам в ближайшее время! 👇");
+});
+
+// Рассылка (только для админа)
+bot.command('broadcast', async (ctx) => {
+    if (ctx.from.id.toString() !== '1654211029') return;
+    
+    // @ts-ignore
+    const text = ctx.message.text.replace('/broadcast', '').trim();
+    if (!text) return ctx.reply('Использование: /broadcast Ваш текст рассылки');
+    
+    const { data } = await supabase.from('subscriptions').select('telegram_id').not('telegram_id', 'is', null);
+    if (!data || data.length === 0) return ctx.reply('Нет привязанных пользователей.');
+    
+    ctx.reply(`⏳ Начинаю рассылку для ${data.length} пользователей...`);
+    let sent = 0;
+    for (const row of data) {
+        try {
+            await ctx.telegram.sendMessage(row.telegram_id, `📢 **Новое уведомление**\n\n${text}`, { parse_mode: 'Markdown' });
+            sent++;
+        } catch(e) {}
+    }
+    ctx.reply(`✅ Рассылка завершена. Доставлено: ${sent} из ${data.length}`);
 });
 
 // Команда /calc
 bot.command('calc', (ctx) => {
     const webAppUrl = process.env.NEXT_PUBLIC_SITE_URL || 'https://fsin-calc.vercel.app';
-    ctx.reply("Нажмите на кнопку ниже, чтобы открыть калькулятор:", Markup.keyboard([
-        [Markup.button.webApp('🧮 Открыть калькулятор', webAppUrl)]
-    ]).resize());
+    const mainMenu = Markup.keyboard([
+        [Markup.button.webApp('🧮 Открыть калькулятор', webAppUrl)],
+        ['📂 Мои расчеты', '🎧 Поддержка']
+    ]).resize();
+    ctx.reply("Нажмите на кнопку ниже, чтобы открыть калькулятор:", mainMenu);
 });
 
 // Скачивание Excel из архива (Callback Query)
@@ -229,8 +264,62 @@ bot.on('web_app_data', async (ctx) => {
     }
 });
 
-bot.on('text', (ctx) => {
-    ctx.reply("Я понимаю только команды. Нажмите /start или /my_archive.");
+// Перехват сообщений (Поддержка)
+bot.on('message', async (ctx) => {
+    const supportChatId = '-4857440327';
+
+    // 1. Если сообщение пришло из группы поддержки
+    if (ctx.chat && ctx.chat.id.toString() === supportChatId) {
+        // @ts-ignore
+        const replyMsg = ctx.message.reply_to_message;
+        if (replyMsg) {
+            const textOrCaption = ('text' in replyMsg ? replyMsg.text : ('caption' in replyMsg ? replyMsg.caption : '')) || '';
+            const match = textOrCaption.match(/#user(\d+)/);
+            if (match) {
+                const targetUserId = match[1];
+                try {
+                    // @ts-ignore
+                    if ('text' in ctx.message) {
+                        // @ts-ignore
+                        await ctx.telegram.sendMessage(targetUserId, `🎧 **Ответ службы поддержки:**\n\n${ctx.message.text}`, { parse_mode: 'Markdown' });
+                    } else {
+                        await ctx.telegram.sendMessage(targetUserId, `🎧 **Ответ службы поддержки:**`, { parse_mode: 'Markdown' });
+                        await ctx.copyMessage(targetUserId);
+                    }
+                } catch(e) {
+                    ctx.reply('❌ Ошибка: не удалось отправить сообщение пользователю (возможно, он заблокировал бота).');
+                }
+            }
+        }
+        return; // Больше в группе ничего не обрабатываем
+    }
+
+    // 2. Если сообщение пришло в личку боту (вопрос в поддержку)
+    if (ctx.chat && ctx.chat.type === 'private') {
+        // @ts-ignore
+        if ('text' in ctx.message && ctx.message.text.startsWith('/')) return; // игнорируем команды
+
+        const userInfo = `#user${ctx.from.id}\n👤 ${ctx.from.first_name || 'Пользователь'} (@${ctx.from.username || 'нет_юзернейма'})`;
+        
+        try {
+            // @ts-ignore
+            if ('text' in ctx.message) {
+                // @ts-ignore
+                await ctx.telegram.sendMessage(supportChatId, `${userInfo}\n\n💬 ${ctx.message.text}`);
+            // @ts-ignore
+            } else if ('photo' in ctx.message || 'document' in ctx.message) {
+                // @ts-ignore
+                const caption = ctx.message.caption ? `\n\n💬 ${ctx.message.caption}` : '';
+                await ctx.telegram.sendMessage(supportChatId, `${userInfo}${caption}`);
+                await ctx.copyMessage(supportChatId);
+            }
+            
+            ctx.reply("✅ Ваше сообщение отправлено в службу поддержки! Мы ответим вам в этом чате.");
+        } catch (e) {
+            console.error(e);
+            ctx.reply("❌ Произошла ошибка при отправке сообщения в поддержку.");
+        }
+    }
 });
 
 // ========================

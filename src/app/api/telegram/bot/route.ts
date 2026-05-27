@@ -37,6 +37,12 @@ bot.start(async (ctx) => {
                 return ctx.reply("❌ Неверный или устаревший токен привязки.");
             }
 
+            // Сначала отвязываем этот telegram_id от всех других аккаунтов, чтобы не было дублей
+            await supabase
+                .from('subscriptions')
+                .update({ telegram_id: null })
+                .eq('telegram_id', ctx.from.id.toString());
+
             const { data: updateData, error: updateErr } = await supabase
                 .from('subscriptions')
                 .update({ 

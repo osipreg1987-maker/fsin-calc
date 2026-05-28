@@ -13,6 +13,7 @@ import TelegramLinkButton from './TelegramLinkButton';
 import { useCalculatorResults } from '../lib/useCalculatorResults';
 import { formatCurrency, getRoundedMonths } from '../lib/helpers';
 import { exportToExcel } from '../lib/exportHelpers';
+import { generateWordReport } from '../lib/reportGenerator';
 import { parseDate } from '../lib/constants';
 import { useAuth } from '../context/AuthContext';
 import { supabase } from '../lib/supabaseClient';

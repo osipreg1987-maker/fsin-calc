@@ -283,13 +283,16 @@ export default function LandingPage() {
             >
               <div className="absolute top-0 right-0 w-32 h-32 bg-purple-500/10 rounded-full blur-[40px]" />
               <div className="relative z-10 flex-1">
-                <h3 className="text-2xl font-bold text-white mb-2">Для увольняющихся</h3>
+                <h3 className="text-2xl font-bold text-white mb-1">Разовый</h3>
+                <div className="text-sm text-purple-300 font-medium mb-4">Для увольняющихся</div>
                 <div className="flex items-baseline gap-2 mb-6">
                   <span className="text-4xl font-bold text-white">390</span>
                   <span className="text-slate-400">руб. / разово</span>
                 </div>
                 <p className="text-purple-400 font-medium text-sm mb-6 leading-relaxed bg-purple-500/10 p-3 rounded-xl border border-purple-500/20">
-                  Заплатите 390 руб. и получите справку с обоснованием для спора с бухгалтерией. Это поможет сэкономить десятки тысяч рублей на недополученной вещевке.
+                  Заплатите 390 руб. и получите справку с обоснованием для спора с бухгалтерией. Это поможет сэкономить десятки тысяч рублей на недополученной вещевке.<br/><br/>
+                  <span className="text-white font-bold mb-1 block">Внимание:</span> 
+                  Для заполнения калькулятора необходимо запросить <b>арматурную карточку</b> у тыловиков.
                 </p>
                 <ul className="space-y-4 mb-8">
                   <li className="flex items-start gap-3">
@@ -328,13 +331,13 @@ export default function LandingPage() {
                 Популярный
               </div>
               <div className="relative z-10 flex-1">
-                <h3 className="text-2xl font-bold text-white mb-2">Для тыловиков</h3>
+                <h3 className="text-2xl font-bold text-white mb-2">Для тыловиков и ревизоров</h3>
                 <div className="flex items-baseline gap-2 mb-6">
                   <span className="text-4xl font-bold text-white">990</span>
                   <span className="text-slate-400">руб. / мес.</span>
                 </div>
                 <p className="text-blue-300 font-medium text-sm mb-6 leading-relaxed bg-blue-500/10 p-3 rounded-xl border border-blue-500/20">
-                  Что лучше: отдать 990 руб. в месяц за точные расчеты или получить начет на десятки тысяч штрафа по итогам ревизии КРО из-за ручной ошибки?
+                  Идеальный инструмент, который позволит вам быстро, чётко и безошибочно рассчитывать компенсации. Получите точный расчёт, который поможет не попасться на штрафы по проверке КРО.
                 </p>
                 <ul className="space-y-4 mb-8">
                   <li className="flex items-start gap-3">
@@ -370,13 +373,13 @@ export default function LandingPage() {
             >
               <div className="absolute top-0 right-0 w-32 h-32 bg-green-500/10 rounded-full blur-[40px]" />
               <div className="relative z-10 flex-1">
-                <h3 className="text-2xl font-bold text-white mb-2">Для КРО и ревизоров</h3>
+                <h3 className="text-2xl font-bold text-white mb-2">PRO на 6 месяцев</h3>
                 <div className="flex items-baseline gap-2 mb-6">
                   <span className="text-4xl font-bold text-white">2990</span>
-                  <span className="text-slate-400">руб. / полгода</span>
+                  <span className="text-slate-400">руб. / за 6 мес.</span>
                 </div>
                 <p className="text-green-400 font-medium text-sm mb-6 leading-relaxed bg-green-500/10 p-3 rounded-xl border border-green-500/20">
-                  Сэкономьте десятки часов рутинной работы. Проверьте 20 чужих справок-расчетов за 10 минут и моментально выявите незаконные переплаты или недоплаты.
+                  Выгодное предложение! Оплатите доступ сразу на полгода и получите существенную скидку. Все преимущества PRO-тарифа по лучшей цене.
                 </p>
                 <ul className="space-y-4 mb-8">
                   <li className="flex items-start gap-3">

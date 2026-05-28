@@ -71,9 +71,109 @@ export const formatDateToMMYYYY = (dateStr) => {
 export const generateExcelHtml = (type, data) => {
     const { results, instData, employeeFio, employeeRank, dismissalDate } = data;
     const isComp = type === 'comp';
+    const isB2c = type === 'b2c-comp';
     let html = '';
 
-    if (isComp) {
+    if (isB2c) {
+        html += `
+        <html xmlns:o="urn:schemas-microsoft-com:office:office"
+              xmlns:x="urn:schemas-microsoft-com:office:excel"
+              xmlns="http://www.w3.org/TR/REC-html40">
+        <head>
+            <meta charset="utf-8">
+            <style>
+                table { border-collapse: collapse; width: 100%; font-family: 'Times New Roman', Times, serif; font-size: 12pt; }
+                td, th { border: 1px solid black; padding: 4px; text-align: center; vertical-align: middle; }
+                .no-border { border: none !important; text-align: center; }
+                .no-border.left { text-align: left; }
+                .bold { font-weight: bold; }
+                .red { color: red; }
+                .center { text-align: center; }
+                .right { text-align: right; }
+                .left { text-align: left; }
+                .underline { text-decoration: underline; }
+                .italic { font-style: italic; }
+            </style>
+        </head>
+        <body>
+            <table>
+                <colgroup>
+                    <col width="64" />
+                    <col width="320" />
+                    <col width="96" />
+                    <col width="96" />
+                    <col width="96" />
+                    <col width="96" />
+                </colgroup>
+                <tr><td colspan="6" style="border: none;">${instData.institution} ${instData.region}</td></tr>
+                <tr><td colspan="6" style="border: none;"></td></tr>
+                <tr><td colspan="6" style="border: none;" class="center bold">Справка-обоснование на выплату денежной компенсации</td></tr>
+                <tr><td colspan="6" style="border: none;" class="center bold">вместо положенных предметов форменного обмундирования</td></tr>
+                <tr><td colspan="6" style="border: none;" class="center bold underline">${declineFio(employeeFio, 'dative') || '_________________________________'}</td></tr>
+                <tr><td colspan="6" style="border: none;" class="center bold underline red">${declineRank(employeeRank, 'dative') || '_________________________________'}</td></tr>
+                <tr><td colspan="6" style="border: none;" class="left">Арматурная карточка № _____</td></tr>
+                <tr><td colspan="6" style="border: none;" class="left">Обоснование для выплаты компенсации:</td></tr>
+                <tr><td colspan="6" style="border: none;" class="left">- ч. 2 ст. 69 Федерального закона от 19.07.2018 № 197-ФЗ</td></tr>
+                <tr><td colspan="6" style="border: none;" class="left">- Постановление Правительства РФ от 10.02.2021 г. № 150</td></tr>
+                <tr><td colspan="6" style="border: none;" class="left">- Приказ Минюста РФ № 211 и Приказ ФСИН № 676 (Нормы снабжения и сроки носки)</td></tr>
+                <tr><td colspan="6" style="border: none;" class="left red">Дата увольнения: ${dismissalDate ? formatDateToMMYYYY(dismissalDate) : '_________________'}</td></tr>
+                <tr><td colspan="6" style="border: none;"></td></tr>
+                <tr>
+                    <td class="bold">№ п/п</td>
+                    <td class="bold">Наименование предметов</td>
+                    <td class="bold">Единица<br>измерения</td>
+                    <td class="bold">Количество<br>предметов</td>
+                    <td class="bold">Размер денежной<br>компенсации за<br>один предмет (руб.)</td>
+                    <td class="bold">Сумма к<br>выплате<br>(руб.)</td>
+                </tr>
+        `;
+
+        const targetResults = results.filter(r => r.comp > 0);
+        
+        targetResults.forEach((r, idx) => {
+            let unit = 'шт.';
+            if (r.name.toLowerCase().includes('костюм') || r.name.toLowerCase().includes('белье')) unit = 'к-т';
+            if (r.name.toLowerCase().includes('ботинки') || r.name.toLowerCase().includes('полусапоги') || r.name.toLowerCase().includes('носки') || r.name.toLowerCase().includes('перчатки') || r.name.toLowerCase().includes('сапоги')) unit = 'пар.';
+            
+            let qty = Math.round(r.comp / r.price);
+            
+            html += `
+                <tr>
+                    <td>${idx + 1}</td>
+                    <td class="left">${r.name}</td>
+                    <td>${unit}</td>
+                    <td style="mso-number-format:'0';">${qty}</td>
+                    <td style="mso-number-format:'0.00';">${r.price}</td>
+                    <td style="mso-number-format:'0.00';">${r.comp.toFixed(2).replace('.', ',')}</td>
+                </tr>
+            `;
+        });
+
+        const totalSum = targetResults.reduce((sum, r) => sum + r.comp, 0);
+        const totalQty = targetResults.reduce((sum, r) => sum + Math.round(r.comp / r.price), 0);
+
+        html += `
+                <tr>
+                    <td colspan="3" class="right bold">Итого:</td>
+                    <td class="bold red center" style="mso-number-format:'0';">${totalQty}</td>
+                    <td style="border: none;"></td>
+                    <td class="bold red" style="mso-number-format:'0.00';">${totalSum.toFixed(2).replace('.', ',')}</td>
+                </tr>
+                <tr><td colspan="6" class="center">Количество предметов: ${totalQty}</td></tr>
+                <tr><td colspan="6" class="center">Сумма к выплате: ${totalSum.toFixed(2).replace('.', ',')} руб.</td></tr>
+                
+                <tr><td colspan="6" style="border: none;"></td></tr>
+                <tr><td colspan="6" style="border: none;" class="left italic">Настоящий расчет произведен на основании данных из Арматурной карточки и является законным обоснованием для выплаты денежной компенсации за недополученное вещевое имущество.</td></tr>
+                <tr><td colspan="6" style="border: none;"></td></tr>
+                <tr>
+                    <td colspan="3" style="border: none;" class="left">${employeeRank || '________________________________'}</td>
+                    <td colspan="3" style="border: none;" class="right">${employeeFio || '________________'}</td>
+                </tr>
+            </table>
+        </body>
+        </html>
+        `;
+    } else if (isComp) {
         html += `
         <html xmlns:o="urn:schemas-microsoft-com:office:office"
               xmlns:x="urn:schemas-microsoft-com:office:excel"
@@ -326,7 +426,7 @@ export const generateExcelHtml = (type, data) => {
 };
 
 export const exportToExcel = (type, data) => {
-    const isComp = type === 'comp';
+    const isComp = type === 'comp' || type === 'b2c-comp';
     const html = generateExcelHtml(type, data);
     
     const blob = new Blob([html], { type: 'application/vnd.ms-excel' });
@@ -334,7 +434,7 @@ export const exportToExcel = (type, data) => {
     const url = URL.createObjectURL(blob);
     const a = document.createElement('a');
     a.href = url;
-    a.download = isComp ? 'Spravka_Kompensaciya.xls' : 'Spravka_Uderzhanie.xls';
+    a.download = type === 'b2c-comp' ? 'Spravka_Obosnovanie_Fsin.xls' : (type === 'comp' ? 'Spravka_Kompensaciya.xls' : 'Spravka_Uderzhanie.xls');
     a.click();
     URL.revokeObjectURL(url);
 };

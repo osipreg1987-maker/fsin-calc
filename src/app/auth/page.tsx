@@ -28,7 +28,7 @@ export default function AuthPage() {
           password,
         });
         if (error) throw error;
-        router.push('/');
+        router.push('/calc');
         router.refresh();
       } else {
         const { error } = await supabase.auth.signUp({
@@ -52,7 +52,7 @@ export default function AuthPage() {
     await supabase.auth.signInWithOAuth({
       provider: 'google',
       options: {
-        redirectTo: window.location.origin,
+        redirectTo: `${window.location.origin}/calc`,
       }
     });
   };

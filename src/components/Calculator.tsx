@@ -321,10 +321,6 @@ export default function Calculator() {
   };
 
   const addPeriod = () => {
-    if (!isPro && periods.length >= 1) {
-      setIsProModalOpen(true);
-      return;
-    }
     setPeriods([...periods, { id: Math.random(), start: '', end: '', norm: activeNorms[0].id }]);
   };
   const updatePeriod = (id: number, field: string, value: any) => {
@@ -695,6 +691,9 @@ export default function Calculator() {
                     setCustomPrices={setCustomPrices} 
                     results={results} 
                     dismissalGroup={dismissalGroup} 
+                    isPro={isPro}
+                    setIsProModalOpen={setIsProModalOpen}
+                    periodCount={periods.length}
                 />
             </div>
 

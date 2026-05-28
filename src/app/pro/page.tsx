@@ -151,7 +151,7 @@ export default function ProPage() {
             <div className="text-xl font-semibold text-green-400 mb-2 flex items-center gap-2">
               PRO на 6 месяцев
             </div>
-            <div className="text-3xl font-bold text-white mb-6">2990 ₽ <span className="text-lg text-slate-400 font-normal">/ за 6 мес</span></div>
+            <div className="text-3xl font-bold text-white mb-6">3999 ₽ <span className="text-lg text-slate-400 font-normal">/ за 6 мес</span></div>
             
             <div className="space-y-4 mb-8 flex-1">
               <Feature text="Десятки часов сэкономленного времени" included />

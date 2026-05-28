@@ -375,7 +375,7 @@ export default function LandingPage() {
               <div className="relative z-10 flex-1">
                 <h3 className="text-2xl font-bold text-white mb-2">PRO на 6 месяцев</h3>
                 <div className="flex items-baseline gap-2 mb-6">
-                  <span className="text-4xl font-bold text-white">2990</span>
+                  <span className="text-4xl font-bold text-white">3999</span>
                   <span className="text-slate-400">руб. / за 6 мес.</span>
                 </div>
                 <p className="text-green-400 font-medium text-sm mb-6 leading-relaxed bg-green-500/10 p-3 rounded-xl border border-green-500/20">

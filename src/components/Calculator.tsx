@@ -199,13 +199,21 @@ export default function Calculator() {
 
   const loadFromArchive = (record: any) => {
       if (!confirm(`Загрузить расчет для ${record.employee_fio}? Текущие несохраненные данные будут стерты.`)) return;
+      
+      const safeParse = (val: any, fallback: any) => {
+          if (typeof val === 'string') {
+              try { return JSON.parse(val); } catch(e) { return fallback; }
+          }
+          return val || fallback;
+      };
+
       setEmployeeFio(record.employee_fio || '');
       setEmployeeRank(record.employee_rank || '');
       setDismissalGroup(record.dismissal_group || 'V');
       setGender(record.gender || 'M');
-      setPeriods(record.periods || [{ id: 1, start: '', end: '', norm: 2 }]);
-      setItemTotals(record.item_totals || {});
-      setCustomPrices(record.custom_prices || {});
+      setPeriods(safeParse(record.periods, [{ id: 1, start: '', end: '', norm: 2 }]));
+      setItemTotals(safeParse(record.item_totals, {}));
+      setCustomPrices(safeParse(record.custom_prices, {}));
       setIsArchiveOpen(false);
   };
   

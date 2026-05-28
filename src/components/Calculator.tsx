@@ -65,6 +65,30 @@ export default function Calculator() {
   }, [user]);
 
   useEffect(() => {
+    const draftStr = localStorage.getItem('fsin_calc_draft');
+    if (draftStr) {
+      try {
+        const draft = JSON.parse(draftStr);
+        if (draft.employeeFio) setEmployeeFio(draft.employeeFio);
+        if (draft.employeeRank) setEmployeeRank(draft.employeeRank);
+        if (draft.dismissalGroup) setDismissalGroup(draft.dismissalGroup);
+        if (draft.gender) setGender(draft.gender);
+        if (draft.periods && Array.isArray(draft.periods) && draft.periods.length > 0) setPeriods(draft.periods);
+        if (draft.itemTotals && typeof draft.itemTotals === 'object') setItemTotals(draft.itemTotals);
+        if (draft.customPrices && typeof draft.customPrices === 'object') setCustomPrices(draft.customPrices);
+      } catch (e) {
+        console.error("Failed to load draft", e);
+      }
+    }
+  }, []);
+
+  useEffect(() => {
+    const draft = { employeeFio, employeeRank, dismissalGroup, gender, periods, itemTotals, customPrices };
+    localStorage.setItem('fsin_calc_draft', JSON.stringify(draft));
+  }, [employeeFio, employeeRank, dismissalGroup, gender, periods, itemTotals, customPrices]);
+
+
+  useEffect(() => {
       const saved = localStorage.getItem('fsin_instData');
       if (saved) {
           setInstData(JSON.parse(saved));
@@ -296,7 +320,13 @@ export default function Calculator() {
     setCustomPrices({});
   };
 
-  const addPeriod = () => setPeriods([...periods, { id: Math.random(), start: '', end: '', norm: activeNorms[0].id }]);
+  const addPeriod = () => {
+    if (!isPro && periods.length >= 1) {
+      setIsProModalOpen(true);
+      return;
+    }
+    setPeriods([...periods, { id: Math.random(), start: '', end: '', norm: activeNorms[0].id }]);
+  };
   const updatePeriod = (id: number, field: string, value: any) => {
     setPeriods(periods.map(p => p.id === id ? { ...p, [field]: value } : p));
   };

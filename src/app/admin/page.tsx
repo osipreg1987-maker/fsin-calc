@@ -85,7 +85,7 @@ export default function AdminDashboard() {
         <ShieldAlert size={64} className="text-rose-500" />
         <h1 className="text-2xl font-bold">Доступ запрещен</h1>
         <p className="text-slate-400">{error}</p>
-        <button onClick={() => router.push('/')} className="px-4 py-2 bg-indigo-600 rounded-lg">Вернуться на главную</button>
+        <button onClick={() => router.push('/calc')} className="px-4 py-2 bg-indigo-600 rounded-lg">Вернуться в калькулятор</button>
       </div>
     );
   }
@@ -102,8 +102,8 @@ export default function AdminDashboard() {
             <h1 className="text-3xl font-bold text-white mb-2">Панель Администратора</h1>
             <p className="text-slate-400">Управление пользователями и статистика</p>
           </div>
-          <button onClick={() => router.push('/')} className="mt-4 md:mt-0 px-4 py-2 bg-slate-800 hover:bg-slate-700 rounded-lg text-sm transition-colors">
-            Вернуться на сайт
+          <button onClick={() => router.push('/calc')} className="mt-4 md:mt-0 px-4 py-2 bg-slate-800 hover:bg-slate-700 rounded-lg text-sm transition-colors">
+            Вернуться в калькулятор
           </button>
         </div>
 

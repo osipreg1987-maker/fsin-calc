@@ -27,9 +27,9 @@ export default function PaymentSimulator() {
 
       setStatus('success');
       
-      // Возвращаем в приложение
+      // Возвращаем в калькулятор
       setTimeout(() => {
-        router.push('/');
+        router.push('/calc');
         router.refresh(); 
       }, 2000);
       

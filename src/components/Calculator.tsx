@@ -23,7 +23,7 @@ export default function Calculator() {
   const [employeeRank, setEmployeeRank] = useState('');
   const [gender, setGender] = useState('M');
   const [periods, setPeriods] = useState([{ id: 1, start: '', end: '', norm: 2 }]);
-  const [dismDate, setDismDate] = useState('');
+  const dismDate = periods[periods.length - 1]?.end || '';
   const [dismissalGroup, setDismissalGroup] = useState('V');
   const [itemTotals, setItemTotals] = useState({});
   const [customPrices, setCustomPrices] = useState({});
@@ -202,7 +202,6 @@ export default function Calculator() {
       setEmployeeFio(record.employee_fio || '');
       setEmployeeRank(record.employee_rank || '');
       setDismissalGroup(record.dismissal_group || 'V');
-      setDismDate(record.dism_date || '');
       setGender(record.gender || 'M');
       setPeriods(record.periods || [{ id: 1, start: '', end: '', norm: 2 }]);
       setItemTotals(record.item_totals || {});
@@ -463,7 +462,7 @@ export default function Calculator() {
                   <input 
                     type="text" 
                     className="w-full bg-[var(--tw-bg-base)] border border-[var(--tw-hint)]/30 rounded-xl p-3 text-[var(--foreground)] outline-none focus:border-[var(--tw-link)] transition-all"
-                    placeholder="Иванов И.И."
+                    placeholder="Иванов Иван Иванович"
                     value={employeeFio}
                     onChange={(e) => setEmployeeFio(e.target.value)}
                   />
@@ -510,14 +509,6 @@ export default function Calculator() {
                     </div>
                   </div>
 
-                  <div>
-                    <label className="block text-xs text-[var(--tw-hint)] mb-1">Дата увольнения</label>
-                    <input 
-                      type="date" 
-                      className="w-full bg-[var(--tw-bg-base)] border border-[var(--tw-hint)]/30 rounded-xl p-3 text-[var(--foreground)] outline-none focus:border-[var(--tw-link)] transition-all"
-                      value={dismDate}
-                      onChange={(e) => setDismDate(e.target.value)}
-                    />
                   </div>
                 </div>
               </div>

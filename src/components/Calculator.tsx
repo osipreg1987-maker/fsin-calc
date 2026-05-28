@@ -508,8 +508,6 @@ export default function Calculator() {
                         </button>
                     </div>
                   </div>
-
-                  </div>
                 </div>
               </div>
             </div>

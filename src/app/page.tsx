@@ -256,6 +256,156 @@ export default function LandingPage() {
         </div>
       </section>
 
+      {/* Pricing Section */}
+      <section id="pricing" className="relative z-10 py-24 bg-slate-900/50 border-y border-slate-800 backdrop-blur-sm">
+        <div className="max-w-7xl mx-auto px-4">
+          <motion.div 
+            initial={{ opacity: 0, y: 20 }}
+            whileInView={{ opacity: 1, y: 0 }}
+            viewport={{ once: true }}
+            className="mb-16 text-center"
+          >
+            <span className="text-blue-400 font-bold tracking-wider uppercase text-sm">Тарифы</span>
+            <h2 className="text-4xl md:text-5xl font-bold mt-2">
+              Выберите подходящий <span className="text-slate-500">формат работы</span>
+            </h2>
+          </motion.div>
+          
+          <div className="grid grid-cols-1 md:grid-cols-3 gap-8 max-w-6xl mx-auto">
+            
+            {/* Tier 1: Retiring */}
+            <motion.div 
+              initial={{ opacity: 0, y: 20 }}
+              whileInView={{ opacity: 1, y: 0 }}
+              viewport={{ once: true }}
+              transition={{ delay: 0.1 }}
+              className="bg-slate-800/40 border border-slate-700/50 rounded-3xl p-8 hover:bg-slate-800/60 transition-all hover:border-purple-500/30 relative overflow-hidden flex flex-col"
+            >
+              <div className="absolute top-0 right-0 w-32 h-32 bg-purple-500/10 rounded-full blur-[40px]" />
+              <div className="relative z-10 flex-1">
+                <h3 className="text-2xl font-bold text-white mb-2">Для увольняющихся</h3>
+                <div className="flex items-baseline gap-2 mb-6">
+                  <span className="text-4xl font-bold text-white">390</span>
+                  <span className="text-slate-400">руб. / разово</span>
+                </div>
+                <p className="text-purple-400 font-medium text-sm mb-6 leading-relaxed bg-purple-500/10 p-3 rounded-xl border border-purple-500/20">
+                  Заплатите 390 руб. и получите справку с обоснованием для спора с бухгалтерией. Это поможет сэкономить десятки тысяч рублей на недополученной вещевке.
+                </p>
+                <ul className="space-y-4 mb-8">
+                  <li className="flex items-start gap-3">
+                    <CheckCircle2 className="text-purple-400 shrink-0 w-5 h-5" />
+                    <span className="text-slate-300 text-sm">Готовая Excel-справка с обоснованием</span>
+                  </li>
+                  <li className="flex items-start gap-3">
+                    <CheckCircle2 className="text-purple-400 shrink-0 w-5 h-5" />
+                    <span className="text-slate-300 text-sm">Шаблон правильного рапорта</span>
+                  </li>
+                  <li className="flex items-start gap-3">
+                    <CheckCircle2 className="text-purple-400 shrink-0 w-5 h-5" />
+                    <span className="text-slate-300 text-sm">Инструкция по спору с бухгалтерией</span>
+                  </li>
+                  <li className="flex items-start gap-3">
+                    <CheckCircle2 className="text-purple-400 shrink-0 w-5 h-5" />
+                    <span className="text-slate-300 text-sm">Разовый доступ на 24 часа</span>
+                  </li>
+                </ul>
+              </div>
+              <button onClick={handleStart} className="w-full bg-slate-700/50 hover:bg-purple-600 text-white py-3 rounded-xl font-medium transition-colors">
+                Выбрать тариф
+              </button>
+            </motion.div>
+
+            {/* Tier 2: Logistics */}
+            <motion.div 
+              initial={{ opacity: 0, y: 20 }}
+              whileInView={{ opacity: 1, y: 0 }}
+              viewport={{ once: true }}
+              transition={{ delay: 0.2 }}
+              className="bg-blue-900/20 border-2 border-blue-500/50 rounded-3xl p-8 hover:bg-blue-900/30 transition-all relative overflow-hidden flex flex-col transform md:-translate-y-4 shadow-2xl shadow-blue-900/20"
+            >
+              <div className="absolute top-0 right-0 w-48 h-48 bg-blue-500/10 rounded-full blur-[40px]" />
+              <div className="absolute top-4 right-4 bg-blue-500 text-white text-xs font-bold px-3 py-1 rounded-full uppercase tracking-wider">
+                Популярный
+              </div>
+              <div className="relative z-10 flex-1">
+                <h3 className="text-2xl font-bold text-white mb-2">Для тыловиков</h3>
+                <div className="flex items-baseline gap-2 mb-6">
+                  <span className="text-4xl font-bold text-white">990</span>
+                  <span className="text-slate-400">руб. / мес.</span>
+                </div>
+                <p className="text-blue-300 font-medium text-sm mb-6 leading-relaxed bg-blue-500/10 p-3 rounded-xl border border-blue-500/20">
+                  Что лучше: отдать 990 руб. в месяц за точные расчеты или получить начет на десятки тысяч штрафа по итогам ревизии КРО из-за ручной ошибки?
+                </p>
+                <ul className="space-y-4 mb-8">
+                  <li className="flex items-start gap-3">
+                    <CheckCircle2 className="text-blue-400 shrink-0 w-5 h-5" />
+                    <span className="text-slate-300 text-sm">Безлимитная генерация справок</span>
+                  </li>
+                  <li className="flex items-start gap-3">
+                    <CheckCircle2 className="text-blue-400 shrink-0 w-5 h-5" />
+                    <span className="text-slate-300 text-sm">Облачный архив на всех сотрудников</span>
+                  </li>
+                  <li className="flex items-start gap-3">
+                    <CheckCircle2 className="text-blue-400 shrink-0 w-5 h-5" />
+                    <span className="text-slate-300 text-sm">Гарантия точности по приказам</span>
+                  </li>
+                  <li className="flex items-start gap-3">
+                    <CheckCircle2 className="text-blue-400 shrink-0 w-5 h-5" />
+                    <span className="text-slate-300 text-sm">1 месяц PRO в подарок за друга</span>
+                  </li>
+                </ul>
+              </div>
+              <button onClick={handleStart} className="w-full bg-blue-600 hover:bg-blue-500 text-white py-3 rounded-xl font-medium transition-colors shadow-lg shadow-blue-600/20">
+                Оформить подписку
+              </button>
+            </motion.div>
+
+            {/* Tier 3: Auditors */}
+            <motion.div 
+              initial={{ opacity: 0, y: 20 }}
+              whileInView={{ opacity: 1, y: 0 }}
+              viewport={{ once: true }}
+              transition={{ delay: 0.3 }}
+              className="bg-slate-800/40 border border-slate-700/50 rounded-3xl p-8 hover:bg-slate-800/60 transition-all hover:border-green-500/30 relative overflow-hidden flex flex-col"
+            >
+              <div className="absolute top-0 right-0 w-32 h-32 bg-green-500/10 rounded-full blur-[40px]" />
+              <div className="relative z-10 flex-1">
+                <h3 className="text-2xl font-bold text-white mb-2">Для КРО и ревизоров</h3>
+                <div className="flex items-baseline gap-2 mb-6">
+                  <span className="text-4xl font-bold text-white">2990</span>
+                  <span className="text-slate-400">руб. / полгода</span>
+                </div>
+                <p className="text-green-400 font-medium text-sm mb-6 leading-relaxed bg-green-500/10 p-3 rounded-xl border border-green-500/20">
+                  Сэкономьте десятки часов рутинной работы. Проверьте 20 чужих справок-расчетов за 10 минут и моментально выявите незаконные переплаты или недоплаты.
+                </p>
+                <ul className="space-y-4 mb-8">
+                  <li className="flex items-start gap-3">
+                    <CheckCircle2 className="text-green-400 shrink-0 w-5 h-5" />
+                    <span className="text-slate-300 text-sm">Все функции PRO тарифа</span>
+                  </li>
+                  <li className="flex items-start gap-3">
+                    <CheckCircle2 className="text-green-400 shrink-0 w-5 h-5" />
+                    <span className="text-slate-300 text-sm">Быстрый аудит чужих расчетов</span>
+                  </li>
+                  <li className="flex items-start gap-3">
+                    <CheckCircle2 className="text-green-400 shrink-0 w-5 h-5" />
+                    <span className="text-slate-300 text-sm">Массовое выявление ошибок</span>
+                  </li>
+                  <li className="flex items-start gap-3">
+                    <CheckCircle2 className="text-green-400 shrink-0 w-5 h-5" />
+                    <span className="text-slate-300 text-sm">Выгодная цена за 6 месяцев</span>
+                  </li>
+                </ul>
+              </div>
+              <button onClick={handleStart} className="w-full bg-slate-700/50 hover:bg-green-600 text-white py-3 rounded-xl font-medium transition-colors">
+                Получить доступ
+              </button>
+            </motion.div>
+
+          </div>
+        </div>
+      </section>
+
       {/* Footer */}
       <footer className="relative z-10 border-t border-slate-800 bg-slate-950 py-12 text-center px-4">
         <div className="max-w-7xl mx-auto flex flex-col items-center gap-6">

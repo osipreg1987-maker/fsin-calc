@@ -65,7 +65,8 @@ bot.start(async (ctx) => {
             ctx.reply("❌ Произошла ошибка: " + String(e));
         }
     } else {
-        const webAppUrl = process.env.NEXT_PUBLIC_SITE_URL || 'https://fsin-calc.vercel.app';
+        const baseUrl = process.env.NEXT_PUBLIC_SITE_URL || 'https://fsin-calc.vercel.app';
+        const webAppUrl = `${baseUrl}/calc`;
         const mainMenu = Markup.keyboard([
             [Markup.button.webApp('🧮 Открыть калькулятор', webAppUrl)],
             ['📂 Мои расчеты', '❓ Частые вопросы'],
@@ -196,7 +197,8 @@ bot.command('broadcast', async (ctx) => {
 
 // Команда /calc
 bot.command('calc', (ctx) => {
-    const webAppUrl = process.env.NEXT_PUBLIC_SITE_URL || 'https://fsin-calc.vercel.app';
+    const baseUrl = process.env.NEXT_PUBLIC_SITE_URL || 'https://fsin-calc.vercel.app';
+    const webAppUrl = `${baseUrl}/calc`;
     const mainMenu = Markup.keyboard([
         [Markup.button.webApp('🧮 Открыть калькулятор', webAppUrl)],
         ['📂 Мои расчеты', '❓ Частые вопросы'],

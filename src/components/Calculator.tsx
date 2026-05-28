@@ -41,7 +41,7 @@ export default function Calculator() {
   const [proModalTitle, setProModalTitle] = useState('');
   const [isTwa, setIsTwa] = useState(false);
 
-  const { user, subscription, signOut } = useAuth();
+  const { user, subscription, signOut, isLoading } = useAuth();
   const router = useRouter();
 
   const isPro = subscription?.is_pro || false;
@@ -276,7 +276,12 @@ export default function Calculator() {
       {!isTwa && (
       <div className="flex flex-col md:flex-row justify-between items-start md:items-center gap-4 mb-6">
           <div className="flex items-center gap-3">
-              {user ? (
+              {isLoading ? (
+                  <div className="bg-slate-800/50 border border-slate-700/50 text-slate-400 px-5 py-2 rounded-xl flex items-center gap-2 animate-pulse">
+                      <div className="w-4 h-4 rounded-full bg-slate-700"></div>
+                      <span className="text-sm">Загрузка...</span>
+                  </div>
+              ) : user ? (
                   <div className="bg-slate-800/50 border border-slate-700/50 backdrop-blur-xl px-4 py-2 rounded-xl flex items-center gap-3">
                       <div className="w-8 h-8 bg-indigo-600 rounded-full flex items-center justify-center">
                           <User size={16} className="text-white" />

@@ -379,24 +379,24 @@ export default function LandingPage() {
                   <span className="text-slate-400">руб. / за 6 мес.</span>
                 </div>
                 <p className="text-green-400 font-medium text-sm mb-6 leading-relaxed bg-green-500/10 p-3 rounded-xl border border-green-500/20">
-                  Выгодное предложение! Оплатите доступ сразу на полгода и получите существенную скидку. Все преимущества PRO-тарифа по лучшей цене.
+                  Идеальное решение для ревизоров (КРО). Экономьте десятки часов на рутинных проверках. Находите любые ошибки в расчетах за считанные секунды!
                 </p>
                 <ul className="space-y-4 mb-8">
                   <li className="flex items-start gap-3">
                     <CheckCircle2 className="text-green-400 shrink-0 w-5 h-5" />
-                    <span className="text-slate-300 text-sm">Все функции PRO тарифа</span>
+                    <span className="text-slate-300 text-sm">Десятки часов сэкономленного времени</span>
                   </li>
                   <li className="flex items-start gap-3">
                     <CheckCircle2 className="text-green-400 shrink-0 w-5 h-5" />
-                    <span className="text-slate-300 text-sm">Быстрый аудит чужих расчетов</span>
+                    <span className="text-slate-300 text-sm">Проверьте 20 справок за 10 минут</span>
                   </li>
                   <li className="flex items-start gap-3">
                     <CheckCircle2 className="text-green-400 shrink-0 w-5 h-5" />
-                    <span className="text-slate-300 text-sm">Массовое выявление ошибок</span>
+                    <span className="text-slate-300 text-sm">Мгновенный поиск ошибок в расчетах</span>
                   </li>
                   <li className="flex items-start gap-3">
                     <CheckCircle2 className="text-green-400 shrink-0 w-5 h-5" />
-                    <span className="text-slate-300 text-sm">Выгодная цена за 6 месяцев</span>
+                    <span className="text-slate-300 text-sm">Все функции PRO тарифа на 6 мес.</span>
                   </li>
                 </ul>
               </div>

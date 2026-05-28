@@ -154,10 +154,10 @@ export default function ProPage() {
             <div className="text-3xl font-bold text-white mb-6">2990 ₽ <span className="text-lg text-slate-400 font-normal">/ за 6 мес</span></div>
             
             <div className="space-y-4 mb-8 flex-1">
-              <Feature text="Все функции PRO тарифа" included />
-              <Feature text="Быстрый аудит чужих расчетов" included />
-              <Feature text="Массовое выявление ошибок" included />
-              <Feature text="Существенная скидка" included />
+              <Feature text="Десятки часов сэкономленного времени" included />
+              <Feature text="Проверьте 20 справок за 10 минут" included />
+              <Feature text="Мгновенный поиск ошибок в расчетах" included />
+              <Feature text="Все функции PRO тарифа на 6 мес." included />
             </div>
             
             <button 

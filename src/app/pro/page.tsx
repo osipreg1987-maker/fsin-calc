@@ -13,21 +13,21 @@ export default function ProPage() {
 
   const isPro = subscription?.is_pro;
 
-  const handleCheckout = async () => {
+  const handleCheckout = async (planType: string = 'monthly') => {
     if (!user) {
       router.push('/auth');
       return;
     }
     
     setIsLoading(true);
-    // TODO: Вызов API ЮKassa для создания платежа
     try {
       const res = await fetch('/api/checkout', {
         method: 'POST',
+        body: JSON.stringify({ planType }),
       });
       const data = await res.json();
       if (data.url) {
-        window.location.href = data.url; // Перенаправление на оплату
+        window.location.href = data.url; 
       } else {
         alert("Ошибка при создании платежа");
       }
@@ -49,7 +49,7 @@ export default function ProPage() {
         <span className="hidden sm:inline">Вернуться в калькулятор</span>
       </button>
 
-      <div className="max-w-4xl mx-auto mt-16 relative z-0">
+      <div className="max-w-6xl mx-auto mt-16 relative z-0">
         <div className="text-center mb-12">
           <motion.div 
             initial={{ scale: 0 }} 
@@ -71,69 +71,102 @@ export default function ProPage() {
             transition={{ delay: 0.1 }}
             className="text-lg text-slate-400 max-w-2xl mx-auto"
           >
-            Раскройте весь потенциал калькулятора. Сохраняйте неограниченное количество расчетов, скачивайте официальные справки и экономьте часы работы.
+            Выберите подходящий формат работы, сохраняйте неограниченное количество расчетов и экономьте часы работы.
           </motion.p>
         </div>
 
-        <div className="grid md:grid-cols-2 gap-8 max-w-3xl mx-auto">
-          {/* Free Tier */}
+        <div className="grid md:grid-cols-3 gap-8 max-w-6xl mx-auto">
+          {/* Tier 1 */}
           <motion.div 
             initial={{ x: -20, opacity: 0 }} 
             animate={{ x: 0, opacity: 1 }} 
             transition={{ delay: 0.2 }}
-            className="bg-slate-900 border border-slate-800 rounded-3xl p-8"
+            className="bg-slate-900 border border-slate-800 rounded-3xl p-8 flex flex-col"
           >
-            <div className="text-xl font-semibold text-white mb-2">Базовый</div>
-            <div className="text-3xl font-bold text-slate-500 mb-6">Бесплатно</div>
+            <div className="text-xl font-semibold text-purple-400 mb-2">Разовый</div>
+            <div className="text-3xl font-bold text-white mb-6">390 ₽ <span className="text-lg text-slate-400 font-normal">/ разово</span></div>
             
-            <div className="space-y-4 mb-8">
-              <Feature text="Базовый расчет выслуги" included />
-              <Feature text="До 1 расчета в облачном архиве" included />
-              <Feature text="Сложные составные периоды" included={false} />
-              <Feature text="Выгрузка справок в Excel" included={false} />
+            <div className="space-y-4 mb-8 flex-1">
+              <Feature text="Excel-справка с обоснованием" included />
+              <Feature text="Шаблон правильного рапорта" included />
+              <Feature text="Инструкция по спору" included />
+              <Feature text="Доступ на 24 часа" included />
+              <Feature text="Облачный архив" included={false} />
             </div>
             
-            <div className="w-full py-3 px-4 rounded-xl border border-slate-700 text-center text-slate-500 font-medium">
-              Текущий тариф
-            </div>
+            <button 
+                onClick={() => handleCheckout('single')}
+                disabled={isLoading}
+                className="w-full bg-slate-800 hover:bg-slate-700 text-white font-bold py-3.5 px-4 rounded-xl flex items-center justify-center transition-all disabled:opacity-70 border border-slate-700"
+            >
+                {isLoading ? 'Загрузка...' : 'Оформить доступ'}
+            </button>
           </motion.div>
 
-          {/* Pro Tier */}
+          {/* Tier 2 */}
           <motion.div 
-            initial={{ x: 20, opacity: 0 }} 
-            animate={{ x: 0, opacity: 1 }} 
+            initial={{ y: 20, opacity: 0 }} 
+            animate={{ y: 0, opacity: 1 }} 
             transition={{ delay: 0.3 }}
-            className="bg-slate-800 border-2 border-amber-500/50 rounded-3xl p-8 relative shadow-[0_0_30px_rgba(245,158,11,0.1)] overflow-hidden"
+            className="bg-slate-800 border-2 border-blue-500/50 rounded-3xl p-8 relative shadow-[0_0_30px_rgba(59,130,246,0.15)] overflow-hidden flex flex-col"
           >
-            <div className="absolute top-0 right-0 bg-amber-500 text-slate-900 text-xs font-bold px-3 py-1 rounded-bl-lg">
+            <div className="absolute top-0 right-0 bg-blue-500 text-white text-xs font-bold px-3 py-1 rounded-bl-lg">
               ПОПУЛЯРНЫЙ
             </div>
             
-            <div className="text-xl font-semibold text-amber-400 mb-2 flex items-center gap-2">
-              <Crown size={20} /> Профессионал
+            <div className="text-xl font-semibold text-blue-400 mb-2 flex items-center gap-2">
+              <Crown size={20} /> Для тыловиков
             </div>
-            <div className="text-3xl font-bold text-white mb-6">390 ₽ <span className="text-lg text-slate-400 font-normal">/ мес</span></div>
+            <div className="text-3xl font-bold text-white mb-6">990 ₽ <span className="text-lg text-slate-400 font-normal">/ мес</span></div>
             
-            <div className="space-y-4 mb-8">
-              <Feature text="Всё из Базового тарифа" included />
-              <Feature text="Безлимитный облачный архив" included />
-              <Feature text="Скачивание справок в Excel" included />
-              <Feature text="Приоритетная поддержка" included />
+            <div className="space-y-4 mb-8 flex-1">
+              <Feature text="Безлимитная генерация справок" included />
+              <Feature text="Облачный архив на всех" included />
+              <Feature text="Гарантия точности по приказам" included />
+              <Feature text="1 месяц PRO в подарок за друга" included />
             </div>
             
             {isPro ? (
-               <div className="w-full py-3 px-4 rounded-xl bg-amber-500/20 text-amber-400 text-center font-medium border border-amber-500/30">
-                 PRO подписка активна!
+               <div className="w-full py-3.5 px-4 rounded-xl bg-blue-500/20 text-blue-400 text-center font-bold border border-blue-500/30">
+                 Подписка активна!
                </div>
             ) : (
                <button 
-                 onClick={handleCheckout}
+                 onClick={() => handleCheckout('monthly')}
                  disabled={isLoading}
-                 className="w-full bg-gradient-to-r from-amber-500 to-yellow-500 hover:from-amber-400 hover:to-yellow-400 text-slate-900 font-bold py-3.5 px-4 rounded-xl flex items-center justify-center gap-2 transition-all shadow-[0_0_20px_rgba(245,158,11,0.2)] disabled:opacity-70"
+                 className="w-full bg-blue-600 hover:bg-blue-500 text-white font-bold py-3.5 px-4 rounded-xl flex items-center justify-center gap-2 transition-all shadow-[0_0_20px_rgba(59,130,246,0.2)] disabled:opacity-70"
                >
                  {isLoading ? 'Загрузка...' : 'Оформить подписку'}
                </button>
             )}
+          </motion.div>
+
+          {/* Tier 3 */}
+          <motion.div 
+            initial={{ x: 20, opacity: 0 }} 
+            animate={{ x: 0, opacity: 1 }} 
+            transition={{ delay: 0.4 }}
+            className="bg-slate-900 border border-slate-800 rounded-3xl p-8 flex flex-col"
+          >
+            <div className="text-xl font-semibold text-green-400 mb-2 flex items-center gap-2">
+              PRO на 6 месяцев
+            </div>
+            <div className="text-3xl font-bold text-white mb-6">2990 ₽ <span className="text-lg text-slate-400 font-normal">/ за 6 мес</span></div>
+            
+            <div className="space-y-4 mb-8 flex-1">
+              <Feature text="Все функции PRO тарифа" included />
+              <Feature text="Быстрый аудит чужих расчетов" included />
+              <Feature text="Массовое выявление ошибок" included />
+              <Feature text="Существенная скидка" included />
+            </div>
+            
+            <button 
+                onClick={() => handleCheckout('half-year')}
+                disabled={isLoading}
+                className="w-full bg-slate-800 hover:bg-slate-700 text-white font-bold py-3.5 px-4 rounded-xl flex items-center justify-center transition-all disabled:opacity-70 border border-slate-700"
+            >
+                {isLoading ? 'Загрузка...' : 'Оформить подписку'}
+            </button>
           </motion.div>
         </div>
 

@@ -3,7 +3,7 @@
 
 import { useState, useEffect, useMemo } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
-import { Save, LogOut, User, Download, Plus, Trash2, HelpCircle, Archive, Crown, ChevronDown, ChevronUp, Lock, Unlock, FileText } from 'lucide-react';
+import { Save, LogOut, User, Download, Plus, Trash2, HelpCircle, Archive, Crown, ChevronDown, ChevronUp, Lock, Unlock, FileText, X } from 'lucide-react';
 import { driver } from 'driver.js';
 import 'driver.js/dist/driver.css';
 import IssueLogTable from './IssueLogTable';
@@ -55,9 +55,13 @@ export default function Calculator() {
       .from('archives')
       .select('*')
       .order('created_at', { ascending: false });
-    if (!error && data) {
-      setArchive(data);
+    if (error) {
+      console.error('Ошибка загрузки архива:', error);
+      alert('Не удалось загрузить архив. Проверьте соединение и права доступа.');
+      setArchive([]);
+      return;
     }
+    setArchive(data ?? []);
   };
 
   useEffect(() => {

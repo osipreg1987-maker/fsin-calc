@@ -153,7 +153,11 @@ export const generateWordReport = async (data: any) => {
         }],
     });
 
-    Packer.toBlob(doc).then((blob) => {
+    try {
+        const blob = await Packer.toBlob(doc);
         saveAs(blob, "Рапорт_на_компенсацию.docx");
-    });
+    } catch (e: any) {
+        console.error("Error generating report:", e);
+        alert("Ошибка при создании рапорта: " + e.message);
+    }
 };

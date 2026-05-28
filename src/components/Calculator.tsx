@@ -207,13 +207,28 @@ export default function Calculator() {
           return val || fallback;
       };
 
+      let parsedPeriods = safeParse(record.periods, [{ id: 1, start: '', end: '', norm: 2 }]);
+      if (!Array.isArray(parsedPeriods) || parsedPeriods.length === 0) {
+          parsedPeriods = [{ id: 1, start: '', end: '', norm: 2 }];
+      }
+
+      let parsedTotals = safeParse(record.item_totals, {});
+      if (typeof parsedTotals !== 'object' || parsedTotals === null || Array.isArray(parsedTotals)) {
+          parsedTotals = {};
+      }
+
+      let parsedPrices = safeParse(record.custom_prices, {});
+      if (typeof parsedPrices !== 'object' || parsedPrices === null || Array.isArray(parsedPrices)) {
+          parsedPrices = {};
+      }
+
       setEmployeeFio(record.employee_fio || '');
       setEmployeeRank(record.employee_rank || '');
       setDismissalGroup(record.dismissal_group || 'V');
       setGender(record.gender || 'M');
-      setPeriods(safeParse(record.periods, [{ id: 1, start: '', end: '', norm: 2 }]));
-      setItemTotals(safeParse(record.item_totals, {}));
-      setCustomPrices(safeParse(record.custom_prices, {}));
+      setPeriods(parsedPeriods);
+      setItemTotals(parsedTotals);
+      setCustomPrices(parsedPrices);
       setIsArchiveOpen(false);
   };
   

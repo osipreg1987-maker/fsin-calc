@@ -26,7 +26,7 @@ export function useCalculatorResults({ periods, gender, itemTotals, customPrices
     // 2. Основной расчет результатов
     const results = useMemo(() => {
         const res = [];
-        if (!periods[0].start || !periods[0].end) return res;
+        if (!periods || periods.length === 0 || !periods[0] || !periods[0].start || !periods[0].end) return res;
 
         const processedPeriods = [];
         periods.forEach((p, index) => {

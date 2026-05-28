@@ -3,7 +3,9 @@
 
 import { useState, useEffect, useMemo } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
-import { Plus, Trash2, Download, Lock, Unlock, Archive, Save, X, LogOut, User, Crown, ChevronDown, ChevronUp } from 'lucide-react';
+import { Plus, Trash2, Download, Lock, Unlock, Archive, Save, X, LogOut, User, Crown, ChevronDown, ChevronUp, HelpCircle } from 'lucide-react';
+import { driver } from 'driver.js';
+import 'driver.js/dist/driver.css';
 import IssueLogTable from './IssueLogTable';
 import ResultsTable from './ResultsTable';
 import ProModal from './ProModal';
@@ -84,7 +86,35 @@ export default function Calculator() {
               tg.expand();
           }
       }
+
+      // Launch onboarding tour
+      const tourCompleted = localStorage.getItem('fsin_tour_completed');
+      if (tourCompleted !== 'true' && !(typeof window !== 'undefined' && (window as any).Telegram?.WebApp?.initData)) {
+          setTimeout(startTour, 1500);
+      }
   }, []);
+
+  const startTour = () => {
+      const driverObj = driver({
+          showProgress: true,
+          animate: true,
+          nextBtnText: 'Далее ➔',
+          prevBtnText: 'Назад',
+          doneBtnText: 'Понятно',
+          steps: [
+              { element: '#tour-employee-details', popover: { title: 'Шаг 1: Данные сотрудника', description: 'Введите ваше ФИО и основание увольнения. Эти данные никуда не отправляются и нужны только для красивого оформления итоговой Excel-справки.' } },
+              { element: '#tour-gender', popover: { title: 'Шаг 2: Укажите ваш пол', description: 'Это очень важно! Нормы положенности, а также сроки носки (особенно для офисного и полевого обмундирования) отличаются для мужчин и женщин.' } },
+              { element: '#tour-periods', popover: { title: 'Шаг 3: Периоды службы', description: 'Добавьте периоды вашей службы. Обязательно добавляйте НОВЫЙ период (через кнопку "Добавить период"), если вы переходили из Младшего начальствующего состава (МНС) в Офицеры, так как нормы для них кардинально разные!' } },
+              { element: '#tour-issue-log', popover: { title: 'Шаг 4: Арматурная карточка', description: 'Перенесите сюда данные из вашей арматурной карточки: просто выберите те вещи, которые вы ФАКТИЧЕСКИ получили на складе, и укажите год выдачи. Калькулятор сам рассчитает износ (недонос) и итоговую сумму компенсации за то, что вам недодали!' } },
+              { element: '#tour-export', popover: { title: 'Шаг 5: Выгрузка справки', description: 'Когда закончите переносить имущество, нажмите сюда. Калькулятор мгновенно сгенерирует готовую справку-расчет в формате Excel, которую можно приложить к рапорту!' } }
+          ],
+          onDestroyStarted: () => {
+              localStorage.setItem('fsin_tour_completed', 'true');
+              driverObj.destroy();
+          }
+      });
+      driverObj.drive();
+  };
 
   const sendToTelegramBot = () => {
       const tg = (window as any).Telegram.WebApp;
@@ -304,7 +334,10 @@ export default function Calculator() {
                   </button>
               )}
           </div>
-          <div className="flex flex-col md:flex-row gap-3 flex-wrap ml-auto">
+          <div className="flex flex-col md:flex-row gap-3 flex-wrap ml-auto" id="tour-export">
+              <button onClick={startTour} className="hidden md:flex items-center gap-2 text-slate-400 hover:text-indigo-400 transition-colors mr-2">
+                  <HelpCircle size={18} /> <span className="text-sm font-medium">Обучение</span>
+              </button>
               <motion.button 
                 whileHover={{ scale: 1.05 }} 
                 whileTap={{ scale: 0.95 }} 
@@ -417,7 +450,7 @@ export default function Calculator() {
             </div>
 
             {/* Employee Details Card */}
-            <div className="glass-panel rounded-2xl p-5">
+            <div id="tour-employee-details" className="glass-panel rounded-2xl p-5">
               <h2 className="text-lg font-bold text-[var(--foreground)] mb-5 flex items-center gap-2">
                 <div className="w-1.5 h-5 bg-blue-500 rounded-full"></div>
                 Данные сотрудника
@@ -458,7 +491,7 @@ export default function Calculator() {
                 </div>
                 
                 <div className="grid grid-cols-2 gap-3">
-                  <div>
+                  <div id="tour-gender">
                     <label className="block text-xs text-[var(--tw-hint)] mb-1">Пол</label>
                     <div className="flex p-1 bg-[var(--tw-bg-base)] rounded-xl border border-[var(--tw-hint)]/30">
                         <button 
@@ -490,7 +523,7 @@ export default function Calculator() {
             </div>
             
             {/* Periods Card */}
-            <div className="glass-panel rounded-2xl p-5">
+            <div id="tour-periods" className="glass-panel rounded-2xl p-5">
               <div className="flex justify-between items-center mb-5">
                   <h2 className="text-lg font-bold text-[var(--foreground)] flex items-center gap-2">
                   <div className="w-1.5 h-5 bg-indigo-500 rounded-full"></div>
@@ -571,7 +604,7 @@ export default function Calculator() {
         </div>
         
         <div className="lg:col-span-8 space-y-8">
-            <div className="bg-slate-800/50 backdrop-blur-xl rounded-2xl border border-slate-700/50 p-6 glow-box">
+            <div id="tour-issue-log" className="bg-slate-800/50 backdrop-blur-xl rounded-2xl border border-slate-700/50 p-6 glow-box">
                 <h2 className="text-xl font-bold text-white mb-6 flex items-center gap-2">
                     <div className="w-2 h-6 bg-teal-500 rounded-full"></div>
                     Журнал выдачи со склада

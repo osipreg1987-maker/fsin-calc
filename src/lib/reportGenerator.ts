@@ -1,4 +1,4 @@
-import { Document, Paragraph, TextRun, Packer, AlignmentType, HeadingLevel } from "docx";
+import { Document, Paragraph, TextRun, Packer, AlignmentType, HeadingLevel, Table, TableRow, TableCell, WidthType, BorderStyle } from "docx";
 import { saveAs } from "file-saver";
 import { declineFio, declineRank } from "./exportHelpers";
 
@@ -14,10 +14,9 @@ export const generateWordReport = async (data: any) => {
     const bossRankDative = declineRank(instData.bossRank || "начальник", "dative");
     const bossNameDative = declineFio(instData.bossName || "Иванов И.И.", "dative");
     
-    // Employee rank and name in Nominative case (or Genitive depending on style, usually "от кого: от старшего лейтенанта", but often just "старший лейтенант Осипов А.А.")
-    // Let's use Genitive for the header "от кого"
-    const employeeRankGenitive = declineRank(employeeRank || "сотрудник", "genitive");
-    const employeeFioGenitive = declineFio(employeeFio || "Сотрудник С.С.", "genitive");
+    const today = new Date();
+    const months = ["января", "февраля", "марта", "апреля", "мая", "июня", "июля", "августа", "сентября", "октября", "ноября", "декабря"];
+    const dateStr = `${today.getDate()} ${months[today.getMonth()]} ${today.getFullYear()} г.`;
 
     const doc = new Document({
         sections: [{
@@ -27,44 +26,25 @@ export const generateWordReport = async (data: any) => {
                 new Paragraph({
                     alignment: AlignmentType.RIGHT,
                     children: [
-                        new TextRun({ text: "Начальнику", size: 24, font: "Times New Roman" }),
+                        new TextRun({ text: "Начальнику", size: 28, font: "Times New Roman" }),
                     ],
                 }),
                 new Paragraph({
                     alignment: AlignmentType.RIGHT,
                     children: [
-                        new TextRun({ text: `${instData.institution} ${instData.region}`, size: 24, font: "Times New Roman" }),
+                        new TextRun({ text: `${instData.institution || "Учреждение"} ${instData.region || "регион"}`, size: 28, font: "Times New Roman" }),
                     ],
                 }),
                 new Paragraph({
                     alignment: AlignmentType.RIGHT,
                     children: [
-                        new TextRun({ text: `${bossRankDative}`, size: 24, font: "Times New Roman" }),
+                        new TextRun({ text: `${bossRankDative}`, size: 28, font: "Times New Roman" }),
                     ],
                 }),
                 new Paragraph({
                     alignment: AlignmentType.RIGHT,
                     children: [
-                        new TextRun({ text: `${bossNameDative}`, size: 24, font: "Times New Roman" }),
-                    ],
-                }),
-                new Paragraph({ text: "", spacing: { after: 200 } }), // Blank line
-                new Paragraph({
-                    alignment: AlignmentType.RIGHT,
-                    children: [
-                        new TextRun({ text: "от", size: 24, font: "Times New Roman" }),
-                    ],
-                }),
-                new Paragraph({
-                    alignment: AlignmentType.RIGHT,
-                    children: [
-                        new TextRun({ text: `${employeeRankGenitive}`, size: 24, font: "Times New Roman" }),
-                    ],
-                }),
-                new Paragraph({
-                    alignment: AlignmentType.RIGHT,
-                    children: [
-                        new TextRun({ text: `${employeeFioGenitive}`, size: 24, font: "Times New Roman" }),
+                        new TextRun({ text: `${bossNameDative}`, size: 28, font: "Times New Roman" }),
                     ],
                 }),
                 new Paragraph({ text: "", spacing: { after: 400 } }), // Blank line
@@ -72,7 +52,6 @@ export const generateWordReport = async (data: any) => {
                 // Title
                 new Paragraph({
                     alignment: AlignmentType.CENTER,
-                    heading: HeadingLevel.HEADING_1,
                     children: [
                         new TextRun({ text: "РАПОРТ", size: 32, font: "Times New Roman", bold: true }),
                     ],
@@ -124,29 +103,50 @@ export const generateWordReport = async (data: any) => {
                 }),
                 new Paragraph({ text: "", spacing: { after: 600 } }), // Blank line
 
-                // Footer
+                // Footer - Employee Info
                 new Paragraph({
                     children: [
-                        new TextRun({ text: `${employeeRank || "Сотрудник"}`, size: 28, font: "Times New Roman" }),
+                        new TextRun({ text: `[Ваша должность] ${instData.institution || "Учреждение"}`, size: 28, font: "Times New Roman" }),
                     ],
                 }),
+                new Paragraph({
+                    children: [
+                        new TextRun({ text: `${instData.region || "регион"}`, size: 28, font: "Times New Roman" }),
+                    ],
+                }),
+                
+                // Signature Table
+                new Table({
+                    width: { size: 100, type: WidthType.PERCENTAGE },
+                    borders: {
+                        top: { style: BorderStyle.NONE, size: 0, color: "auto" },
+                        bottom: { style: BorderStyle.NONE, size: 0, color: "auto" },
+                        left: { style: BorderStyle.NONE, size: 0, color: "auto" },
+                        right: { style: BorderStyle.NONE, size: 0, color: "auto" },
+                        insideHorizontal: { style: BorderStyle.NONE, size: 0, color: "auto" },
+                        insideVertical: { style: BorderStyle.NONE, size: 0, color: "auto" },
+                    },
+                    rows: [
+                        new TableRow({
+                            children: [
+                                new TableCell({
+                                    children: [new Paragraph({ children: [new TextRun({ text: employeeRank || "Сотрудник", size: 28, font: "Times New Roman" })] })]
+                                }),
+                                new TableCell({
+                                    children: [new Paragraph({ alignment: AlignmentType.CENTER, children: [new TextRun({ text: "____________", size: 28, font: "Times New Roman" })] })]
+                                }),
+                                new TableCell({
+                                    children: [new Paragraph({ alignment: AlignmentType.RIGHT, children: [new TextRun({ text: employeeFio || "ФИО", size: 28, font: "Times New Roman" })] })]
+                                }),
+                            ]
+                        })
+                    ]
+                }),
+
                 new Paragraph({ text: "", spacing: { after: 200 } }), // Blank line
                 new Paragraph({
-                    alignment: AlignmentType.LEFT,
                     children: [
-                        new TextRun({ text: "____________________ / ____________________ /", size: 28, font: "Times New Roman" }),
-                    ],
-                }),
-                new Paragraph({
-                    alignment: AlignmentType.LEFT,
-                    children: [
-                        new TextRun({ text: "(подпись)                              (ФИО)", size: 20, font: "Times New Roman" }),
-                    ],
-                }),
-                new Paragraph({ text: "", spacing: { after: 200 } }), // Blank line
-                new Paragraph({
-                    children: [
-                        new TextRun({ text: `"_____" ______________ 20___ г.`, size: 28, font: "Times New Roman" }),
+                        new TextRun({ text: dateStr, size: 28, font: "Times New Roman" }),
                     ],
                 }),
             ],

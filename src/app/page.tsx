@@ -86,74 +86,101 @@ export default function LandingPage() {
         </motion.div>
       </section>
 
-      {/* Bento Grid: Pain Points */}
+      {/* Bento Grid: Target Audiences */}
       <section id="about" className="relative z-10 py-24 bg-slate-900/50 border-y border-slate-800 backdrop-blur-sm">
         <div className="max-w-7xl mx-auto px-4">
           <motion.div 
             initial={{ opacity: 0, y: 20 }}
             whileInView={{ opacity: 1, y: 0 }}
             viewport={{ once: true }}
-            className="mb-16"
+            className="mb-16 text-center md:text-left"
           >
-            <span className="text-blue-400 font-bold tracking-wider uppercase text-sm">Проблема</span>
+            <span className="text-blue-400 font-bold tracking-wider uppercase text-sm">Кому полезен калькулятор?</span>
             <h2 className="text-4xl md:text-5xl font-bold mt-2">
-              Сталкиваетесь с этим <br className="hidden md:block" />
-              <span className="text-slate-500">при оформлении рапорта?</span>
+              Решение реальных проблем <br className="hidden md:block" />
+              <span className="text-slate-500">для каждой задачи</span>
             </h2>
           </motion.div>
           
-          <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
-            {/* Big Card */}
+          <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
+            {/* Audience 1: Logistics (Тыл) */}
             <motion.div 
               initial={{ opacity: 0, scale: 0.95 }}
               whileInView={{ opacity: 1, scale: 1 }}
               viewport={{ once: true }}
               transition={{ delay: 0.1 }}
-              className="md:col-span-2 bg-slate-800/40 border border-slate-700/50 p-8 rounded-3xl hover:bg-slate-800/60 transition-all hover:border-blue-500/30 group overflow-hidden relative"
+              className="bg-slate-800/40 border border-slate-700/50 p-8 rounded-3xl hover:bg-slate-800/60 transition-all hover:border-blue-500/30 group overflow-hidden relative flex flex-col"
             >
-              <div className="absolute top-0 right-0 w-64 h-64 bg-blue-500/10 rounded-full blur-[80px] group-hover:bg-blue-500/20 transition-colors" />
-              <div className="relative z-10">
-                <div className="w-16 h-16 bg-blue-500/20 text-blue-400 flex items-center justify-center rounded-2xl mb-6">
-                  <Calculator size={32} />
+              <div className="absolute top-0 right-0 w-32 h-32 bg-blue-500/10 rounded-full blur-[40px] group-hover:bg-blue-500/20 transition-colors" />
+              <div className="relative z-10 flex-1">
+                <div className="w-14 h-14 bg-blue-500/20 text-blue-400 flex items-center justify-center rounded-2xl mb-6">
+                  <Calculator size={28} />
                 </div>
-                <h3 className="text-2xl font-bold text-white mb-4">Сложная бюрократия</h3>
-                <p className="text-slate-400 text-lg max-w-md leading-relaxed">Самостоятельный расчет по запутанным таблицам приказов и нормам положенности занимает часы и часто ведет к ошибкам.</p>
+                <h3 className="text-2xl font-bold text-white mb-4">Сотрудникам тыловых служб</h3>
+                <div className="space-y-4">
+                  <div>
+                    <span className="text-red-400 text-sm font-bold uppercase tracking-wider block mb-1">Боль:</span>
+                    <p className="text-slate-400 text-sm leading-relaxed">Ручной расчет одной справки-компенсации занимает от 1 до 3 часов. Сверка сроков носки по десяткам позиций выматывает.</p>
+                  </div>
+                  <div>
+                    <span className="text-green-400 text-sm font-bold uppercase tracking-wider block mb-1">Решение:</span>
+                    <p className="text-slate-300 text-sm leading-relaxed">Автоматическая генерация готовой Excel-справки за 2 минуты без математических ошибок и опечаток.</p>
+                  </div>
+                </div>
               </div>
             </motion.div>
 
-            {/* Small Card 1 */}
+            {/* Audience 2: Retiring/Leaving */}
             <motion.div 
               initial={{ opacity: 0, scale: 0.95 }}
               whileInView={{ opacity: 1, scale: 1 }}
               viewport={{ once: true }}
               transition={{ delay: 0.2 }}
-              className="bg-slate-800/40 border border-slate-700/50 p-8 rounded-3xl hover:bg-slate-800/60 transition-all hover:border-purple-500/30 group relative overflow-hidden"
+              className="bg-slate-800/40 border border-slate-700/50 p-8 rounded-3xl hover:bg-slate-800/60 transition-all hover:border-purple-500/30 group relative overflow-hidden flex flex-col"
             >
               <div className="absolute top-0 right-0 w-32 h-32 bg-purple-500/10 rounded-full blur-[40px] group-hover:bg-purple-500/20 transition-colors" />
-              <div className="relative z-10">
-                <div className="w-12 h-12 bg-purple-500/20 text-purple-400 flex items-center justify-center rounded-xl mb-6">
-                  <Clock size={24} />
+              <div className="relative z-10 flex-1">
+                <div className="w-14 h-14 bg-purple-500/20 text-purple-400 flex items-center justify-center rounded-2xl mb-6">
+                  <Clock size={28} />
                 </div>
-                <h3 className="text-xl font-bold text-white mb-3">Ошибки бухгалтерии</h3>
-                <p className="text-slate-400 leading-relaxed">Ощущение, что финчасть занижает суммы или использует старые справки-расчеты.</p>
+                <h3 className="text-2xl font-bold text-white mb-4">Увольняющимся сотрудникам</h3>
+                <div className="space-y-4">
+                  <div>
+                    <span className="text-red-400 text-sm font-bold uppercase tracking-wider block mb-1">Боль:</span>
+                    <p className="text-slate-400 text-sm leading-relaxed">Страх, что бухгалтерия или тыл недосчитали компенсацию, и вы потеряете честно заработанные десятки тысяч рублей.</p>
+                  </div>
+                  <div>
+                    <span className="text-green-400 text-sm font-bold uppercase tracking-wider block mb-1">Решение:</span>
+                    <p className="text-slate-300 text-sm leading-relaxed">Возможность самостоятельно и анонимно проверить правильность расчетов перед подписанием рапорта.</p>
+                  </div>
+                </div>
               </div>
             </motion.div>
 
-            {/* Small Card 2 */}
+            {/* Audience 3: Auditors/Inspectors */}
             <motion.div 
               initial={{ opacity: 0, scale: 0.95 }}
               whileInView={{ opacity: 1, scale: 1 }}
               viewport={{ once: true }}
               transition={{ delay: 0.3 }}
-              className="md:col-span-3 lg:col-span-1 bg-slate-800/40 border border-slate-700/50 p-8 rounded-3xl hover:bg-slate-800/60 transition-all hover:border-green-500/30 group relative overflow-hidden"
+              className="bg-slate-800/40 border border-slate-700/50 p-8 rounded-3xl hover:bg-slate-800/60 transition-all hover:border-green-500/30 group relative overflow-hidden flex flex-col"
             >
               <div className="absolute top-0 right-0 w-32 h-32 bg-green-500/10 rounded-full blur-[40px] group-hover:bg-green-500/20 transition-colors" />
-              <div className="relative z-10 flex flex-col h-full">
-                <div className="w-12 h-12 bg-green-500/20 text-green-400 flex items-center justify-center rounded-xl mb-6">
-                  <FileText size={24} />
+              <div className="relative z-10 flex-1">
+                <div className="w-14 h-14 bg-green-500/20 text-green-400 flex items-center justify-center rounded-2xl mb-6">
+                  <ShieldCheck size={28} />
                 </div>
-                <h3 className="text-xl font-bold text-white mb-3">Возврат документов</h3>
-                <p className="text-slate-400 leading-relaxed">Малейшая ошибка в расчетах приводит к возврату рапорта и затягиванию выплат.</p>
+                <h3 className="text-2xl font-bold text-white mb-4">Ревизорам и сотрудникам КРО</h3>
+                <div className="space-y-4">
+                  <div>
+                    <span className="text-red-400 text-sm font-bold uppercase tracking-wider block mb-1">Боль:</span>
+                    <p className="text-slate-400 text-sm leading-relaxed">Долгая и муторная проверка чужих расчетов на предмет незаконных переплат или недоплат из бюджета.</p>
+                  </div>
+                  <div>
+                    <span className="text-green-400 text-sm font-bold uppercase tracking-wider block mb-1">Решение:</span>
+                    <p className="text-slate-300 text-sm leading-relaxed">Быстрый аудит и перерасчет "в два клика" для выявления нарушений в уже насчитанных справках.</p>
+                  </div>
+                </div>
               </div>
             </motion.div>
           </div>
@@ -182,15 +209,29 @@ export default function LandingPage() {
                 <div className="bg-slate-800/40 border border-slate-700/50 p-6 rounded-2xl flex gap-4 transition-all hover:bg-slate-800/60">
                   <CheckCircle2 className="text-green-400 shrink-0 mt-1" />
                   <div>
-                    <strong className="text-white block text-lg mb-1">Приказ Минюста РФ № 211</strong>
-                    <span className="text-slate-400 leading-relaxed">Об утверждении Порядка обеспечения вещевым имуществом сотрудников УИС (сроки носки и нормы положенности).</span>
+                    <strong className="text-white block text-lg mb-1">Постановление Правительства РФ № 150</strong>
+                    <span className="text-slate-400 leading-relaxed text-sm">От 10.02.2021 «О вещевом обеспечении сотрудников УИС». Основные правила выдачи форменной одежды и выплат.</span>
                   </div>
                 </div>
                 <div className="bg-slate-800/40 border border-slate-700/50 p-6 rounded-2xl flex gap-4 transition-all hover:bg-slate-800/60">
                   <CheckCircle2 className="text-green-400 shrink-0 mt-1" />
                   <div>
-                    <strong className="text-white block text-lg mb-1">Ежегодные Распоряжения ФСИН</strong>
-                    <span className="text-slate-400 leading-relaxed">Актуальная база данных справок-расчетов стоимости предметов вещевого имущества.</span>
+                    <strong className="text-white block text-lg mb-1">Постановление Правительства РФ № 789</strong>
+                    <span className="text-slate-400 leading-relaxed text-sm">От 22.12.2006 «Об утверждении Правил обеспечения вещевым имуществом сотрудников УИС».</span>
+                  </div>
+                </div>
+                <div className="bg-slate-800/40 border border-slate-700/50 p-6 rounded-2xl flex gap-4 transition-all hover:bg-slate-800/60">
+                  <CheckCircle2 className="text-green-400 shrink-0 mt-1" />
+                  <div>
+                    <strong className="text-white block text-lg mb-1">Приказ Минюста РФ № 211 и Приказ ФСИН № 676</strong>
+                    <span className="text-slate-400 leading-relaxed text-sm">Об утверждении Порядка обеспечения вещевым имуществом. Регламентируют точные сроки носки и нормы снабжения.</span>
+                  </div>
+                </div>
+                <div className="bg-slate-800/40 border border-slate-700/50 p-6 rounded-2xl flex gap-4 transition-all hover:bg-slate-800/60">
+                  <CheckCircle2 className="text-green-400 shrink-0 mt-1" />
+                  <div>
+                    <strong className="text-white block text-lg mb-1">Распоряжения ФСИН России</strong>
+                    <span className="text-slate-400 leading-relaxed text-sm">Ежегодно обновляемая база данных размеров денежной компенсации за предметы вещевого имущества.</span>
                   </div>
                 </div>
               </div>

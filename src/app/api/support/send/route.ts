@@ -78,10 +78,14 @@ export async function POST(req: Request) {
         }
 
         // 3. Отправляем сообщение в Telegram админ-группу через простой fetch
-        const tgText = `🌐 **Обращение с сайта** #chat_${chat.id}\n\n` +
-                       `👤 **Имя:** ${name}\n` +
-                       `✉️ **Связь:** ${contact}\n` +
-                       `💬 **Вопрос:** ${message}`;
+        const safeName = String(name).replace(/</g, '&lt;').replace(/>/g, '&gt;');
+        const safeContact = String(contact).replace(/</g, '&lt;').replace(/>/g, '&gt;');
+        const safeMessage = String(message).replace(/</g, '&lt;').replace(/>/g, '&gt;');
+
+        const tgText = `🌐 <b>Обращение с сайта</b> #chat_${chat.id}\n\n` +
+                       `👤 <b>Имя:</b> ${safeName}\n` +
+                       `✉️ <b>Связь:</b> ${safeContact}\n` +
+                       `💬 <b>Вопрос:</b> ${safeMessage}`;
 
         const tgRes = await fetch(`https://api.telegram.org/bot${botToken}/sendMessage`, {
             method: 'POST',
@@ -89,14 +93,13 @@ export async function POST(req: Request) {
             body: JSON.stringify({
                 chat_id: supportChatId,
                 text: tgText,
-                parse_mode: 'Markdown'
+                parse_mode: 'HTML'
             })
         });
 
         if (!tgRes.ok) {
             const errBody = await tgRes.text();
             console.error('Failed to send telegram notification:', errBody);
-            // Мы не возвращаем ошибку клиенту, так как сообщение уже сохранено в базе
         }
 
         return NextResponse.json({ ok: true, message: newMsg });

@@ -213,7 +213,7 @@ export const generateExcelHtml = (type, data) => {
             if (safeName.toLowerCase().includes('костюм') || safeName.toLowerCase().includes('белье')) unit = 'к-т';
             if (safeName.toLowerCase().includes('ботинки') || safeName.toLowerCase().includes('полусапоги') || safeName.toLowerCase().includes('носки') || safeName.toLowerCase().includes('перчатки') || safeName.toLowerCase().includes('сапоги')) unit = 'пар.';
             
-            let qty = Math.round((r.comp || 0) / (r.price || 1));
+            let qty = (r.comp || 0) / (r.price || 1);
             let earnedQty = r.earnedQty || 0;
             let amortQty = (r.amortMoney || 0) / (r.price || 1);
             let totalDeductions = (r.issuedCount || 0) + amortQty;
@@ -227,7 +227,7 @@ export const generateExcelHtml = (type, data) => {
                     <td>-</td>
                     <td style="mso-number-format:'0.00';">${earnedQty.toFixed(2).replace('.', ',')}</td>
                     <td style="mso-number-format:'0.00';">${totalDeductions > 0 ? totalDeductions.toFixed(2).replace('.', ',') : '-'}</td>
-                    <td class="bold red" style="mso-number-format:'0';">${qty}</td>
+                    <td class="bold red" style="mso-number-format:'0.00';">${qty.toFixed(2).replace('.', ',')}</td>
                     <td style="mso-number-format:'0.00';">${r.price || 0}</td>
                     <td class="bold red" style="mso-number-format:'0.00';">${(r.comp || 0).toFixed(2).replace('.', ',')}</td>
                 </tr>
@@ -301,16 +301,16 @@ export const generateExcelHtml = (type, data) => {
         });
 
         const totalSum = targetResults.reduce((sum: number, r: any) => sum + r.comp, 0);
-        const totalQty = targetResults.reduce((sum: number, r: any) => sum + Math.round(r.comp / r.price), 0);
+        const totalQty = targetResults.reduce((sum: number, r: any) => sum + (r.comp / r.price), 0);
 
         html += `
                 <tr class="bg-header">
                     <td colspan="7" class="right bold">Итого к выплате:</td>
-                    <td class="bold red center" style="mso-number-format:'0';">${totalQty}</td>
+                    <td class="bold red center" style="mso-number-format:'0.00';">${totalQty.toFixed(2).replace('.', ',')}</td>
                     <td style="border: none;"></td>
                     <td class="bold red" style="mso-number-format:'0.00';">${totalSum.toFixed(2).replace('.', ',')}</td>
                 </tr>
-                <tr><td colspan="10" class="center bold">Итого начислено компенсаций к выплате: ${totalQty} предметов на сумму ${totalSum.toFixed(2).replace('.', ',')} руб.</td></tr>
+                <tr><td colspan="10" class="center bold">Итого начислено компенсаций к выплате: ${totalQty.toFixed(2).replace('.', ',')} предметов на сумму ${totalSum.toFixed(2).replace('.', ',')} руб.</td></tr>
                 
                 <tr><td colspan="10" style="border: none;"></td></tr>
                 <tr><td colspan="10" style="border: none;" class="left italic">Расчет является официальной справкой-обоснованием, составлен строго в соответствии с нормами вещевого снабжения ФСИН РФ и формулами пропорционального исчисления сроков носки.</td></tr>

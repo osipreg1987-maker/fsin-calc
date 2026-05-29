@@ -466,6 +466,52 @@ export default function Calculator() {
           </motion.div>
       </div>
 
+      {/* Export Section */}
+      {!isTwa && (
+      <div className="flex flex-col md:flex-row gap-3 flex-wrap justify-end items-center mt-2 mb-8" id="tour-export">
+          <button onClick={startTour} className="hidden md:flex items-center gap-2 text-slate-400 hover:text-indigo-400 transition-colors mr-2">
+              <HelpCircle size={18} /> <span className="text-sm font-medium">Обучение</span>
+          </button>
+          <a href="/instructions" target="_blank" className="hidden md:flex items-center gap-2 text-purple-400 hover:text-purple-300 transition-colors mr-4">
+              <FileText size={18} /> <span className="text-sm font-medium">Инструкция (спор)</span>
+          </a>
+          <motion.button 
+            whileHover={{ scale: 1.05 }} 
+            whileTap={{ scale: 0.95 }} 
+            onClick={() => handleExport('comp')} 
+            className="flex items-center gap-2 bg-gradient-to-r from-emerald-600 to-teal-600 hover:from-emerald-500 hover:to-teal-500 text-white px-5 py-2.5 rounded-xl font-medium transition-all shadow-[0_0_15px_rgba(16,185,129,0.3)]"
+            title="Обычная справка-расчет"
+          >
+              <Download size={18} /> На выплату
+          </motion.button>
+          <motion.button 
+            whileHover={{ scale: 1.05 }} 
+            whileTap={{ scale: 0.95 }} 
+            onClick={() => handleExport('ded')} 
+            className="flex items-center gap-2 bg-gradient-to-r from-rose-600 to-red-600 hover:from-rose-500 hover:to-red-500 text-white px-5 py-2.5 rounded-xl font-medium transition-all shadow-[0_0_15px_rgba(225,29,72,0.3)]"
+          >
+              <Download size={18} /> На удержание
+          </motion.button>
+          <motion.button 
+            whileHover={{ scale: 1.05 }} 
+            whileTap={{ scale: 0.95 }} 
+            onClick={() => handleExport('b2c-comp')} 
+            className="flex items-center gap-2 bg-purple-600 hover:bg-purple-500 text-white px-5 py-2.5 rounded-xl font-medium transition-all shadow-[0_0_15px_rgba(147,51,234,0.3)]"
+            title="Подробная справка с юридическим обоснованием для увольняющихся"
+          >
+              <Download size={18} /> Обоснование
+          </motion.button>
+          <motion.button 
+            whileHover={{ scale: 1.05 }} 
+            whileTap={{ scale: 0.95 }} 
+            onClick={handleReportExport} 
+            className="flex items-center gap-2 bg-indigo-600 hover:bg-indigo-500 text-white px-5 py-2.5 rounded-xl font-medium transition-all shadow-[0_0_15px_rgba(79,70,229,0.3)]"
+          >
+              <FileText size={18} /> Рапорт
+          </motion.button>
+      </div>
+      )}
+
       <div className="grid grid-cols-1 lg:grid-cols-12 gap-6 pb-24">
         <div className="lg:col-span-4 space-y-6">
             

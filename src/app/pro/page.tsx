@@ -109,7 +109,7 @@ export default function ProPage() {
               <Feature text="Готовая Excel-справка с обоснованием" included />
               <Feature text="Шаблон правильного рапорта" included />
               <Feature text="Инструкция по спору с бухгалтерией" included />
-              <Feature text="Разовый расчет (без ограничений по времени)" included />
+              <Feature text="Доступ к скачиванию в архиве на 6 месяцев" included />
               <Feature text="Сохранение в облачный архив" included={false} />
             </div>
             
@@ -146,7 +146,7 @@ export default function ProPage() {
             
             <div className="space-y-4 mb-8 flex-grow">
               <Feature text="Безлимитная генерация всех справок" included />
-              <Feature text="Сохранение всех справок в облачном архиве" included />
+              <Feature text="Постоянное хранение архива на период подписки" included />
               <Feature text="Гарантия точности по приказам и нормативам" included />
               <Feature text="1 месяц PRO в подарок за рекомендацию" included />
             </div>

@@ -493,10 +493,10 @@ export default function ResultsTable({
                        <div className="text-[10px] font-extrabold uppercase tracking-wider text-slate-400">Разовый расчет</div>
                        <div className="text-2xl font-black text-white mt-1">390 ₽</div>
                        <p className="text-[11px] text-slate-400 mt-2.5 font-medium leading-relaxed">
-                         Разблокировать <strong>этот конкретный расчет</strong> навсегда. Скачать двухстраничный Word-рапорт и Excel-справку.
+                         Разблокировать <strong>этот конкретный расчет</strong>. Скачивание Word-рапорта и Excel-справки доступно в архиве в течение 6 месяцев.
                        </p>
                      </div>
-                     <div className="text-[10px] text-indigo-400 font-bold mt-3">Без временных ограничений</div>
+                     <div className="text-[10px] text-indigo-400 font-bold mt-3">Доступ к скачиванию: 6 месяцев</div>
                    </div>
 
                    {/* Plan 2: Monthly PRO with Telegram discount */}
@@ -519,7 +519,7 @@ export default function ResultsTable({
                          <span className="text-xs text-slate-500 line-through font-bold">990 ₽</span>
                        </div>
                        <p className="text-[11px] text-slate-400 mt-2.5 font-medium leading-relaxed">
-                         <strong>Полный безлимит</strong> для любого числа сотрудников на 30 дней. Идеально для кадровиков и юристов.
+                         <strong>Полный безлимит</strong> расчетов. Документы в архиве хранятся постоянно, пока активна подписка PRO.
                        </p>
                      </div>
                      <div className="text-[9px] text-rose-400 font-bold mt-3 bg-rose-500/10 border border-rose-500/20 px-2 py-0.5 rounded-md w-fit">
@@ -573,8 +573,8 @@ export default function ResultsTable({
 
                 <p className="text-[10px] text-slate-500 italic mt-3.5">
                   {selectedPlan === 'single' 
-                    ? 'Разовая покупка. Доступ предоставляется пожизненно на вашем аккаунте. Никаких скрытых подписок.' 
-                    : 'Специальная акция: скидка 20% активирована. Подписка предоставляет безлимитный PRO-доступ на 30 дней.'}
+                    ? 'Разовый расчет. Доступ к скачиванию документов в вашем архиве предоставляется на 6 месяцев.' 
+                    : 'Специальная акция: скидка 20% активирована. Хранение архива и доступ к PRO-функциям — постоянно на период действия подписки.'}
                 </p>
               </motion.div>
             </div>

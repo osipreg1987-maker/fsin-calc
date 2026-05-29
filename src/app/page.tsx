@@ -2,7 +2,7 @@
 
 import { motion } from 'framer-motion';
 import { useRouter } from 'next/navigation';
-import { ShieldCheck, Calculator, Clock, Scale, ArrowRight, FileText, CheckCircle2, ChevronRight, Zap } from 'lucide-react';
+import { ShieldCheck, Calculator, Clock, Scale, ArrowRight, FileText, CheckCircle2, ChevronRight, Zap, Smartphone, MessageSquare } from 'lucide-react';
 
 export default function LandingPage() {
   const router = useRouter();
@@ -378,6 +378,48 @@ export default function LandingPage() {
         </div>
       </section>
 
+      {/* Telegram Bot Promo Section */}
+      <section className="relative z-10 py-12">
+        <div className="max-w-6xl mx-auto px-4">
+          <motion.div 
+            initial={{ opacity: 0, y: 30 }}
+            whileInView={{ opacity: 1, y: 0 }}
+            viewport={{ once: true }}
+            className="bg-slate-900/30 backdrop-blur-xl border border-slate-800/80 rounded-[2.5rem] p-8 md:p-10 relative overflow-hidden flex flex-col lg:flex-row items-center justify-between gap-8 shadow-2xl group"
+          >
+            {/* Top border spotlight highlight */}
+            <div className="absolute top-0 left-0 right-0 h-[1.5px] bg-gradient-to-r from-blue-500/30 via-indigo-500/20 to-transparent" />
+            <div className="absolute top-0 right-0 w-64 h-64 bg-blue-500/5 rounded-full blur-[60px] pointer-events-none group-hover:bg-blue-500/10 transition-colors duration-500" />
+            
+            <div className="flex items-center gap-6 flex-1 flex-col sm:flex-row text-center sm:text-left">
+              <div className="w-16 h-16 bg-blue-500/15 text-blue-400 rounded-2xl flex items-center justify-center shrink-0 shadow-inner">
+                <Smartphone size={32} />
+              </div>
+              <div className="space-y-2">
+                <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-blue-500/10 border border-blue-500/20 text-blue-400 text-xs font-bold uppercase tracking-wider">
+                  Мобильность
+                </div>
+                <h2 className="text-2xl font-bold text-white">Работайте без компьютера прямо с телефона</h2>
+                <p className="text-slate-400 text-sm leading-relaxed font-medium">
+                  Наш официальный Telegram-бот позволяет быстро внести данные арматурной карточки и мгновенно сгенерировать расчетную Excel-справку прямо на службе или в дороге. Полная синхронизация с вашим аккаунтом!
+                </p>
+              </div>
+            </div>
+            
+            <motion.a 
+              whileHover={{ scale: 1.04 }}
+              whileTap={{ scale: 0.96 }}
+              href="https://t.me/fsin_calc_bot"
+              target="_blank"
+              className="bg-gradient-to-r from-blue-600 to-indigo-600 hover:from-blue-500 hover:to-indigo-500 text-white px-6 py-3.5 rounded-xl font-bold text-sm shadow-md shadow-blue-600/25 border border-blue-500/30 flex items-center gap-2 shrink-0 cursor-pointer text-center"
+            >
+              <MessageSquare size={16} />
+              Запустить Telegram бот
+            </motion.a>
+          </motion.div>
+        </div>
+      </section>
+
       {/* Pricing Section */}
       <section id="pricing" className="relative z-10 py-24 bg-slate-955/30 border-y border-slate-900/80 backdrop-blur-md">
         <div className="max-w-7xl mx-auto px-4">
@@ -431,7 +473,7 @@ export default function LandingPage() {
                   </li>
                   <li className="flex items-start gap-3">
                     <CheckCircle2 className="text-purple-400 shrink-0 w-5 h-5 mt-0.5" />
-                    <span className="text-slate-300 text-sm font-medium">Разовый доступ на 24 часа</span>
+                    <span className="text-slate-300 text-sm font-medium">Разовый расчет (без ограничений по времени)</span>
                   </li>
                 </ul>
               </div>
@@ -473,19 +515,19 @@ export default function LandingPage() {
                 <ul className="space-y-4 mb-8">
                   <li className="flex items-start gap-3">
                     <CheckCircle2 className="text-blue-400 shrink-0 w-5 h-5 mt-0.5" />
-                    <span className="text-slate-200 text-sm font-medium">Безлимитная генерация справок</span>
+                    <span className="text-slate-200 text-sm font-medium">Безлимитная генерация всех справок</span>
                   </li>
                   <li className="flex items-start gap-3">
                     <CheckCircle2 className="text-blue-400 shrink-0 w-5 h-5 mt-0.5" />
-                    <span className="text-slate-200 text-sm font-medium">Облачный архив на всех сотрудников</span>
+                    <span className="text-slate-200 text-sm font-medium">Сохранение всех справок в облачном архиве</span>
                   </li>
                   <li className="flex items-start gap-3">
                     <CheckCircle2 className="text-blue-400 shrink-0 w-5 h-5 mt-0.5" />
-                    <span className="text-slate-200 text-sm font-medium">Гарантия точности по приказам</span>
+                    <span className="text-slate-200 text-sm font-medium">Гарантия точности по приказам и нормативам</span>
                   </li>
                   <li className="flex items-start gap-3">
                     <CheckCircle2 className="text-blue-400 shrink-0 w-5 h-5 mt-0.5" />
-                    <span className="text-slate-200 text-sm font-medium">1 месяц PRO в подарок за друга</span>
+                    <span className="text-slate-200 text-sm font-medium">1 месяц PRO в подарок за рекомендацию</span>
                   </li>
                 </ul>
               </div>
@@ -525,11 +567,11 @@ export default function LandingPage() {
                   </li>
                   <li className="flex items-start gap-3">
                     <CheckCircle2 className="text-emerald-400 shrink-0 w-5 h-5 mt-0.5" />
-                    <span className="text-slate-300 text-sm font-medium">Проверьте 20 справок за 10 минут</span>
+                    <span className="text-slate-300 text-sm font-medium">Окупается при первом же споре с бухгалтерией</span>
                   </li>
                   <li className="flex items-start gap-3">
                     <CheckCircle2 className="text-emerald-400 shrink-0 w-5 h-5 mt-0.5" />
-                    <span className="text-slate-300 text-sm font-medium">Мгновенный поиск ошибок в расчетах</span>
+                    <span className="text-slate-300 text-sm font-medium">В разы дешевле найма юриста или аудитора</span>
                   </li>
                   <li className="flex items-start gap-3">
                     <CheckCircle2 className="text-emerald-400 shrink-0 w-5 h-5 mt-0.5" />

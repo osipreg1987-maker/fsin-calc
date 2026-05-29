@@ -8,10 +8,18 @@ import { formatCurrency } from '../lib/helpers';
 interface ResultsTableProps {
   results: any[];
   dismissalGroup?: string;
-  isPro?: boolean;
+  isUnlocked?: boolean;
+  onUnlock?: () => void;
+  isLoadingUnlock?: boolean;
 }
 
-export default function ResultsTable({ results, dismissalGroup = 'V' }: ResultsTableProps) {
+export default function ResultsTable({ 
+  results, 
+  dismissalGroup = 'V', 
+  isUnlocked = true, 
+  onUnlock,
+  isLoadingUnlock = false
+}: ResultsTableProps) {
   const [expandedItems, setExpandedItems] = useState<Record<string, boolean>>({});
 
   if (!results || results.length === 0) {
@@ -34,6 +42,11 @@ export default function ResultsTable({ results, dismissalGroup = 'V' }: ResultsT
   const finalBalance = totalCompensation - totalDeductions;
 
   const toggleExpand = (itemId: string) => {
+    if (!isUnlocked && results.findIndex(r => r.id === itemId) >= 4) {
+      // Prevent expanding blurred items
+      if (onUnlock) onUnlock();
+      return;
+    }
     setExpandedItems(prev => ({
       ...prev,
       [itemId]: !prev[itemId]
@@ -127,22 +140,30 @@ export default function ResultsTable({ results, dismissalGroup = 'V' }: ResultsT
 
       {/* 2. Interactive Accordion List */}
       <div className="space-y-3">
-        <h4 className="text-xs uppercase font-bold tracking-wider text-slate-400 px-1">Детализированный расчет по каждому предмету</h4>
+        <div className="flex justify-between items-center px-1">
+          <h4 className="text-xs uppercase font-bold tracking-wider text-slate-400">Детализированный расчет по каждому предмету</h4>
+          {!isUnlocked && (
+            <span className="text-[10px] text-amber-500 bg-amber-500/10 border border-amber-500/25 px-2 py-0.5 rounded-full font-bold uppercase tracking-wider">
+              🔒 Демо-режим расчетов
+            </span>
+          )}
+        </div>
 
-        <div className="divide-y divide-slate-800/40 overflow-hidden rounded-2xl border border-slate-800/50 bg-slate-950/20 backdrop-blur-md">
-          {results.map((r) => {
-            const isExpanded = !!expandedItems[r.id];
-            const itemQtyToPay = Math.max(0, r.earnedQty - r.issuedCount);
+        <div className="divide-y divide-slate-800/40 overflow-hidden rounded-2xl border border-slate-800/50 bg-slate-950/20 backdrop-blur-md relative">
+          {results.map((r, rIdx) => {
+            const isItemLocked = !isUnlocked && rIdx >= 4;
+            const isExpanded = !!expandedItems[r.id] && !isItemLocked;
             
             return (
               <div 
                 key={r.id} 
-                className={`transition-colors duration-200 ${isExpanded ? 'bg-slate-900/10' : 'hover:bg-slate-900/5'}`}
+                className={`transition-colors duration-200 ${isItemLocked ? 'blur-[4.5px] select-none pointer-events-none opacity-25' : ''} ${isExpanded ? 'bg-slate-900/10' : 'hover:bg-slate-900/5'}`}
               >
                 {/* Header (Always Visible) */}
                 <button
                   onClick={() => toggleExpand(r.id)}
-                  className="w-full flex flex-col lg:flex-row lg:items-center justify-between p-4 text-left gap-4 outline-none cursor-pointer"
+                  disabled={isItemLocked}
+                  className={`w-full flex flex-col lg:flex-row lg:items-center justify-between p-4 text-left gap-4 outline-none ${isItemLocked ? 'cursor-default' : 'cursor-pointer'}`}
                 >
                   <div className="flex items-start gap-3 flex-1">
                     <div className="mt-1 flex-shrink-0">
@@ -201,11 +222,11 @@ export default function ResultsTable({ results, dismissalGroup = 'V' }: ResultsT
                     {/* Cost balance badge */}
                     <div className="text-right min-w-[90px]">
                       {r.balance > 0 ? (
-                        <span className="bg-emerald-500/10 text-emerald-400 border border-emerald-500/20 px-2.5 py-1 rounded-xl text-xs font-black block shadow-[0_2px_10px_rgba(16,185,129,0.05)]">
+                        <span className="bg-emerald-500/10 text-emerald-400 border border-emerald-500/20 px-2.5 py-1 rounded-xl text-xs font-black block">
                           +{formatCurrency(r.balance)}
                         </span>
                       ) : r.balance < 0 ? (
-                        <span className="bg-rose-500/10 text-rose-400 border border-rose-500/20 px-2.5 py-1 rounded-xl text-xs font-black block shadow-[0_2px_10px_rgba(244,63,94,0.05)]">
+                        <span className="bg-rose-500/10 text-rose-400 border border-rose-500/20 px-2.5 py-1 rounded-xl text-xs font-black block">
                           -{formatCurrency(Math.abs(r.balance))}
                         </span>
                       ) : (
@@ -243,7 +264,7 @@ export default function ResultsTable({ results, dismissalGroup = 'V' }: ResultsT
                                 return (
                                   <div key={idx} className="border-l border-slate-800 pl-3 py-1 space-y-1">
                                     <div className="text-slate-300 font-medium">
-                                      Период {pd.pIndex}: с {pd.start ? formatDateToMMYYYY(pd.start.toISOString().split('T')[0]) : '—'} по {pd.end ? formatDateToMMYYYY(pd.end.toISOString().split('T')[0]) : '—'} 
+                                      Период {pd.pIndex}: с {pd.start ? formatDateToMMYYYY(pd.start.split('T')[0]) : '—'} по {pd.end ? formatDateToMMYYYY(pd.end.split('T')[0]) : '—'} 
                                       {pd.isTail && <span className="ml-1 text-[9px] bg-indigo-500/10 text-indigo-400 border border-indigo-500/20 px-1.5 py-0.2 rounded">разделение</span>}
                                     </div>
                                     <div className="text-slate-400 text-xs">
@@ -421,6 +442,103 @@ export default function ResultsTable({ results, dismissalGroup = 'V' }: ResultsT
               </div>
             );
           })}
+
+          {/* 3. Gorgeous Glassmorphic Paywall Card Overlay (Only shown if !isUnlocked) */}
+          {!isUnlocked && (
+            <div className="absolute inset-x-0 bottom-0 bg-gradient-to-t from-slate-950 via-slate-950/98 to-transparent pt-32 pb-8 px-4 flex flex-col items-center justify-end z-20 pointer-events-auto">
+              <motion.div 
+                initial={{ y: 30, opacity: 0 }}
+                animate={{ y: 0, opacity: 1 }}
+                transition={{ type: "spring", stiffness: 100, damping: 15 }}
+                className="bg-slate-900/80 backdrop-blur-xl border-2 border-indigo-500/30 p-6 md:p-8 rounded-[2rem] shadow-[0_20px_50px_rgba(99,102,241,0.25)] text-center max-w-lg w-full relative overflow-hidden"
+              >
+                {/* Overhead light stripe */}
+                <div className="absolute top-0 left-0 right-0 h-[2.5px] bg-gradient-to-r from-transparent via-indigo-400 to-transparent" />
+                
+                {/* Glowing light behind icon */}
+                <div className="absolute top-[-20%] left-[50%] translate-x-[-50%] w-32 h-32 bg-indigo-500/10 rounded-full blur-[40px] pointer-events-none" />
+
+                <div className="w-12 h-12 bg-indigo-500/10 text-indigo-400 border border-indigo-500/25 rounded-2xl mx-auto flex items-center justify-center mb-4">
+                  <svg className="w-6 h-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-10V7a4 4 0 00-8 0v4h8z" />
+                  </svg>
+                </div>
+
+                <h3 className="text-xl md:text-2xl font-black text-white leading-tight">
+                  Разблокировать полный расчет и рапорт
+                </h3>
+                
+                <p className="text-xs md:text-sm text-slate-400 mt-2">
+                  Калькулятор нашел недополученное имущество на сумму:
+                </p>
+                
+                <div className="text-2xl md:text-3xl font-black text-emerald-400 mt-1 drop-shadow-[0_2px_15px_rgba(16,185,129,0.2)]">
+                  {formatCurrency(finalBalance)}
+                </div>
+
+                {/* Value Proposition Box */}
+                <div className="grid grid-cols-3 gap-2 bg-slate-950/60 border border-slate-800/60 p-3 rounded-2xl my-5 text-[10px] md:text-xs">
+                  <div className="flex flex-col items-center justify-center border-r border-slate-800/60 py-1">
+                    <span className="text-slate-500">Упустить выплату</span>
+                    <span className="text-rose-500 font-bold line-through mt-0.5">{formatCurrency(finalBalance)}</span>
+                  </div>
+                  <div className="flex flex-col items-center justify-center border-r border-slate-800/60 py-1">
+                    <span className="text-slate-500">Наем юриста</span>
+                    <span className="text-slate-400 font-bold mt-0.5">от 5 000 ₽</span>
+                  </div>
+                  <div className="flex flex-col items-center justify-center py-1 bg-indigo-500/10 rounded-xl border border-indigo-500/20">
+                    <span className="text-indigo-400 font-bold">Разовый тариф</span>
+                    <span className="text-emerald-400 font-extrabold mt-0.5">390 ₽</span>
+                  </div>
+                </div>
+
+                {/* Benefits Bullet Points */}
+                <ul className="text-left space-y-2.5 text-[11px] md:text-xs text-slate-300 font-medium mb-6 pl-2">
+                  <li className="flex items-start gap-2.5">
+                    <span className="text-emerald-400 shrink-0">✓</span>
+                    <span>Полный отчет по всем <strong>{results.length} предметам</strong> довольствия (сейчас скрыто {results.length - 4} предм.)</span>
+                  </li>
+                  <li className="flex items-start gap-2.5">
+                    <span className="text-emerald-400 shrink-0">✓</span>
+                    <span>Скачать <strong>двухстраничный рапорт в Word</strong> (Заявление + Справка-расчет с суммами прописью)</span>
+                  </li>
+                  <li className="flex items-start gap-2.5">
+                    <span className="text-emerald-400 shrink-0">✓</span>
+                    <span>Скачать готовую Справку-обоснование в <strong>Excel</strong></span>
+                  </li>
+                  <li className="flex items-start gap-2.5">
+                    <span className="text-emerald-400 shrink-0">✓</span>
+                    <span>Гарантия юридической точности по приказам ФСИН РФ</span>
+                  </li>
+                </ul>
+
+                {/* Purchase Button CTA */}
+                <motion.button 
+                  whileHover={{ scale: 1.03 }}
+                  whileTap={{ scale: 0.97 }}
+                  onClick={onUnlock}
+                  disabled={isLoadingUnlock}
+                  className="w-full bg-gradient-to-tr from-blue-600 to-indigo-600 hover:from-blue-500 hover:to-indigo-500 text-white font-black py-4 px-4 rounded-2xl flex items-center justify-center gap-2 transition-all shadow-[0_4px_25px_rgba(79,70,229,0.35)] border border-indigo-500/30 cursor-pointer disabled:opacity-75 text-sm uppercase tracking-wide"
+                >
+                  {isLoadingUnlock ? (
+                    <>
+                      <svg className="animate-spin -ml-1 mr-2 h-4 w-4 text-white" fill="none" viewBox="0 0 24 24">
+                        <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4" />
+                        <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z" />
+                      </svg>
+                      Подготовка платежа...
+                    </>
+                  ) : (
+                    <span>Разблокировать расчет за 390 ₽</span>
+                  )}
+                </motion.button>
+
+                <p className="text-[10px] text-slate-500 italic mt-3.5">
+                  Разовая покупка. Доступ предоставляется пожизненно на вашем аккаунте. Никаких скрытых подписок.
+                </p>
+              </motion.div>
+            </div>
+          )}
         </div>
       </div>
     </div>

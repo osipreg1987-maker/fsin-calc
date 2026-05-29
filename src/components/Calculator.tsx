@@ -43,11 +43,19 @@ export default function Calculator() {
   const [isProModalOpen, setIsProModalOpen] = useState(false);
   const [proModalTitle, setProModalTitle] = useState('');
   const [isTwa, setIsTwa] = useState(false);
+  const [isLoadingUnlock, setIsLoadingUnlock] = useState(false);
 
   const { user, subscription, signOut, isLoading } = useAuth();
   const router = useRouter();
 
   const isPro = subscription?.is_pro || false;
+
+  const existingRecord = useMemo(() => {
+    if (!employeeFio) return null;
+    return archive.find(r => r.employee_fio.trim().toLowerCase() === employeeFio.trim().toLowerCase());
+  }, [archive, employeeFio]);
+
+  const isUnlocked = isPro || existingRecord?.is_unlocked === true;
 
   const fetchArchive = async () => {
     if (!user) return;
@@ -340,10 +348,74 @@ export default function Calculator() {
       periods, gender, itemTotals, customPrices, dismissalGroup, dismissalDate: dismDate
   });
 
+  const handleUnlockSingleCalculation = async () => {
+      if (!user) {
+          alert("Для оплаты и сохранения расчета необходимо авторизоваться!");
+          router.push('/auth');
+          return;
+      }
+      if (!employeeFio) {
+          alert("Пожалуйста, заполните ФИО сотрудника, чтобы оформить именной расчет.");
+          return;
+      }
+
+      setIsLoadingUnlock(true);
+      try {
+          const existing = archive.find(r => r.employee_fio.trim().toLowerCase() === employeeFio.trim().toLowerCase());
+          
+          const record = {
+              user_id: user.id,
+              employee_fio: employeeFio,
+              employee_rank: employeeRank,
+              dismissal_group: dismissalGroup,
+              dism_date: dismDate,
+              gender,
+              periods,
+              item_totals: itemTotals,
+              custom_prices: customPrices
+          };
+
+          let recordId = '';
+          if (existing) {
+              recordId = existing.id;
+              const { error } = await supabase.from('archives').update(record).eq('id', recordId);
+              if (error) throw error;
+          } else {
+              const { data, error } = await supabase.from('archives').insert([record]).select('id').single();
+              if (error) throw error;
+              recordId = data.id;
+          }
+
+          // Обновляем архив локально
+          await fetchArchive();
+
+          // Делаем запрос к API оплаты
+          const response = await fetch('/api/checkout', {
+              method: 'POST',
+              headers: { 'Content-Type': 'application/json' },
+              body: JSON.stringify({
+                  planType: 'single',
+                  archiveId: recordId
+              })
+          });
+
+          const resData = await response.json();
+          if (resData.url) {
+              window.location.href = resData.url;
+          } else {
+              throw new Error(resData.error || 'Не удалось получить ссылку на оплату');
+          }
+      } catch (err) {
+          console.error("Ошибка при разблокировке расчета:", err);
+          alert(err instanceof Error ? err.message : "Не удалось начать процесс оплаты. Попробуйте еще раз.");
+      } finally {
+          setIsLoadingUnlock(false);
+      }
+  };
+
   const handleExport = (type: 'comp' | 'ded' | 'b2c-comp') => {
-      if (!isPro) {
-          setProModalTitle('Экспорт в Excel доступен только в PRO');
-          setIsProModalOpen(true);
+      if (!isUnlocked) {
+          handleUnlockSingleCalculation();
           return;
       }
       exportToExcel(type, {
@@ -356,9 +428,8 @@ export default function Calculator() {
   };
 
   const handleReportExport = () => {
-      if (!isPro) {
-          setProModalTitle('Экспорт рапорта доступен только в PRO');
-          setIsProModalOpen(true);
+      if (!isUnlocked) {
+          handleUnlockSingleCalculation();
           return;
       }
       generateWordReport({
@@ -787,7 +858,13 @@ export default function Calculator() {
                     <div className="w-2 h-6 bg-purple-500 rounded-full"></div>
                     Итоговый расчет по предметам
                 </h2>
-                <ResultsTable results={results} />
+                <ResultsTable 
+                    results={results} 
+                    isUnlocked={isUnlocked}
+                    onUnlock={handleUnlockSingleCalculation}
+                    isLoadingUnlock={isLoadingUnlock}
+                    dismissalGroup={dismissalGroup}
+                />
             </div>
         </div>
       </div>

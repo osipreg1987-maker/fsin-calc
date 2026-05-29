@@ -33,9 +33,8 @@ export default function IssueLogTable({ groupedItems, itemTotals, setItemTotals,
                             return (
                                 <tr key={item.id} className="border-b border-slate-800/40 hover:bg-slate-800/20 transition-all duration-200">
                                     <td className="py-2.5 px-3 text-slate-300 font-medium">{item.name}</td>
-                                    <td className="py-2.5 px-3 text-center text-slate-400 font-semibold relative">
-                                        {!isPro && <div className="absolute inset-0 z-10 cursor-pointer" onClick={() => setIsProModalOpen(true)} title="Доступно в PRO"></div>}
-                                        <div className={blurClass}>{r ? r.earnedQty.toFixed(2) : '0.00'}</div>
+                                    <td className="py-2.5 px-3 text-center text-slate-400 font-semibold">
+                                        {r ? r.earnedQty.toFixed(2) : '0.00'}
                                     </td>
                                     <td className="py-2 px-3 relative">
                                         <input 

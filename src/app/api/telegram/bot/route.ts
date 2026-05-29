@@ -353,6 +353,37 @@ bot.on('message', async (ctx) => {
         const replyMsg = ctx.message.reply_to_message;
         if (replyMsg) {
             const textOrCaption = ('text' in replyMsg ? replyMsg.text : ('caption' in replyMsg ? replyMsg.caption : '')) || '';
+            
+            // 1.1 Если ответ на обращение с сайта (#chat_UUID)
+            const chatMatch = textOrCaption.match(/#chat_([a-f0-9\-]+)/);
+            if (chatMatch) {
+                const targetChatId = chatMatch[1];
+                try {
+                    // @ts-ignore
+                    const adminText = 'text' in ctx.message ? ctx.message.text : '';
+                    if (!adminText) {
+                        return ctx.reply('❌ Ответ на сайт пока поддерживает только текстовые сообщения.');
+                    }
+                    
+                    const { error } = await supabase
+                        .from('support_messages')
+                        .insert({
+                            chat_id: targetChatId,
+                            sender: 'admin',
+                            text: adminText
+                        });
+                        
+                    if (error) {
+                        console.error('Error saving admin reply to Supabase:', error);
+                        ctx.reply('❌ Ошибка записи ответа в базу данных.');
+                    }
+                } catch (e) {
+                    console.error('Error handling website support reply:', e);
+                    ctx.reply('❌ Не удалось доставить ответ на сайт.');
+                }
+                return;
+            }
+
             const match = textOrCaption.match(/#user(\d+)/);
             if (match) {
                 const targetUserId = match[1];

@@ -21,7 +21,7 @@ export default function IssueLogTable({ groupedItems, itemTotals, setItemTotals,
                 {Object.entries(groupedItems).map(([cat, items]) => (
                     <React.Fragment key={cat}>
                         <tr>
-                            <td colSpan={4} className="bg-slate-800/80 py-2 px-3 mt-2 font-bold text-teal-400 uppercase text-xs rounded-t-lg">
+                            <td colSpan={4} className="bg-slate-900/60 backdrop-blur-sm border-y border-slate-800/50 py-2.5 px-3 font-bold text-teal-400 uppercase text-[10px] tracking-wider">
                                 {cat}
                             </td>
                         </tr>
@@ -31,31 +31,31 @@ export default function IssueLogTable({ groupedItems, itemTotals, setItemTotals,
                             const dedMonthsTotal = r && r.deductionLines ? r.deductionLines.reduce((acc: number, l: any) => acc + l.monthsLeft, 0) : 0;
                             
                             return (
-                                <tr key={item.id} className="border-b border-slate-700/30 hover:bg-slate-800/30 transition-colors">
-                                    <td className="py-2 px-2 text-slate-300">{item.name}</td>
-                                    <td className="py-2 px-2 text-center text-slate-400 font-medium relative">
+                                <tr key={item.id} className="border-b border-slate-800/40 hover:bg-slate-800/20 transition-all duration-200">
+                                    <td className="py-2.5 px-3 text-slate-300 font-medium">{item.name}</td>
+                                    <td className="py-2.5 px-3 text-center text-slate-400 font-semibold relative">
                                         {!isPro && <div className="absolute inset-0 z-10 cursor-pointer" onClick={() => setIsProModalOpen(true)} title="Доступно в PRO"></div>}
                                         <div className={blurClass}>{r ? r.earnedQty.toFixed(2) : '0.00'}</div>
                                     </td>
-                                    <td className="py-2 px-2 relative">
+                                    <td className="py-2 px-3 relative">
                                         <input 
                                             type="number" 
                                             min="0"
-                                            className="w-full bg-slate-900 border border-slate-700 rounded p-1.5 text-slate-200 outline-none focus:border-teal-500 transition-colors"
+                                            className="w-full bg-slate-950/40 backdrop-blur-md border border-slate-800 rounded-xl px-3 py-1.5 text-slate-200 placeholder-slate-500 outline-none focus:border-teal-500/50 focus:ring-1 focus:ring-teal-500/20 transition-all"
                                             placeholder="0"
                                             value={itemTotals[item.id] || ''}
                                             onChange={(e) => setItemTotals({...itemTotals, [item.id]: e.target.value})}
                                         />
                                     </td>
-                                    <td className="py-2 px-2 text-right relative">
+                                    <td className="py-2 px-3 text-right relative">
                                         {!isPro && <div className="absolute inset-0 z-10 cursor-pointer" onClick={() => setIsProModalOpen(true)} title="Доступно в PRO"></div>}
                                         {hasDeduction && (
-                                            <div className={`flex flex-col gap-1 items-end ${blurClass}`}>
-                                                <span className="text-xs text-rose-400">Недонос: {dedMonthsTotal} мес.</span>
+                                            <div className={`flex flex-col gap-1.5 items-end ${blurClass}`}>
+                                                <span className="text-[10px] font-bold text-rose-400 tracking-wider">НЕДОНОС: {dedMonthsTotal} МЕС.</span>
                                                 <input 
                                                     type="number" 
                                                     placeholder="Цена бух."
-                                                    className="w-24 bg-slate-900 border border-rose-700/50 rounded p-1.5 text-rose-200 text-xs outline-none focus:border-rose-400 pointer-events-auto"
+                                                    className="w-24 bg-slate-950/40 backdrop-blur-md border border-rose-950/50 rounded-xl px-3 py-1 text-rose-200 text-xs outline-none focus:border-rose-400/50 focus:ring-1 focus:ring-rose-400/20 transition-all pointer-events-auto"
                                                     value={customPrices[item.id] || ''}
                                                     onChange={(e) => setCustomPrices({...customPrices, [item.id]: Number(e.target.value)})}
                                                 />

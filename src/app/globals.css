@@ -63,3 +63,36 @@ body {
   background: var(--tw-hint);
   border-radius: 10px;
 }
+
+/* Ambient animated background blurs */
+@keyframes float-slow {
+  0%, 100% {
+    transform: translate(0px, 0px) scale(1);
+  }
+  33% {
+    transform: translate(40px, -60px) scale(1.1);
+  }
+  66% {
+    transform: translate(-30px, 30px) scale(0.95);
+  }
+}
+
+@keyframes float-slow-reverse {
+  0%, 100% {
+    transform: translate(0px, 0px) scale(1);
+  }
+  33% {
+    transform: translate(-50px, 40px) scale(0.9);
+  }
+  66% {
+    transform: translate(40px, -30px) scale(1.15);
+  }
+}
+
+.animate-float-1 {
+  animation: float-slow 25s infinite ease-in-out;
+}
+
+.animate-float-2 {
+  animation: float-slow-reverse 30s infinite ease-in-out;
+}

@@ -16,8 +16,13 @@ export default function CalculatorPage() {
   const isAdmin = user?.email === 'osipreg.1987@gmail.com';
 
   return (
-    <div className="min-h-screen bg-slate-900 text-slate-200 p-4 md:p-8 font-sans selection:bg-blue-500/30">
-      <div className="max-w-7xl mx-auto space-y-8">
+    <div className="min-h-screen bg-slate-950 text-slate-200 p-4 md:p-8 font-sans selection:bg-blue-500/30 overflow-hidden relative">
+      
+      {/* Ambient Animated Backdrops */}
+      <div className="fixed top-[-15%] left-[-15%] w-[60%] h-[60%] rounded-full bg-blue-600/10 blur-[130px] pointer-events-none animate-float-1" />
+      <div className="fixed bottom-[-15%] right-[-15%] w-[60%] h-[60%] rounded-full bg-purple-600/10 blur-[130px] pointer-events-none animate-float-2" />
+
+      <div className="max-w-7xl mx-auto space-y-8 relative z-10">
         
         {/* Header */}
         <motion.div 

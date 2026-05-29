@@ -403,20 +403,35 @@ export default function Calculator() {
                   </button>
               )}
           </div>
-          <div className="flex flex-col md:flex-row gap-3 flex-wrap ml-auto" id="tour-export">
-              <button onClick={startTour} className="hidden md:flex items-center gap-2 text-slate-400 hover:text-indigo-400 transition-colors mr-2">
-                  <HelpCircle size={18} /> <span className="text-sm font-medium">Обучение</span>
-              </button>
-              <a href="/instructions" target="_blank" className="hidden md:flex items-center gap-2 text-purple-400 hover:text-purple-300 transition-colors mr-4">
-                  <FileText size={18} /> <span className="text-sm font-medium">Инструкция (спор)</span>
-              </a>
+          <div className="flex flex-wrap items-center gap-2 ml-auto bg-slate-900/40 backdrop-blur-xl border border-slate-800/60 p-1.5 rounded-2xl shadow-lg shadow-black/20" id="tour-export">
               <motion.button 
-                whileHover={{ scale: 1.05 }} 
-                whileTap={{ scale: 0.95 }} 
-                onClick={handleReportExport} 
-                className="flex items-center gap-2 bg-indigo-600 hover:bg-indigo-500 text-white px-5 py-2.5 rounded-xl font-medium transition-all shadow-[0_0_15px_rgba(79,70,229,0.3)]"
+                  whileHover={{ scale: 1.03, x: 2 }} 
+                  whileTap={{ scale: 0.97 }}
+                  onClick={startTour} 
+                  className="hidden md:flex items-center gap-2 text-slate-300 hover:text-indigo-400 hover:bg-indigo-500/10 transition-all px-3.5 py-2 rounded-xl text-xs font-semibold cursor-pointer"
               >
-                  <FileText size={18} /> Рапорт
+                  <HelpCircle size={15} /> Обучение
+              </motion.button>
+              
+              <motion.a 
+                  whileHover={{ scale: 1.03, x: 2 }} 
+                  whileTap={{ scale: 0.97 }}
+                  href="/instructions" 
+                  target="_blank" 
+                  className="hidden md:flex items-center gap-2 text-slate-300 hover:text-purple-400 hover:bg-purple-500/10 transition-all px-3.5 py-2 rounded-xl text-xs font-semibold cursor-pointer"
+              >
+                  <FileText size={15} /> Инструкция (спор)
+              </motion.a>
+              
+              <div className="h-5 w-px bg-slate-800/80 hidden md:block mx-1"></div>
+              
+              <motion.button 
+                whileHover={{ scale: 1.04 }} 
+                whileTap={{ scale: 0.96 }} 
+                onClick={handleReportExport} 
+                className="flex items-center gap-2 bg-gradient-to-tr from-blue-600 to-indigo-600 hover:from-blue-500 hover:to-indigo-500 text-white px-5 py-2 rounded-xl text-xs font-bold shadow-[0_0_15px_rgba(79,70,229,0.25)] transition-all cursor-pointer"
+              >
+                  <FileText size={15} /> Скачать Рапорт
               </motion.button>
           </div>
       </div>
@@ -522,41 +537,41 @@ export default function Calculator() {
                         >
                             <div className="space-y-4 mt-5">
                                 <div>
-                                    <label className="block text-xs text-[var(--tw-hint)] mb-1">Учреждение</label>
-                                    <input type="text" className="w-full bg-[var(--tw-bg-base)] border border-[var(--tw-hint)]/30 rounded-xl p-3 text-[var(--foreground)] outline-none" value={instData.institution} onChange={e => updateInstData('institution', e.target.value)} placeholder="ФКУ ИК-6" />
+                                    <label className="block text-xs text-slate-400 mb-1">Учреждение</label>
+                                    <input type="text" className="w-full bg-slate-950/45 backdrop-blur-md border border-slate-800/80 rounded-xl p-3 text-slate-100 placeholder-slate-500 outline-none focus:border-blue-500/50 focus:ring-1 focus:ring-blue-500/10 transition-all" value={instData.institution} onChange={e => updateInstData('institution', e.target.value)} placeholder="ФКУ ИК-6" />
                                 </div>
                                 <div>
-                                    <label className="block text-xs text-[var(--tw-hint)] mb-1">Регион / Управление</label>
-                                    <input type="text" className="w-full bg-[var(--tw-bg-base)] border border-[var(--tw-hint)]/30 rounded-xl p-3 text-[var(--foreground)] outline-none" value={instData.region} onChange={e => updateInstData('region', e.target.value)} placeholder="ГУФСИН России по СО" />
+                                    <label className="block text-xs text-slate-400 mb-1">Регион / Управление</label>
+                                    <input type="text" className="w-full bg-slate-950/45 backdrop-blur-md border border-slate-800/80 rounded-xl p-3 text-slate-100 placeholder-slate-500 outline-none focus:border-blue-500/50 focus:ring-1 focus:ring-blue-500/10 transition-all" value={instData.region} onChange={e => updateInstData('region', e.target.value)} placeholder="ГУФСИН России по СО" />
                                 </div>
 
-                                <div className="pt-4 mt-4 border-t border-[var(--tw-hint)]/20">
+                                <div className="pt-4 mt-4 border-t border-slate-800/80">
                                     <div className="space-y-4">
                                         <div>
-                                            <h3 className="text-teal-500 text-xs font-semibold mb-2">Руководитель</h3>
+                                            <h3 className="text-teal-400 text-xs font-semibold mb-2">Руководитель</h3>
                                             <div className="grid grid-cols-2 gap-2 mb-2">
-                                                <input type="text" className="w-full bg-[var(--tw-bg-base)] border border-[var(--tw-hint)]/30 rounded-lg p-2.5 text-[var(--foreground)] text-sm outline-none" value={instData.bossTitle} onChange={e => updateInstData('bossTitle', e.target.value)} placeholder="Должность" />
-                                                <input type="text" className="w-full bg-[var(--tw-bg-base)] border border-[var(--tw-hint)]/30 rounded-lg p-2.5 text-[var(--foreground)] text-sm outline-none" value={instData.bossRank} onChange={e => updateInstData('bossRank', e.target.value)} placeholder="Звание" />
+                                                <input type="text" className="w-full bg-slate-950/45 backdrop-blur-md border border-slate-800/80 rounded-lg p-2.5 text-slate-100 placeholder-slate-500 text-sm outline-none focus:border-blue-500/50 focus:ring-1 focus:ring-blue-500/10 transition-all" value={instData.bossTitle} onChange={e => updateInstData('bossTitle', e.target.value)} placeholder="Должность" />
+                                                <input type="text" className="w-full bg-slate-950/45 backdrop-blur-md border border-slate-800/80 rounded-lg p-2.5 text-slate-100 placeholder-slate-500 text-sm outline-none focus:border-blue-500/50 focus:ring-1 focus:ring-blue-500/10 transition-all" value={instData.bossRank} onChange={e => updateInstData('bossRank', e.target.value)} placeholder="Звание" />
                                             </div>
-                                            <input type="text" className="w-full bg-[var(--tw-bg-base)] border border-[var(--tw-hint)]/30 rounded-lg p-2.5 text-[var(--foreground)] text-sm outline-none" value={instData.bossName} onChange={e => updateInstData('bossName', e.target.value)} placeholder="Инициалы, фамилия (А.А. Иванов)" />
+                                            <input type="text" className="w-full bg-slate-950/45 backdrop-blur-md border border-slate-800/80 rounded-lg p-2.5 text-slate-100 placeholder-slate-500 text-sm outline-none focus:border-blue-500/50 focus:ring-1 focus:ring-blue-500/10 transition-all" value={instData.bossName} onChange={e => updateInstData('bossName', e.target.value)} placeholder="Инициалы, фамилия (А.А. Иванов)" />
                                         </div>
 
-                                        <div className="pt-3 border-t border-[var(--tw-hint)]/20">
-                                            <h3 className="text-teal-500 text-xs font-semibold mb-2">Начальник ОКБИ и ХО</h3>
+                                        <div className="pt-3 border-t border-slate-800/80">
+                                            <h3 className="text-teal-400 text-xs font-semibold mb-2">Начальник ОКБИ и ХО</h3>
                                             <div className="grid grid-cols-2 gap-2 mb-2">
-                                                <input type="text" className="w-full bg-[var(--tw-bg-base)] border border-[var(--tw-hint)]/30 rounded-lg p-2.5 text-[var(--foreground)] text-sm outline-none" value={instData.okbiTitle} onChange={e => updateInstData('okbiTitle', e.target.value)} placeholder="Должность" />
-                                                <input type="text" className="w-full bg-[var(--tw-bg-base)] border border-[var(--tw-hint)]/30 rounded-lg p-2.5 text-[var(--foreground)] text-sm outline-none" value={instData.okbiRank} onChange={e => updateInstData('okbiRank', e.target.value)} placeholder="Звание" />
+                                                <input type="text" className="w-full bg-slate-950/45 backdrop-blur-md border border-slate-800/80 rounded-lg p-2.5 text-slate-100 placeholder-slate-500 text-sm outline-none focus:border-blue-500/50 focus:ring-1 focus:ring-blue-500/10 transition-all" value={instData.okbiTitle} onChange={e => updateInstData('okbiTitle', e.target.value)} placeholder="Должность" />
+                                                <input type="text" className="w-full bg-slate-950/45 backdrop-blur-md border border-slate-800/80 rounded-lg p-2.5 text-slate-100 placeholder-slate-500 text-sm outline-none focus:border-blue-500/50 focus:ring-1 focus:ring-blue-500/10 transition-all" value={instData.okbiRank} onChange={e => updateInstData('okbiRank', e.target.value)} placeholder="Звание" />
                                             </div>
-                                            <input type="text" className="w-full bg-[var(--tw-bg-base)] border border-[var(--tw-hint)]/30 rounded-lg p-2.5 text-[var(--foreground)] text-sm outline-none" value={instData.okbiName} onChange={e => updateInstData('okbiName', e.target.value)} placeholder="Инициалы, фамилия (Б.Б. Петров)" />
+                                            <input type="text" className="w-full bg-slate-950/45 backdrop-blur-md border border-slate-800/80 rounded-lg p-2.5 text-slate-100 placeholder-slate-500 text-sm outline-none focus:border-blue-500/50 focus:ring-1 focus:ring-blue-500/10 transition-all" value={instData.okbiName} onChange={e => updateInstData('okbiName', e.target.value)} placeholder="Инициалы, фамилия (Б.Б. Петров)" />
                                         </div>
 
-                                        <div className="pt-3 border-t border-[var(--tw-hint)]/20">
-                                            <h3 className="text-teal-500 text-xs font-semibold mb-2">Бухгалтерия</h3>
+                                        <div className="pt-3 border-t border-slate-800/80">
+                                            <h3 className="text-teal-400 text-xs font-semibold mb-2">Бухгалтерия</h3>
                                             <div className="grid grid-cols-2 gap-2 mb-2">
-                                                <input type="text" className="w-full bg-[var(--tw-bg-base)] border border-[var(--tw-hint)]/30 rounded-lg p-2.5 text-[var(--foreground)] text-sm outline-none" value={instData.accTitle} onChange={e => updateInstData('accTitle', e.target.value)} placeholder="Должность" />
-                                                <input type="text" className="w-full bg-[var(--tw-bg-base)] border border-[var(--tw-hint)]/30 rounded-lg p-2.5 text-[var(--foreground)] text-sm outline-none" value={instData.accRank} onChange={e => updateInstData('accRank', e.target.value)} placeholder="Звание" />
+                                                <input type="text" className="w-full bg-slate-950/45 backdrop-blur-md border border-slate-800/80 rounded-lg p-2.5 text-slate-100 placeholder-slate-500 text-sm outline-none focus:border-blue-500/50 focus:ring-1 focus:ring-blue-500/10 transition-all" value={instData.accTitle} onChange={e => updateInstData('accTitle', e.target.value)} placeholder="Должность" />
+                                                <input type="text" className="w-full bg-slate-950/45 backdrop-blur-md border border-slate-800/80 rounded-lg p-2.5 text-slate-100 placeholder-slate-500 text-sm outline-none focus:border-blue-500/50 focus:ring-1 focus:ring-blue-500/10 transition-all" value={instData.accRank} onChange={e => updateInstData('accRank', e.target.value)} placeholder="Звание" />
                                             </div>
-                                            <input type="text" className="w-full bg-[var(--tw-bg-base)] border border-[var(--tw-hint)]/30 rounded-lg p-2.5 text-[var(--foreground)] text-sm outline-none" value={instData.accName} onChange={e => updateInstData('accName', e.target.value)} placeholder="Инициалы, фамилия (В.В. Сидорова)" />
+                                            <input type="text" className="w-full bg-slate-950/45 backdrop-blur-md border border-slate-800/80 rounded-lg p-2.5 text-slate-100 placeholder-slate-500 text-sm outline-none focus:border-blue-500/50 focus:ring-1 focus:ring-blue-500/10 transition-all" value={instData.accName} onChange={e => updateInstData('accName', e.target.value)} placeholder="Инициалы, фамилия (В.В. Сидорова)" />
                                         </div>
                                     </div>
                                 </div>
@@ -568,42 +583,42 @@ export default function Calculator() {
 
             {/* Employee Details Card */}
             <div id="tour-employee-details" className="glass-panel rounded-2xl p-5">
-              <h2 className="text-lg font-bold text-[var(--foreground)] mb-5 flex items-center gap-2">
+              <h2 className="text-lg font-bold text-slate-100 mb-5 flex items-center gap-2">
                 <div className="w-1.5 h-5 bg-blue-500 rounded-full"></div>
                 Данные сотрудника
               </h2>
               
               <div className="space-y-4">
                 <div>
-                  <label className="block text-xs text-[var(--tw-hint)] mb-1">ФИО сотрудника</label>
+                  <label className="block text-xs text-slate-400 mb-1">ФИО сотрудника</label>
                   <input 
                     type="text" 
-                    className="w-full bg-[var(--tw-bg-base)] border border-[var(--tw-hint)]/30 rounded-xl p-3 text-[var(--foreground)] outline-none focus:border-[var(--tw-link)] transition-all"
+                    className="w-full bg-slate-950/45 backdrop-blur-md border border-slate-800/80 rounded-xl p-3 text-slate-100 placeholder-slate-500 outline-none focus:border-blue-500/50 focus:ring-1 focus:ring-blue-500/10 transition-all"
                     placeholder="Иванов Иван Иванович"
                     value={employeeFio}
                     onChange={(e) => setEmployeeFio(e.target.value)}
                   />
                 </div>
                 <div>
-                  <label className="block text-xs text-[var(--tw-hint)] mb-1">Звание</label>
+                  <label className="block text-xs text-slate-400 mb-1">Звание</label>
                   <input 
                     type="text" 
-                    className="w-full bg-[var(--tw-bg-base)] border border-[var(--tw-hint)]/30 rounded-xl p-3 text-[var(--foreground)] outline-none focus:border-[var(--tw-link)] transition-all"
+                    className="w-full bg-slate-950/45 backdrop-blur-md border border-slate-800/80 rounded-xl p-3 text-slate-100 placeholder-slate-500 outline-none focus:border-blue-500/50 focus:ring-1 focus:ring-blue-500/10 transition-all"
                     placeholder="прапорщик вн. сл."
                     value={employeeRank}
                     onChange={(e) => setEmployeeRank(e.target.value)}
                   />
                 </div>
                 <div>
-                  <label className="block text-xs text-[var(--tw-hint)] mb-1">Основание увольнения</label>
+                  <label className="block text-xs text-slate-400 mb-1">Основание увольнения</label>
                   <select
-                      className="w-full bg-[var(--tw-bg-base)] border border-[var(--tw-hint)]/30 rounded-xl p-3 text-[var(--foreground)] outline-none focus:border-[var(--tw-link)] transition-all"
+                      className="w-full bg-slate-950/45 backdrop-blur-md border border-slate-800/80 rounded-xl p-3 text-slate-100 placeholder-slate-500 outline-none focus:border-blue-500/50 focus:ring-1 focus:ring-blue-500/10 transition-all"
                       value={dismissalGroup}
                       onChange={(e) => setDismissalGroup(e.target.value)}
                   >
-                      <option value="A">Положительные (Пенсия, ОШМ)</option>
-                      <option value="B">Отрицательные (Нарушение, суд)</option>
-                      <option value="V">Нейтральные (Собственное желание)</option>
+                      <option value="A" className="bg-slate-900 text-slate-200">Положительные (Пенсия, ОШМ)</option>
+                      <option value="B" className="bg-slate-900 text-slate-200">Отрицательные (Нарушение, суд)</option>
+                      <option value="V" className="bg-slate-900 text-slate-200">Нейтральные (Собственное желание)</option>
                   </select>
                 </div>
                 

@@ -413,6 +413,33 @@ export default function Calculator() {
       }
   };
 
+  const handleUnlockPro = async () => {
+      if (!user) {
+          alert("Для оплаты подписки необходимо авторизоваться!");
+          router.push('/auth');
+          return;
+      }
+      setIsLoadingUnlock(true);
+      try {
+          const response = await fetch('/api/checkout', {
+              method: 'POST',
+              headers: { 'Content-Type': 'application/json' },
+              body: JSON.stringify({ planType: 'monthly' })
+          });
+          const resData = await response.json();
+          if (resData.url) {
+              window.location.href = resData.url;
+          } else {
+              throw new Error(resData.error || 'Не удалось получить ссылку на оплату');
+          }
+      } catch (err) {
+          console.error("Ошибка при оплате PRO:", err);
+          alert("Не удалось запустить оплату подписки.");
+      } finally {
+          setIsLoadingUnlock(false);
+      }
+  };
+
   const handleExport = (type: 'comp' | 'ded' | 'b2c-comp') => {
       if (!isUnlocked) {
           handleUnlockSingleCalculation();
@@ -862,6 +889,7 @@ export default function Calculator() {
                     results={results} 
                     isUnlocked={isUnlocked}
                     onUnlock={handleUnlockSingleCalculation}
+                    onUnlockPro={handleUnlockPro}
                     isLoadingUnlock={isLoadingUnlock}
                     dismissalGroup={dismissalGroup}
                 />

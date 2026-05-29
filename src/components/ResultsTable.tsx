@@ -10,6 +10,7 @@ interface ResultsTableProps {
   dismissalGroup?: string;
   isUnlocked?: boolean;
   onUnlock?: () => void;
+  onUnlockPro?: () => void;
   isLoadingUnlock?: boolean;
 }
 
@@ -18,9 +19,11 @@ export default function ResultsTable({
   dismissalGroup = 'V', 
   isUnlocked = true, 
   onUnlock,
+  onUnlockPro,
   isLoadingUnlock = false
 }: ResultsTableProps) {
   const [expandedItems, setExpandedItems] = useState<Record<string, boolean>>({});
+  const [selectedPlan, setSelectedPlan] = useState<'single' | 'monthly'>('single');
 
   if (!results || results.length === 0) {
     return (
@@ -264,7 +267,7 @@ export default function ResultsTable({
                                 return (
                                   <div key={idx} className="border-l border-slate-800 pl-3 py-1 space-y-1">
                                     <div className="text-slate-300 font-medium">
-                                      Период {pd.pIndex}: с {pd.start ? formatDateToMMYYYY(pd.start.split('T')[0]) : '—'} по {pd.end ? formatDateToMMYYYY(pd.end.split('T')[0]) : '—'} 
+                                      Период {pd.pIndex}: с {pd.start ? formatDateToMMYYYY(typeof pd.start === 'string' ? pd.start.split('T')[0] : pd.start.toISOString ? pd.start.toISOString().split('T')[0] : String(pd.start).split('T')[0]) : '—'} по {pd.end ? formatDateToMMYYYY(typeof pd.end === 'string' ? pd.end.split('T')[0] : pd.end.toISOString ? pd.end.toISOString().split('T')[0] : String(pd.end).split('T')[0]) : '—'} 
                                       {pd.isTail && <span className="ml-1 text-[9px] bg-indigo-500/10 text-indigo-400 border border-indigo-500/20 px-1.5 py-0.2 rounded">разделение</span>}
                                     </div>
                                     <div className="text-slate-400 text-xs">
@@ -450,10 +453,10 @@ export default function ResultsTable({
                 initial={{ y: 30, opacity: 0 }}
                 animate={{ y: 0, opacity: 1 }}
                 transition={{ type: "spring", stiffness: 100, damping: 15 }}
-                className="bg-slate-900/80 backdrop-blur-xl border-2 border-indigo-500/30 p-6 md:p-8 rounded-[2rem] shadow-[0_20px_50px_rgba(99,102,241,0.25)] text-center max-w-lg w-full relative overflow-hidden"
+                className="bg-slate-900/80 backdrop-blur-xl border-2 border-indigo-500/30 p-6 md:p-8 rounded-[2rem] shadow-[0_20px_50px_rgba(99,102,241,0.25)] text-center max-w-2xl w-full relative overflow-hidden"
               >
                 {/* Overhead light stripe */}
-                <div className="absolute top-0 left-0 right-0 h-[2.5px] bg-gradient-to-r from-transparent via-indigo-400 to-transparent" />
+                <div className="absolute top-0 left-0 right-0 h-[2.5px] bg-gradient-to-r from-transparent via-indigo-450 to-transparent" />
                 
                 {/* Glowing light behind icon */}
                 <div className="absolute top-[-20%] left-[50%] translate-x-[-50%] w-32 h-32 bg-indigo-500/10 rounded-full blur-[40px] pointer-events-none" />
@@ -476,20 +479,53 @@ export default function ResultsTable({
                   {formatCurrency(finalBalance)}
                 </div>
 
-                {/* Value Proposition Box */}
-                <div className="grid grid-cols-3 gap-2 bg-slate-950/60 border border-slate-800/60 p-3 rounded-2xl my-5 text-[10px] md:text-xs">
-                  <div className="flex flex-col items-center justify-center border-r border-slate-800/60 py-1">
-                    <span className="text-slate-500">Упустить выплату</span>
-                    <span className="text-rose-500 font-bold line-through mt-0.5">{formatCurrency(finalBalance)}</span>
-                  </div>
-                  <div className="flex flex-col items-center justify-center border-r border-slate-800/60 py-1">
-                    <span className="text-slate-500">Наем юриста</span>
-                    <span className="text-slate-400 font-bold mt-0.5">от 5 000 ₽</span>
-                  </div>
-                  <div className="flex flex-col items-center justify-center py-1 bg-indigo-500/10 rounded-xl border border-indigo-500/20">
-                    <span className="text-indigo-400 font-bold">Разовый тариф</span>
-                    <span className="text-emerald-400 font-extrabold mt-0.5">390 ₽</span>
-                  </div>
+                {/* Tariff Selection Grid */}
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-4 my-6">
+                   {/* Plan 1: Single */}
+                   <div 
+                     onClick={() => setSelectedPlan('single')}
+                     className={`cursor-pointer text-left p-4.5 rounded-2xl border-2 transition-all duration-300 relative flex flex-col justify-between ${selectedPlan === 'single' ? 'border-indigo-500 bg-indigo-500/10 shadow-[0_0_20px_rgba(99,102,241,0.2)]' : 'border-slate-800 bg-slate-950/45 hover:border-slate-700'}`}
+                   >
+                     {selectedPlan === 'single' && (
+                       <span className="absolute top-3.5 right-3.5 w-4 h-4 rounded-full bg-indigo-500 border border-indigo-400 flex items-center justify-center text-[10px] text-white">✓</span>
+                     )}
+                     <div>
+                       <div className="text-[10px] font-extrabold uppercase tracking-wider text-slate-400">Разовый расчет</div>
+                       <div className="text-2xl font-black text-white mt-1">390 ₽</div>
+                       <p className="text-[11px] text-slate-400 mt-2.5 font-medium leading-relaxed">
+                         Разблокировать <strong>этот конкретный расчет</strong> навсегда. Скачать двухстраничный Word-рапорт и Excel-справку.
+                       </p>
+                     </div>
+                     <div className="text-[10px] text-indigo-400 font-bold mt-3">Без временных ограничений</div>
+                   </div>
+
+                   {/* Plan 2: Monthly PRO with Telegram discount */}
+                   <div 
+                     onClick={() => setSelectedPlan('monthly')}
+                     className={`cursor-pointer text-left p-4.5 rounded-2xl border-2 transition-all duration-300 relative overflow-hidden flex flex-col justify-between ${selectedPlan === 'monthly' ? 'border-amber-500 bg-amber-500/10 shadow-[0_0_20px_rgba(245,158,11,0.2)]' : 'border-slate-800 bg-slate-950/45 hover:border-slate-700'}`}
+                   >
+                     <div className="absolute top-0 right-0 bg-gradient-to-l from-rose-500 to-amber-500 text-white text-[8px] font-black px-2.5 py-0.5 rounded-bl-xl uppercase tracking-wider">
+                       Скидка 20%
+                     </div>
+                     {selectedPlan === 'monthly' && (
+                       <span className="absolute bottom-3.5 right-3.5 w-4 h-4 rounded-full bg-amber-500 border border-amber-400 flex items-center justify-center text-[10px] text-slate-950">✓</span>
+                     )}
+                     <div>
+                       <div className="text-[10px] font-extrabold uppercase tracking-wider text-amber-400 flex items-center gap-1">
+                         🔥 Безлимитный PRO (Месяц)
+                       </div>
+                       <div className="text-2xl font-black text-white mt-1 flex items-baseline gap-1.5">
+                         <span>790 ₽</span>
+                         <span className="text-xs text-slate-500 line-through font-bold">990 ₽</span>
+                       </div>
+                       <p className="text-[11px] text-slate-400 mt-2.5 font-medium leading-relaxed">
+                         <strong>Полный безлимит</strong> для любого числа сотрудников на 30 дней. Идеально для кадровиков и юристов.
+                       </p>
+                     </div>
+                     <div className="text-[9px] text-rose-400 font-bold mt-3 bg-rose-500/10 border border-rose-500/20 px-2 py-0.5 rounded-md w-fit">
+                       🎁 Скидка за привязку Telegram!
+                     </div>
+                   </div>
                 </div>
 
                 {/* Benefits Bullet Points */}
@@ -514,27 +550,31 @@ export default function ResultsTable({
 
                 {/* Purchase Button CTA */}
                 <motion.button 
-                  whileHover={{ scale: 1.03 }}
-                  whileTap={{ scale: 0.97 }}
-                  onClick={onUnlock}
+                  whileHover={{ scale: 1.02 }}
+                  whileTap={{ scale: 0.98 }}
+                  onClick={selectedPlan === 'single' ? onUnlock : onUnlockPro}
                   disabled={isLoadingUnlock}
-                  className="w-full bg-gradient-to-tr from-blue-600 to-indigo-600 hover:from-blue-500 hover:to-indigo-500 text-white font-black py-4 px-4 rounded-2xl flex items-center justify-center gap-2 transition-all shadow-[0_4px_25px_rgba(79,70,229,0.35)] border border-indigo-500/30 cursor-pointer disabled:opacity-75 text-sm uppercase tracking-wide"
+                  className={`w-full font-black py-4 px-4 rounded-2xl flex items-center justify-center gap-2 transition-all cursor-pointer disabled:opacity-75 text-sm uppercase tracking-wide ${selectedPlan === 'single' ? 'bg-gradient-to-tr from-blue-600 to-indigo-600 hover:from-blue-500 hover:to-indigo-500 text-white shadow-[0_4px_25px_rgba(79,70,229,0.35)] border border-indigo-500/30' : 'bg-gradient-to-tr from-amber-500 to-yellow-500 hover:from-amber-450 hover:to-yellow-450 text-slate-950 shadow-[0_4px_25px_rgba(245,158,11,0.35)] border border-amber-500/30'}`}
                 >
                   {isLoadingUnlock ? (
                     <>
-                      <svg className="animate-spin -ml-1 mr-2 h-4 w-4 text-white" fill="none" viewBox="0 0 24 24">
+                      <svg className="animate-spin -ml-1 mr-2 h-4 w-4 text-current" fill="none" viewBox="0 0 24 24">
                         <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4" />
                         <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z" />
                       </svg>
                       Подготовка платежа...
                     </>
-                  ) : (
+                  ) : selectedPlan === 'single' ? (
                     <span>Разблокировать расчет за 390 ₽</span>
+                  ) : (
+                    <span>Активировать PRO за 790 ₽</span>
                   )}
                 </motion.button>
 
                 <p className="text-[10px] text-slate-500 italic mt-3.5">
-                  Разовая покупка. Доступ предоставляется пожизненно на вашем аккаунте. Никаких скрытых подписок.
+                  {selectedPlan === 'single' 
+                    ? 'Разовая покупка. Доступ предоставляется пожизненно на вашем аккаунте. Никаких скрытых подписок.' 
+                    : 'Специальная акция: скидка 20% активирована. Подписка предоставляет безлимитный PRO-доступ на 30 дней.'}
                 </p>
               </motion.div>
             </div>

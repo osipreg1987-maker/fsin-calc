@@ -442,7 +442,12 @@ export default function Calculator() {
 
   const handleExport = (type: 'comp' | 'ded' | 'b2c-comp') => {
       if (!isUnlocked) {
-          document.getElementById('results-section')?.scrollIntoView({ behavior: 'smooth' });
+          const paywallEl = document.getElementById('paywall-card');
+          if (paywallEl) {
+              paywallEl.scrollIntoView({ behavior: 'smooth', block: 'center' });
+          } else {
+              document.getElementById('results-section')?.scrollIntoView({ behavior: 'smooth' });
+          }
           return;
       }
       exportToExcel(type, {
@@ -456,7 +461,12 @@ export default function Calculator() {
 
   const handleReportExport = () => {
       if (!isUnlocked) {
-          document.getElementById('results-section')?.scrollIntoView({ behavior: 'smooth' });
+          const paywallEl = document.getElementById('paywall-card');
+          if (paywallEl) {
+              paywallEl.scrollIntoView({ behavior: 'smooth', block: 'center' });
+          } else {
+              document.getElementById('results-section')?.scrollIntoView({ behavior: 'smooth' });
+          }
           return;
       }
       generateWordReport({

@@ -450,6 +450,7 @@ export default function ResultsTable({
           {!isUnlocked && (
             <div className="absolute inset-x-0 bottom-0 bg-gradient-to-t from-slate-950 via-slate-950/98 to-transparent pt-32 pb-8 px-4 flex flex-col items-center justify-end z-20 pointer-events-auto">
               <motion.div 
+                id="paywall-card"
                 initial={{ y: 30, opacity: 0 }}
                 animate={{ y: 0, opacity: 1 }}
                 transition={{ type: "spring", stiffness: 100, damping: 15 }}

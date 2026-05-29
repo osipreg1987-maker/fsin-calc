@@ -624,20 +624,24 @@ export default function Calculator() {
                 
                 <div className="grid grid-cols-2 gap-3">
                   <div id="tour-gender">
-                    <label className="block text-xs text-[var(--tw-hint)] mb-1">Пол</label>
-                    <div className="flex p-1 bg-[var(--tw-bg-base)] rounded-xl border border-[var(--tw-hint)]/30">
-                        <button 
+                    <label className="block text-xs text-slate-400 mb-1">Пол</label>
+                    <div className="flex p-1 bg-slate-950/45 backdrop-blur-md rounded-xl border border-slate-800/80">
+                        <motion.button 
+                          whileHover={{ scale: 1.02 }}
+                          whileTap={{ scale: 0.98 }}
                           onClick={() => handleGenderChange('M')}
-                          className={`flex-1 py-2 text-sm font-medium rounded-lg transition-all ${gender === 'M' ? 'bg-[var(--tw-button-bg)] text-[var(--tw-button-text)] shadow-sm' : 'text-[var(--tw-hint)] hover:text-[var(--foreground)]'}`}
+                          className={`flex-1 py-2 text-xs font-bold rounded-lg transition-all cursor-pointer ${gender === 'M' ? 'bg-gradient-to-r from-blue-600 to-indigo-600 text-white shadow-[0_0_15px_rgba(79,70,229,0.3)]' : 'text-slate-400 hover:text-slate-200'}`}
                         >
                           Муж
-                        </button>
-                        <button 
+                        </motion.button>
+                        <motion.button 
+                          whileHover={{ scale: 1.02 }}
+                          whileTap={{ scale: 0.98 }}
                           onClick={() => handleGenderChange('F')}
-                          className={`flex-1 py-2 text-sm font-medium rounded-lg transition-all ${gender === 'F' ? 'bg-[var(--tw-button-bg)] text-[var(--tw-button-text)] shadow-sm' : 'text-[var(--tw-hint)] hover:text-[var(--foreground)]'}`}
+                          className={`flex-1 py-2 text-xs font-bold rounded-lg transition-all cursor-pointer ${gender === 'F' ? 'bg-gradient-to-r from-blue-600 to-indigo-600 text-white shadow-[0_0_15px_rgba(79,70,229,0.3)]' : 'text-slate-400 hover:text-slate-200'}`}
                         >
                           Жен
-                        </button>
+                        </motion.button>
                     </div>
                   </div>
                 </div>
@@ -647,7 +651,7 @@ export default function Calculator() {
             {/* Periods Card */}
             <div id="tour-periods" className="glass-panel rounded-2xl p-5">
               <div className="flex justify-between items-center mb-5">
-                  <h2 className="text-lg font-bold text-[var(--foreground)] flex items-center gap-2">
+                  <h2 className="text-lg font-bold text-slate-100 flex items-center gap-2">
                   <div className="w-1.5 h-5 bg-indigo-500 rounded-full"></div>
                   Периоды службы
                   </h2>
@@ -661,34 +665,34 @@ export default function Calculator() {
                           initial={{ opacity: 0, height: 0 }}
                           animate={{ opacity: 1, height: 'auto' }}
                           exit={{ opacity: 0, height: 0 }}
-                          className="p-4 bg-[var(--tw-bg-base)] rounded-xl border border-[var(--tw-hint)]/20 space-y-3 relative group shadow-sm"
+                          className="p-4 bg-slate-950/35 backdrop-blur-md rounded-2xl border border-slate-800/60 space-y-3 relative group shadow-lg shadow-black/20"
                       >
                           <div className="flex justify-between items-center">
-                              <span className="text-sm font-bold text-[var(--tw-hint)]">
+                              <span className="text-xs font-bold text-slate-400">
                                   Период службы ({activeNorms.find(n => n.id === period.norm)?.name?.match(/\((.*?)\)/)?.[1] || `№${index + 1}`})
                               </span>
                               {periods.length > 1 && (
-                                  <button onClick={() => removePeriod(period.id)} className="text-rose-400 hover:text-rose-500 p-1">
-                                      <Trash2 size={18} />
+                                  <button onClick={() => removePeriod(period.id)} className="text-rose-400 hover:text-rose-500 p-1 cursor-pointer animate-none">
+                                      <Trash2 size={16} />
                                   </button>
                               )}
                           </div>
                           
                           <div className="grid grid-cols-2 gap-3">
                               <div>
-                                  <label className="block text-[10px] uppercase font-bold text-[var(--tw-hint)] mb-1">Начало</label>
+                                  <label className="block text-[9px] uppercase font-bold text-slate-500 mb-1">Начало</label>
                                   <input 
                                       type="date" 
-                                      className="w-full bg-transparent border border-[var(--tw-hint)]/30 rounded-lg p-2 text-sm text-[var(--foreground)] outline-none focus:border-[var(--tw-link)]"
+                                      className="w-full bg-slate-950/45 backdrop-blur-md border border-slate-800/80 rounded-xl p-2.5 text-xs text-slate-100 placeholder-slate-500 outline-none focus:border-blue-500/50 focus:ring-1 focus:ring-blue-500/10 transition-all"
                                       value={period.start}
                                       onChange={(e) => updatePeriod(period.id, 'start', e.target.value)}
                                   />
                               </div>
                               <div>
-                                  <label className="block text-[10px] uppercase font-bold text-[var(--tw-hint)] mb-1">Конец</label>
+                                  <label className="block text-[9px] uppercase font-bold text-slate-500 mb-1">Конец</label>
                                   <input 
                                       type="date" 
-                                      className="w-full bg-transparent border border-[var(--tw-hint)]/30 rounded-lg p-2 text-sm text-[var(--foreground)] outline-none focus:border-[var(--tw-link)]"
+                                      className="w-full bg-slate-950/45 backdrop-blur-md border border-slate-800/80 rounded-xl p-2.5 text-xs text-slate-100 placeholder-slate-500 outline-none focus:border-blue-500/50 focus:ring-1 focus:ring-blue-500/10 transition-all"
                                       value={period.end}
                                       onChange={(e) => updatePeriod(period.id, 'end', e.target.value)}
                                   />
@@ -698,29 +702,31 @@ export default function Calculator() {
                           <div>
                               <label className="block text-[10px] uppercase font-bold text-[var(--tw-hint)] mb-1">Норма</label>
                               <select 
-                                  className="w-full bg-[var(--tw-bg-base)] border border-[var(--tw-hint)]/30 rounded-lg p-2 text-sm text-[var(--foreground)] outline-none focus:border-[var(--tw-link)]"
+                                  className="w-full bg-slate-950/45 backdrop-blur-md border border-slate-800/80 rounded-xl p-2.5 text-xs text-slate-100 placeholder-slate-500 outline-none focus:border-blue-500/50 focus:ring-1 focus:ring-blue-500/10 transition-all"
                                   value={period.norm}
                                   onChange={(e) => updatePeriod(period.id, 'norm', parseInt(e.target.value))}
                               >
-                                  {activeNorms.map(n => <option key={n.id} value={n.id}>{n.name}</option>)}
+                                  {activeNorms.map(n => <option key={n.id} value={n.id} className="bg-slate-900 text-slate-200">{n.name}</option>)}
                               </select>
                           </div>
                       </motion.div>
                   ))}
                   </AnimatePresence>
                   
-                  <div className="text-right text-sm text-[var(--tw-link)] mt-2 font-medium">
+                  <div className="text-right text-xs text-indigo-400 mt-2 font-bold tracking-wide">
                       Выслуга: {formatServiceTime(totalServiceMonths)}
                   </div>
 
-                  <button 
+                  <motion.button 
                       type="button"
+                      whileHover={{ scale: 1.02 }}
+                      whileTap={{ scale: 0.98 }}
                       onClick={addPeriod}
-                      className="w-full py-3 border border-dashed border-[var(--tw-link)] rounded-xl text-[var(--tw-link)] hover:bg-[var(--tw-link)] hover:text-white transition-all flex items-center justify-center gap-2 text-sm font-medium mt-2"
+                      className="w-full py-3.5 border border-dashed border-blue-500/40 hover:border-blue-400 rounded-xl text-blue-400 hover:text-white hover:bg-blue-600/10 transition-all flex items-center justify-center gap-2 text-xs font-bold mt-2 cursor-pointer animate-none"
                   >
-                      <Plus size={16} />
+                      <Plus size={14} />
                       Добавить период
-                  </button>
+                  </motion.button>
               </div>
             </div>
         </div>

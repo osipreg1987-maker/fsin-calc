@@ -412,32 +412,6 @@ export default function Calculator() {
               <motion.button 
                 whileHover={{ scale: 1.05 }} 
                 whileTap={{ scale: 0.95 }} 
-                onClick={() => handleExport('comp')} 
-                className="flex items-center gap-2 bg-gradient-to-r from-emerald-600 to-teal-600 hover:from-emerald-500 hover:to-teal-500 text-white px-5 py-2.5 rounded-xl font-medium transition-all shadow-[0_0_15px_rgba(16,185,129,0.3)]"
-                title="Обычная справка-расчет"
-              >
-                  <Download size={18} /> На выплату
-              </motion.button>
-              <motion.button 
-                whileHover={{ scale: 1.05 }} 
-                whileTap={{ scale: 0.95 }} 
-                onClick={() => handleExport('ded')} 
-                className="flex items-center gap-2 bg-gradient-to-r from-rose-600 to-red-600 hover:from-rose-500 hover:to-red-500 text-white px-5 py-2.5 rounded-xl font-medium transition-all shadow-[0_0_15px_rgba(225,29,72,0.3)]"
-              >
-                  <Download size={18} /> На удержание
-              </motion.button>
-              <motion.button 
-                whileHover={{ scale: 1.05 }} 
-                whileTap={{ scale: 0.95 }} 
-                onClick={() => handleExport('b2c-comp')} 
-                className="flex items-center gap-2 bg-purple-600 hover:bg-purple-500 text-white px-5 py-2.5 rounded-xl font-medium transition-all shadow-[0_0_15px_rgba(147,51,234,0.3)]"
-                title="Подробная справка с юридическим обоснованием для увольняющихся"
-              >
-                  <Download size={18} /> Обоснование
-              </motion.button>
-              <motion.button 
-                whileHover={{ scale: 1.05 }} 
-                whileTap={{ scale: 0.95 }} 
                 onClick={handleReportExport} 
                 className="flex items-center gap-2 bg-indigo-600 hover:bg-indigo-500 text-white px-5 py-2.5 rounded-xl font-medium transition-all shadow-[0_0_15px_rgba(79,70,229,0.3)]"
               >
@@ -455,20 +429,13 @@ export default function Calculator() {
                       Положено компенсации
                       {!isTwa && <Download size={16} className="text-emerald-500 opacity-0 group-hover:opacity-100 transition-opacity" />}
                   </h3>
-                  <div className="text-2xl font-bold text-[var(--foreground)]">{formatCurrency(totalComp)}</div>
+                  <div className="text-2xl font-bold text-emerald-500">{formatCurrency(totalComp)}</div>
                   {!isTwa && (
                       <div className="mt-2 text-emerald-500 text-xs font-medium flex items-center gap-1 opacity-70 group-hover:opacity-100 transition-opacity">
                           <Download size={14} /> Скачать справку
                       </div>
                   )}
               </button>
-              {!isTwa && (
-                  <div className="bg-slate-800/30 border-t border-slate-700/30 p-2">
-                      <button onClick={(e) => { e.stopPropagation(); handleExport('b2c-comp'); }} className="w-full py-1.5 rounded-lg text-xs font-medium text-purple-400 hover:text-white hover:bg-purple-500/20 flex items-center justify-center gap-1 transition-colors">
-                          <FileText size={14} /> Скачать расширенное обоснование
-                      </button>
-                  </div>
-              )}
           </motion.div>
 
           <motion.button 
@@ -492,7 +459,7 @@ export default function Calculator() {
 
           <motion.button 
               whileHover={{ y: -5 }} 
-              onClick={handleReportExport} 
+              onClick={() => handleExport('b2c-comp')} 
               className={`glass-panel p-5 rounded-2xl text-left w-full transition-colors group flex flex-col justify-between ${isPositive ? 'bg-emerald-500/10 border-emerald-500/20 hover:bg-emerald-500/15' : 'bg-rose-500/10 border-rose-500/20 hover:bg-rose-500/15'}`}
           >
               <div>
@@ -507,7 +474,7 @@ export default function Calculator() {
               </div>
               {!isTwa && (
                   <div className={`mt-2 text-xs font-medium flex items-center gap-1 opacity-70 group-hover:opacity-100 transition-opacity ${isPositive ? 'text-emerald-500' : 'text-rose-500'}`}>
-                      <FileText size={14} /> Скачать рапорт
+                      <FileText size={14} /> Скачать расширенное обоснование
                   </div>
               )}
           </motion.button>

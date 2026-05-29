@@ -127,7 +127,7 @@ export const generateExcelHtml = (type, data) => {
                     <td class="bold">№</td>
                     <td class="bold">Наименование / Периоды службы</td>
                     <td class="bold">Ед.<br>изм.</td>
-                    <td class="bold">Норма<br>(лет)</td>
+                    <td class="bold">Норма<br>(мес)</td>
                     <td class="bold">Срок<br>(мес)</td>
                     <td class="bold">Положено<br>(шт)</td>
                     <td class="bold">Удержано<br>(шт)</td>
@@ -146,6 +146,9 @@ export const generateExcelHtml = (type, data) => {
             if (safeName.toLowerCase().includes('ботинки') || safeName.toLowerCase().includes('полусапоги') || safeName.toLowerCase().includes('носки') || safeName.toLowerCase().includes('перчатки') || safeName.toLowerCase().includes('сапоги')) unit = 'пар.';
             
             let qty = Math.round((r.comp || 0) / (r.price || 1));
+            let earnedQty = r.earnedQty || 0;
+            let amortQty = (r.amortMoney || 0) / (r.price || 1);
+            let totalDeductions = (r.issuedCount || 0) + amortQty;
             
             html += `
                 <tr class="bg-light">
@@ -154,8 +157,8 @@ export const generateExcelHtml = (type, data) => {
                     <td class="bold">${unit}</td>
                     <td class="bold">-</td>
                     <td class="bold">-</td>
-                    <td class="bold">-</td>
-                    <td class="bold">-</td>
+                    <td class="bold" style="mso-number-format:'0.00';">${earnedQty.toFixed(2).replace('.', ',')}</td>
+                    <td class="bold" style="mso-number-format:'0.00';">${totalDeductions > 0 ? totalDeductions.toFixed(2).replace('.', ',') : '-'}</td>
                     <td class="bold" style="mso-number-format:'0';">${qty}</td>
                     <td class="bold" style="mso-number-format:'0.00';">${r.price || 0}</td>
                     <td class="bold" style="mso-number-format:'0.00';">${(r.comp || 0).toFixed(2).replace('.', ',')}</td>
@@ -170,7 +173,7 @@ export const generateExcelHtml = (type, data) => {
                             <td></td>
                             <td class="left italic" style="padding-left: 20px;">Период: ${p.start || ''} - ${p.end || ''} (Пост. ${p.type || '150'})</td>
                             <td></td>
-                            <td style="mso-number-format:'0.0';">${p.norm || 0}</td>
+                            <td style="mso-number-format:'0';">${Math.round((p.norm || 0) * 12)}</td>
                             <td style="mso-number-format:'0';">${p.monthsInPeriod || 0}</td>
                             <td style="mso-number-format:'0.00';">${(p.earned || 0).toFixed(2).replace('.', ',')}</td>
                             <td></td>

@@ -70,7 +70,7 @@ bot.start(async (ctx) => {
         const mainMenu = Markup.keyboard([
             [Markup.button.webApp('🧮 Открыть калькулятор', webAppUrl)],
             ['📂 Мои расчеты', '❓ Частые вопросы'],
-            ['🎧 Поддержка']
+            ['🎧 Поддержка', '📄 Шаблон рапорта']
         ]).resize();
         
         ctx.reply(
@@ -130,7 +130,8 @@ const handleArchive = async (ctx: any) => {
             
             if (sub.is_pro) {
                 await ctx.reply(text, Markup.inlineKeyboard([
-                    [Markup.button.callback('⬇️ На выплату', `xls_comp_${r.id}`), Markup.button.callback('⬇️ На удержание', `xls_ded_${r.id}`)]
+                    [Markup.button.callback('⬇️ На выплату', `xls_comp_${r.id}`), Markup.button.callback('⬇️ На удержание', `xls_ded_${r.id}`)],
+                    [Markup.button.callback('⬇️ Обоснование', `xls_b2c-comp_${r.id}`)]
                 ]));
             } else {
                 await ctx.reply(text);
@@ -173,6 +174,20 @@ bot.hears('🎧 Поддержка', (ctx) => {
     ctx.reply("Напишите ваш вопрос прямо в этот чат, и наши специалисты ответят вам в ближайшее время! 👇");
 });
 
+// Шаблон рапорта
+bot.hears('📄 Шаблон рапорта', async (ctx) => {
+    const baseUrl = process.env.NEXT_PUBLIC_SITE_URL || 'https://fsin-calc.vercel.app';
+    const fileUrl = `${baseUrl}/Рапорт_на_компенсацию.docx`;
+    try {
+        await ctx.replyWithDocument(
+            { url: fileUrl, filename: 'Рапорт_на_компенсацию.docx' },
+            { caption: 'Вот ваш шаблон рапорта на компенсацию!' }
+        );
+    } catch (e) {
+        ctx.reply("❌ Не удалось отправить файл. Попробуйте скачать его на сайте.");
+    }
+});
+
 // Рассылка (только для админа)
 bot.command('broadcast', async (ctx) => {
     if (ctx.from.id.toString() !== '1654211029') return;
@@ -202,13 +217,13 @@ bot.command('calc', (ctx) => {
     const mainMenu = Markup.keyboard([
         [Markup.button.webApp('🧮 Открыть калькулятор', webAppUrl)],
         ['📂 Мои расчеты', '❓ Частые вопросы'],
-        ['🎧 Поддержка']
+        ['🎧 Поддержка', '📄 Шаблон рапорта']
     ]).resize();
     ctx.reply("Нажмите на кнопку ниже, чтобы открыть калькулятор:", mainMenu);
 });
 
 // Скачивание Excel из архива (Callback Query)
-bot.action(/xls_(comp|ded)_(.+)/, async (ctx) => {
+bot.action(/xls_(comp|ded|b2c-comp)_(.+)/, async (ctx) => {
     try {
         const type = ctx.match[1];
         const archiveId = ctx.match[2];
@@ -240,10 +255,13 @@ bot.action(/xls_(comp|ded)_(.+)/, async (ctx) => {
             dismissalDate: record.dism_date
         };
 
-        const htmlString = generateExcelHtml(type as 'comp'|'ded', exportData);
+        const htmlString = generateExcelHtml(type as 'comp'|'ded'|'b2c-comp', exportData);
         const buffer = Buffer.from(htmlString, 'utf-8');
         
-        const filename = type === 'comp' ? `Kompensaciya_${record.employee_fio}.xls` : `Uderzhanie_${record.employee_fio}.xls`;
+        let filename = `Spravka_${record.employee_fio}.xls`;
+        if (type === 'comp') filename = `Kompensaciya_${record.employee_fio}.xls`;
+        else if (type === 'ded') filename = `Uderzhanie_${record.employee_fio}.xls`;
+        else if (type === 'b2c-comp') filename = `Obosnovanie_${record.employee_fio}.xls`;
         
         await ctx.replyWithDocument({
             source: buffer,
@@ -261,7 +279,34 @@ bot.on('web_app_data', async (ctx) => {
         const dataStr = ctx.message.web_app_data.data;
         const payload = JSON.parse(dataStr);
         
-        ctx.reply("⏳ Принял расчет! Генерирую Excel файлы...");
+        ctx.reply("⏳ Принял расчет! Сохраняю в архив и генерирую Excel файлы...");
+
+        const telegramId = ctx.from.id.toString();
+        
+        // Пытаемся найти пользователя и сохранить расчет в его облачный архив
+        try {
+            const { data: sub } = await supabase
+                .from('subscriptions')
+                .select('user_id')
+                .eq('telegram_id', telegramId)
+                .single();
+
+            if (sub && sub.user_id) {
+                await supabase.from('archives').insert({
+                    user_id: sub.user_id,
+                    employee_fio: payload.employeeFio || 'Сотрудник',
+                    employee_rank: payload.employeeRank || '',
+                    dismissal_group: payload.dismissalGroup || '1',
+                    dism_date: payload.dismDate,
+                    gender: payload.gender || 'male',
+                    periods: payload.periods || [],
+                    item_totals: payload.itemTotals || {},
+                    custom_prices: payload.customPrices || {}
+                });
+            }
+        } catch (e) {
+            console.error("Ошибка при сохранении в архив:", e);
+        }
 
         const calculated = calculateCore({
             periods: payload.periods,
@@ -282,12 +327,15 @@ bot.on('web_app_data', async (ctx) => {
 
         const htmlComp = generateExcelHtml('comp', exportData);
         const htmlDed = generateExcelHtml('ded', exportData);
+        const htmlB2c = generateExcelHtml('b2c-comp', exportData);
         
         const bufComp = Buffer.from(htmlComp, 'utf-8');
         const bufDed = Buffer.from(htmlDed, 'utf-8');
+        const bufB2c = Buffer.from(htmlB2c, 'utf-8');
         
         await ctx.replyWithDocument({ source: bufComp, filename: `Kompensaciya_${exportData.employeeFio}.xls` });
         await ctx.replyWithDocument({ source: bufDed, filename: `Uderzhanie_${exportData.employeeFio}.xls` });
+        await ctx.replyWithDocument({ source: bufB2c, filename: `Obosnovanie_${exportData.employeeFio}.xls` });
 
     } catch (e) {
         console.error(e);

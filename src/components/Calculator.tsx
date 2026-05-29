@@ -3,7 +3,7 @@
 
 import { useState, useEffect, useMemo } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
-import { Save, LogOut, User, Download, Plus, Trash2, HelpCircle, Archive, Crown, ChevronDown, ChevronUp, Lock, Unlock, FileText, X } from 'lucide-react';
+import { Save, LogOut, User, Download, Plus, Trash2, HelpCircle, Archive, Crown, ChevronDown, ChevronUp, Lock, Unlock, FileText, X, Scale } from 'lucide-react';
 import { driver } from 'driver.js';
 import 'driver.js/dist/driver.css';
 import IssueLogTable from './IssueLogTable';
@@ -423,16 +423,20 @@ export default function Calculator() {
 
       {/* Dashboards */}
       <div className="grid grid-cols-1 md:grid-cols-3 gap-4 mb-8">
-          <motion.div whileHover={{ y: -5 }} className="rounded-2xl overflow-hidden flex flex-col bg-gradient-to-br from-emerald-600 to-teal-600 shadow-[0_0_15px_rgba(16,185,129,0.3)]">
-              <button onClick={() => handleExport('comp')} className="p-5 text-left w-full hover:brightness-110 transition-all group flex-1">
-                  <h3 className="text-emerald-50 font-medium mb-1 text-sm flex justify-between">
-                      Положено компенсации
-                      {!isTwa && <Download size={16} className="text-white opacity-0 group-hover:opacity-100 transition-opacity" />}
-                  </h3>
-                  <div className="text-2xl font-bold text-white">{formatCurrency(totalComp)}</div>
+          <motion.div whileHover={{ y: -5 }} className="glass-panel p-0 rounded-2xl overflow-hidden flex flex-col">
+              <button onClick={() => handleExport('comp')} className="p-6 text-left w-full hover:bg-emerald-500/5 transition-colors group flex-1">
+                  <div className="flex items-center gap-3 mb-4">
+                      <div className="bg-emerald-500/20 text-emerald-400 p-2.5 rounded-xl">
+                          <Scale size={24} />
+                      </div>
+                      <h3 className="text-[var(--tw-hint)] font-medium text-base">
+                          Положено компенсации
+                      </h3>
+                  </div>
+                  <div className="text-3xl lg:text-4xl font-bold text-emerald-400 mb-2">{formatCurrency(totalComp)}</div>
                   {!isTwa && (
-                      <div className="mt-2 text-emerald-100 text-xs font-medium flex items-center gap-1 opacity-70 group-hover:opacity-100 transition-opacity">
-                          <Download size={14} /> Скачать справку
+                      <div className="mt-4 text-emerald-500/80 text-sm font-medium flex items-center gap-2 group-hover:text-emerald-400 transition-colors">
+                          <Download size={16} /> Скачать справку
                       </div>
                   )}
               </button>
@@ -441,18 +445,22 @@ export default function Calculator() {
           <motion.button 
               whileHover={{ y: -5 }} 
               onClick={() => handleExport('ded')} 
-              className="rounded-2xl p-5 text-left w-full bg-gradient-to-br from-rose-600 to-red-600 hover:brightness-110 text-white shadow-[0_0_15px_rgba(225,29,72,0.3)] transition-all group flex flex-col justify-between"
+              className="glass-panel p-6 rounded-2xl text-left w-full hover:bg-rose-500/5 transition-colors group flex flex-col justify-between"
           >
               <div>
-                  <h3 className="text-rose-50 font-medium mb-1 text-sm flex justify-between">
-                      Подлежит удержанию
-                      {!isTwa && <Download size={16} className="text-white opacity-0 group-hover:opacity-100 transition-opacity" />}
-                  </h3>
-                  <div className="text-2xl font-bold text-white">{formatCurrency(totalDed)}</div>
+                  <div className="flex items-center gap-3 mb-4">
+                      <div className="bg-rose-500/20 text-rose-400 p-2.5 rounded-xl">
+                          <Scale size={24} />
+                      </div>
+                      <h3 className="text-[var(--tw-hint)] font-medium text-base">
+                          Подлежит удержанию
+                      </h3>
+                  </div>
+                  <div className="text-3xl lg:text-4xl font-bold text-[var(--foreground)] mb-2">{formatCurrency(totalDed)}</div>
               </div>
               {!isTwa && (
-                  <div className="mt-2 text-rose-100 text-xs font-medium flex items-center gap-1 opacity-70 group-hover:opacity-100 transition-opacity">
-                      <Download size={14} /> Скачать справку
+                  <div className="mt-4 text-rose-500/80 text-sm font-medium flex items-center gap-2 group-hover:text-rose-400 transition-colors">
+                      <Download size={16} /> Скачать справку
                   </div>
               )}
           </motion.button>
@@ -460,21 +468,25 @@ export default function Calculator() {
           <motion.button 
               whileHover={{ y: -5 }} 
               onClick={() => handleExport('b2c-comp')} 
-              className="rounded-2xl p-5 text-left w-full bg-gradient-to-br from-purple-600 to-indigo-600 hover:brightness-110 text-white shadow-[0_0_15px_rgba(147,51,234,0.3)] transition-all group flex flex-col justify-between"
+              className={`glass-panel p-6 rounded-2xl text-left w-full transition-colors group flex flex-col justify-between ${isPositive ? 'bg-emerald-500/5 hover:bg-emerald-500/10' : 'bg-rose-500/5 hover:bg-rose-500/10'}`}
           >
               <div>
-                  <h3 className="text-purple-50 font-medium mb-1 text-sm flex justify-between">
-                      ИТОГОВЫЙ БАЛАНС
-                      {!isTwa && <FileText size={16} className="text-white opacity-0 group-hover:opacity-100 transition-opacity" />}
-                  </h3>
-                  <div className="text-2xl font-bold text-white mb-1">{formatCurrency(Math.abs(finalBalance))}</div>
-                  <div className="text-xs text-purple-100 opacity-90">
+                  <div className="flex items-center gap-3 mb-4">
+                      <div className="bg-purple-500/20 text-purple-400 p-2.5 rounded-xl">
+                          <Scale size={24} />
+                      </div>
+                      <h3 className="text-purple-400 font-medium text-base">
+                          ИТОГОВЫЙ БАЛАНС
+                      </h3>
+                  </div>
+                  <div className={`text-3xl lg:text-4xl font-bold mb-1 ${isPositive ? 'text-emerald-500' : 'text-rose-500'}`}>{formatCurrency(Math.abs(finalBalance))}</div>
+                  <div className={`text-sm ${isPositive ? 'text-emerald-500/70' : 'text-rose-500/70'}`}>
                       {isPositive ? 'К выплате сотруднику' : 'Взыскать в бюджет'}
                   </div>
               </div>
               {!isTwa && (
-                  <div className="mt-2 text-purple-100 text-xs font-medium flex items-center gap-1 opacity-70 group-hover:opacity-100 transition-opacity">
-                      <FileText size={14} /> Скачать расширенное обоснование
+                  <div className="mt-4 text-purple-400/80 text-sm font-medium flex items-center gap-2 group-hover:text-purple-400 transition-colors">
+                      <FileText size={16} /> Скачать расширенное обоснование
                   </div>
               )}
           </motion.button>

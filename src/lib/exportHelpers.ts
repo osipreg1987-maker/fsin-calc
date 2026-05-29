@@ -502,9 +502,15 @@ export const exportToExcel = (type, data) => {
 
     const url = URL.createObjectURL(blob);
     const a = document.createElement('a');
+    a.style.display = 'none';
     a.href = url;
+    a.target = '_blank';
     a.download = type === 'b2c-comp' ? 'Spravka_Obosnovanie_Fsin.xls' : (type === 'comp' ? 'Spravka_Kompensaciya.xls' : 'Spravka_Uderzhanie.xls');
+    document.body.appendChild(a);
     a.click();
-    URL.revokeObjectURL(url);
+    setTimeout(() => {
+        document.body.removeChild(a);
+        URL.revokeObjectURL(url);
+    }, 100);
 };
 

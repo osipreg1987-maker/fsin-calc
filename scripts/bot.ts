@@ -70,7 +70,7 @@ bot.start(async (ctx) => {
             "/instruction - Инструкция по спорам\n" +
             "/calc - Открыть калькулятор",
             Markup.keyboard([
-                [Markup.button.webApp('🧮 Открыть калькулятор', 'https://b5dfb09dd5ee0f.lhr.life')]
+                [Markup.button.webApp('🧮 Открыть калькулятор', 'https://fsin-calc.vercel.app/calc')]
             ]).resize()
         );
     }
@@ -136,7 +136,7 @@ bot.command('my_archive', async (ctx) => {
 
 bot.command('calc', (ctx) => {
     ctx.reply("Нажмите на кнопку ниже, чтобы открыть калькулятор:", Markup.keyboard([
-        [Markup.button.webApp('🧮 Открыть калькулятор', 'https://b5dfb09dd5ee0f.lhr.life')]
+        [Markup.button.webApp('🧮 Открыть калькулятор', 'https://fsin-calc.vercel.app/calc')]
     ]).resize());
 });
 
@@ -161,7 +161,7 @@ bot.command('instruction', async (ctx) => {
         "вы можете ознакомиться с подробной инструкцией, где собрана вся необходимая юридическая база.\n\n" +
         "Нажмите кнопку ниже, чтобы прочитать инструкцию на сайте:",
         Markup.inlineKeyboard([
-            [Markup.button.url('Читать инструкцию', 'https://b5dfb09dd5ee0f.lhr.life/instructions')]
+            [Markup.button.url('Читать инструкцию', 'https://fsin-calc.vercel.app/instructions')]
         ])
     );
 });

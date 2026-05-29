@@ -448,69 +448,70 @@ export default function Calculator() {
       )}
 
       {/* Dashboards */}
-      <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-          <motion.div whileHover={{ y: -5 }} className="glass-panel p-5 rounded-2xl">
-              <h3 className="text-[var(--tw-hint)] font-medium mb-1 text-sm">Положено компенсации</h3>
-              <div className="text-2xl font-bold text-[var(--foreground)]">{formatCurrency(totalComp)}</div>
+      <div className="grid grid-cols-1 md:grid-cols-3 gap-4 mb-8">
+          <motion.div whileHover={{ y: -5 }} className="glass-panel p-0 rounded-2xl overflow-hidden flex flex-col">
+              <button onClick={() => handleExport('comp')} className="p-5 text-left w-full hover:bg-emerald-500/5 transition-colors group flex-1">
+                  <h3 className="text-[var(--tw-hint)] font-medium mb-1 text-sm flex justify-between">
+                      Положено компенсации
+                      {!isTwa && <Download size={16} className="text-emerald-500 opacity-0 group-hover:opacity-100 transition-opacity" />}
+                  </h3>
+                  <div className="text-2xl font-bold text-[var(--foreground)]">{formatCurrency(totalComp)}</div>
+                  {!isTwa && (
+                      <div className="mt-2 text-emerald-500 text-xs font-medium flex items-center gap-1 opacity-70 group-hover:opacity-100 transition-opacity">
+                          <Download size={14} /> Скачать справку
+                      </div>
+                  )}
+              </button>
+              {!isTwa && (
+                  <div className="bg-slate-800/30 border-t border-slate-700/30 p-2">
+                      <button onClick={(e) => { e.stopPropagation(); handleExport('b2c-comp'); }} className="w-full py-1.5 rounded-lg text-xs font-medium text-purple-400 hover:text-white hover:bg-purple-500/20 flex items-center justify-center gap-1 transition-colors">
+                          <FileText size={14} /> Скачать расширенное обоснование
+                      </button>
+                  </div>
+              )}
           </motion.div>
-          <motion.div whileHover={{ y: -5 }} className="glass-panel p-5 rounded-2xl">
-              <h3 className="text-[var(--tw-hint)] font-medium mb-1 text-sm">Подлежит удержанию</h3>
-              <div className="text-2xl font-bold text-[var(--foreground)]">{formatCurrency(totalDed)}</div>
-          </motion.div>
-          <motion.div whileHover={{ y: -5 }} className={`glass-panel p-5 rounded-2xl ${isPositive ? 'bg-emerald-500/10 border-emerald-500/20' : 'bg-rose-500/10 border-rose-500/20'}`}>
-              <h3 className={`font-medium mb-1 text-sm ${isPositive ? 'text-emerald-500' : 'text-rose-500'}`}>ИТОГОВЫЙ БАЛАНС</h3>
-              <div className={`text-2xl font-bold mb-1 ${isPositive ? 'text-emerald-600 dark:text-emerald-400' : 'text-rose-600 dark:text-rose-400'}`}>{formatCurrency(Math.abs(finalBalance))}</div>
-              <div className={`text-xs ${isPositive ? 'text-emerald-600/70 dark:text-emerald-400/70' : 'text-rose-600/70 dark:text-rose-400/70'}`}>
-                  {isPositive ? 'К выплате сотруднику' : 'Взыскать в бюджет'}
-              </div>
-          </motion.div>
-      </div>
 
-      {/* Export Section */}
-      {!isTwa && (
-      <div className="flex flex-col md:flex-row gap-3 flex-wrap justify-end items-center mt-2 mb-8" id="tour-export">
-          <button onClick={startTour} className="hidden md:flex items-center gap-2 text-slate-400 hover:text-indigo-400 transition-colors mr-2">
-              <HelpCircle size={18} /> <span className="text-sm font-medium">Обучение</span>
-          </button>
-          <a href="/instructions" target="_blank" className="hidden md:flex items-center gap-2 text-purple-400 hover:text-purple-300 transition-colors mr-4">
-              <FileText size={18} /> <span className="text-sm font-medium">Инструкция (спор)</span>
-          </a>
           <motion.button 
-            whileHover={{ scale: 1.05 }} 
-            whileTap={{ scale: 0.95 }} 
-            onClick={() => handleExport('comp')} 
-            className="flex items-center gap-2 bg-gradient-to-r from-emerald-600 to-teal-600 hover:from-emerald-500 hover:to-teal-500 text-white px-5 py-2.5 rounded-xl font-medium transition-all shadow-[0_0_15px_rgba(16,185,129,0.3)]"
-            title="Обычная справка-расчет"
+              whileHover={{ y: -5 }} 
+              onClick={() => handleExport('ded')} 
+              className="glass-panel p-5 rounded-2xl text-left w-full hover:bg-rose-500/5 transition-colors group flex flex-col justify-between"
           >
-              <Download size={18} /> На выплату
+              <div>
+                  <h3 className="text-[var(--tw-hint)] font-medium mb-1 text-sm flex justify-between">
+                      Подлежит удержанию
+                      {!isTwa && <Download size={16} className="text-rose-500 opacity-0 group-hover:opacity-100 transition-opacity" />}
+                  </h3>
+                  <div className="text-2xl font-bold text-[var(--foreground)]">{formatCurrency(totalDed)}</div>
+              </div>
+              {!isTwa && (
+                  <div className="mt-2 text-rose-500 text-xs font-medium flex items-center gap-1 opacity-70 group-hover:opacity-100 transition-opacity">
+                      <Download size={14} /> Скачать справку
+                  </div>
+              )}
           </motion.button>
+
           <motion.button 
-            whileHover={{ scale: 1.05 }} 
-            whileTap={{ scale: 0.95 }} 
-            onClick={() => handleExport('ded')} 
-            className="flex items-center gap-2 bg-gradient-to-r from-rose-600 to-red-600 hover:from-rose-500 hover:to-red-500 text-white px-5 py-2.5 rounded-xl font-medium transition-all shadow-[0_0_15px_rgba(225,29,72,0.3)]"
+              whileHover={{ y: -5 }} 
+              onClick={handleReportExport} 
+              className={`glass-panel p-5 rounded-2xl text-left w-full transition-colors group flex flex-col justify-between ${isPositive ? 'bg-emerald-500/10 border-emerald-500/20 hover:bg-emerald-500/15' : 'bg-rose-500/10 border-rose-500/20 hover:bg-rose-500/15'}`}
           >
-              <Download size={18} /> На удержание
-          </motion.button>
-          <motion.button 
-            whileHover={{ scale: 1.05 }} 
-            whileTap={{ scale: 0.95 }} 
-            onClick={() => handleExport('b2c-comp')} 
-            className="flex items-center gap-2 bg-purple-600 hover:bg-purple-500 text-white px-5 py-2.5 rounded-xl font-medium transition-all shadow-[0_0_15px_rgba(147,51,234,0.3)]"
-            title="Подробная справка с юридическим обоснованием для увольняющихся"
-          >
-              <Download size={18} /> Обоснование
-          </motion.button>
-          <motion.button 
-            whileHover={{ scale: 1.05 }} 
-            whileTap={{ scale: 0.95 }} 
-            onClick={handleReportExport} 
-            className="flex items-center gap-2 bg-indigo-600 hover:bg-indigo-500 text-white px-5 py-2.5 rounded-xl font-medium transition-all shadow-[0_0_15px_rgba(79,70,229,0.3)]"
-          >
-              <FileText size={18} /> Рапорт
+              <div>
+                  <h3 className={`font-medium mb-1 text-sm flex justify-between ${isPositive ? 'text-emerald-500' : 'text-rose-500'}`}>
+                      ИТОГОВЫЙ БАЛАНС
+                      {!isTwa && <FileText size={16} className={`${isPositive ? 'text-emerald-500' : 'text-rose-500'} opacity-0 group-hover:opacity-100 transition-opacity`} />}
+                  </h3>
+                  <div className={`text-2xl font-bold mb-1 ${isPositive ? 'text-emerald-600 dark:text-emerald-400' : 'text-rose-600 dark:text-rose-400'}`}>{formatCurrency(Math.abs(finalBalance))}</div>
+                  <div className={`text-xs ${isPositive ? 'text-emerald-600/70 dark:text-emerald-400/70' : 'text-rose-600/70 dark:text-rose-400/70'}`}>
+                      {isPositive ? 'К выплате сотруднику' : 'Взыскать в бюджет'}
+                  </div>
+              </div>
+              {!isTwa && (
+                  <div className={`mt-2 text-xs font-medium flex items-center gap-1 opacity-70 group-hover:opacity-100 transition-opacity ${isPositive ? 'text-emerald-500' : 'text-rose-500'}`}>
+                      <FileText size={14} /> Скачать рапорт
+                  </div>
+              )}
           </motion.button>
       </div>
-      )}
 
       <div className="grid grid-cols-1 lg:grid-cols-12 gap-6 pb-24">
         <div className="lg:col-span-4 space-y-6">

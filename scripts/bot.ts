@@ -113,7 +113,8 @@ bot.command('my_archive', async (ctx) => {
             
             if (sub.is_pro) {
                 await ctx.reply(text, Markup.inlineKeyboard([
-                    [Markup.button.callback('⬇️ На выплату', `xls_comp_${r.id}`), Markup.button.callback('⬇️ На удержание', `xls_ded_${r.id}`)]
+                    [Markup.button.callback('⬇️ На выплату', `xls_comp_${r.id}`), Markup.button.callback('⬇️ На удержание', `xls_ded_${r.id}`)],
+                    [Markup.button.callback('⬇️ Обоснование', `xls_b2c-comp_${r.id}`)]
                 ]));
             } else {
                 await ctx.reply(text);
@@ -137,7 +138,7 @@ bot.command('calc', (ctx) => {
 });
 
 // Обработка нажатий на кнопки скачивания Excel
-bot.action(/xls_(comp|ded)_(.+)/, async (ctx) => {
+bot.action(/xls_(comp|ded|b2c-comp)_(.+)/, async (ctx) => {
     try {
         const type = ctx.match[1];
         const archiveId = ctx.match[2];
@@ -175,7 +176,10 @@ bot.action(/xls_(comp|ded)_(.+)/, async (ctx) => {
         // Превращаем строку в буфер (файл)
         const buffer = Buffer.from(htmlString, 'utf-8');
         
-        const filename = type === 'comp' ? `Kompensaciya_${record.employee_fio}.xls` : `Uderzhanie_${record.employee_fio}.xls`;
+        let filename = `Spravka_${record.employee_fio}.xls`;
+        if (type === 'comp') filename = `Kompensaciya_${record.employee_fio}.xls`;
+        else if (type === 'ded') filename = `Uderzhanie_${record.employee_fio}.xls`;
+        else if (type === 'b2c-comp') filename = `Obosnovanie_${record.employee_fio}.xls`;
         
         await ctx.replyWithDocument({
             source: buffer,
@@ -214,12 +218,15 @@ bot.on('web_app_data', async (ctx) => {
 
         const htmlComp = generateExcelHtml('comp', exportData);
         const htmlDed = generateExcelHtml('ded', exportData);
+        const htmlB2c = generateExcelHtml('b2c-comp', exportData);
         
         const bufComp = Buffer.from(htmlComp, 'utf-8');
         const bufDed = Buffer.from(htmlDed, 'utf-8');
+        const bufB2c = Buffer.from(htmlB2c, 'utf-8');
         
         await ctx.replyWithDocument({ source: bufComp, filename: `Kompensaciya_${exportData.employeeFio}.xls` });
         await ctx.replyWithDocument({ source: bufDed, filename: `Uderzhanie_${exportData.employeeFio}.xls` });
+        await ctx.replyWithDocument({ source: bufB2c, filename: `Obosnovanie_${exportData.employeeFio}.xls` });
 
     } catch (e) {
         console.error(e);

@@ -141,23 +141,24 @@ export const generateExcelHtml = (type, data) => {
         
         targetResults.forEach((r: any, idx: number) => {
             let unit = 'шт.';
-            if (r.name.toLowerCase().includes('костюм') || r.name.toLowerCase().includes('белье')) unit = 'к-т';
-            if (r.name.toLowerCase().includes('ботинки') || r.name.toLowerCase().includes('полусапоги') || r.name.toLowerCase().includes('носки') || r.name.toLowerCase().includes('перчатки') || r.name.toLowerCase().includes('сапоги')) unit = 'пар.';
+            const safeName = r.name || 'Предмет';
+            if (safeName.toLowerCase().includes('костюм') || safeName.toLowerCase().includes('белье')) unit = 'к-т';
+            if (safeName.toLowerCase().includes('ботинки') || safeName.toLowerCase().includes('полусапоги') || safeName.toLowerCase().includes('носки') || safeName.toLowerCase().includes('перчатки') || safeName.toLowerCase().includes('сапоги')) unit = 'пар.';
             
-            let qty = Math.round(r.comp / r.price);
+            let qty = Math.round((r.comp || 0) / (r.price || 1));
             
             html += `
                 <tr class="bg-light">
                     <td class="bold">${idx + 1}</td>
-                    <td class="bold left">${r.name}</td>
+                    <td class="bold left">${safeName}</td>
                     <td class="bold">${unit}</td>
                     <td class="bold">-</td>
                     <td class="bold">-</td>
                     <td class="bold">-</td>
                     <td class="bold">-</td>
                     <td class="bold" style="mso-number-format:'0';">${qty}</td>
-                    <td class="bold" style="mso-number-format:'0.00';">${r.price}</td>
-                    <td class="bold" style="mso-number-format:'0.00';">${r.comp.toFixed(2).replace('.', ',')}</td>
+                    <td class="bold" style="mso-number-format:'0.00';">${r.price || 0}</td>
+                    <td class="bold" style="mso-number-format:'0.00';">${(r.comp || 0).toFixed(2).replace('.', ',')}</td>
                 </tr>
             `;
 
@@ -169,9 +170,9 @@ export const generateExcelHtml = (type, data) => {
                             <td></td>
                             <td class="left italic" style="padding-left: 20px;">Период: ${p.start || ''} - ${p.end || ''} (Пост. ${p.type || '150'})</td>
                             <td></td>
-                            <td style="mso-number-format:'0.0';">${p.norm}</td>
-                            <td style="mso-number-format:'0';">${p.monthsInPeriod}</td>
-                            <td style="mso-number-format:'0.00';">${p.earned.toFixed(2).replace('.', ',')}</td>
+                            <td style="mso-number-format:'0.0';">${p.norm || 0}</td>
+                            <td style="mso-number-format:'0';">${p.monthsInPeriod || 0}</td>
+                            <td style="mso-number-format:'0.00';">${(p.earned || 0).toFixed(2).replace('.', ',')}</td>
                             <td></td>
                             <td></td>
                             <td></td>
@@ -495,22 +496,27 @@ export const generateExcelHtml = (type, data) => {
 };
 
 export const exportToExcel = (type, data) => {
-    const isComp = type === 'comp' || type === 'b2c-comp';
-    const html = generateExcelHtml(type, data);
-    
-    const blob = new Blob([html], { type: 'application/vnd.ms-excel' });
+    try {
+        const isComp = type === 'comp' || type === 'b2c-comp';
+        const html = generateExcelHtml(type, data);
+        
+        const blob = new Blob([html], { type: 'application/vnd.ms-excel' });
 
-    const url = URL.createObjectURL(blob);
-    const a = document.createElement('a');
-    a.style.display = 'none';
-    a.href = url;
-    a.target = '_blank';
-    a.download = type === 'b2c-comp' ? 'Spravka_Obosnovanie_Fsin.xls' : (type === 'comp' ? 'Spravka_Kompensaciya.xls' : 'Spravka_Uderzhanie.xls');
-    document.body.appendChild(a);
-    a.click();
-    setTimeout(() => {
-        document.body.removeChild(a);
-        URL.revokeObjectURL(url);
-    }, 100);
+        const url = URL.createObjectURL(blob);
+        const a = document.createElement('a');
+        a.style.display = 'none';
+        a.href = url;
+        a.target = '_blank';
+        a.download = type === 'b2c-comp' ? 'Spravka_Obosnovanie_Fsin.xls' : (type === 'comp' ? 'Spravka_Kompensaciya.xls' : 'Spravka_Uderzhanie.xls');
+        document.body.appendChild(a);
+        a.click();
+        setTimeout(() => {
+            document.body.removeChild(a);
+            URL.revokeObjectURL(url);
+        }, 100);
+    } catch (e: any) {
+        alert('Ошибка при выгрузке: ' + e.message + '\n' + e.stack);
+        console.error('Export Excel Error:', e);
+    }
 };
 

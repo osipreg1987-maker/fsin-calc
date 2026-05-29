@@ -439,71 +439,97 @@ export default function Calculator() {
 
       {/* Dashboards */}
       <div id="tour-dashboards" className="grid grid-cols-1 md:grid-cols-3 gap-4 mb-8">
+          {/* Dashboard 1: Compensation */}
           <motion.button 
-              whileHover={{ y: -5 }} 
+              whileHover={{ y: -5, scale: 1.01 }} 
+              whileTap={{ scale: 0.99 }}
               onClick={() => handleExport('comp')} 
-              className="glass-panel p-6 rounded-2xl text-left w-full hover:bg-emerald-500/20 transition-colors group flex flex-col justify-between h-full"
+              className="bg-slate-900/30 backdrop-blur-xl border border-slate-800/80 rounded-3xl p-6 text-left w-full transition-all duration-300 relative overflow-hidden flex flex-col justify-between h-full group cursor-pointer hover:border-emerald-500/40 hover:bg-slate-900/50 hover:shadow-[0_0_30px_rgba(52,211,153,0.08)]"
           >
-              <div>
+              <div className="absolute top-0 left-0 right-0 h-[2px] bg-gradient-to-r from-emerald-500/30 via-emerald-500/10 to-transparent" />
+              <div className="w-full">
                   <div className="flex items-center gap-3 mb-4">
-                      <div className="bg-emerald-500/20 text-emerald-400 p-2.5 rounded-xl group-hover:scale-110 transition-transform">
+                      <div className="bg-emerald-500/10 text-emerald-400 p-2.5 rounded-xl group-hover:scale-110 group-hover:bg-emerald-500/20 transition-all shadow-inner">
                           <Scale size={24} />
                       </div>
-                      <h3 className="text-[var(--tw-hint)] font-medium text-base">
+                      <h3 className="text-slate-400 font-medium text-base">
                           Положено компенсации
                       </h3>
                   </div>
-                  <div className="text-3xl lg:text-4xl font-bold text-emerald-400 mb-2">{formatCurrency(totalComp)}</div>
+                  <div className="text-3xl lg:text-4xl font-extrabold text-emerald-400 mb-2 drop-shadow-[0_0_15px_rgba(52,211,153,0.15)]">{formatCurrency(totalComp)}</div>
               </div>
               {!isTwa && (
-                  <div className="mt-4 pt-4 border-t border-slate-700/50 text-emerald-500/80 text-sm font-medium flex items-center gap-2 group-hover:text-emerald-400 transition-colors w-full">
+                  <div className="mt-4 pt-4 border-t border-slate-800/80 text-emerald-500/80 text-sm font-semibold flex items-center gap-2 group-hover:text-emerald-400 transition-colors w-full">
                       <Download size={16} /> Скачать справку
                   </div>
               )}
           </motion.button>
 
+          {/* Dashboard 2: Deduction */}
           <motion.button 
-              whileHover={{ y: -5 }} 
+              whileHover={{ y: -5, scale: 1.01 }} 
+              whileTap={{ scale: 0.99 }}
               onClick={() => handleExport('ded')} 
-              className="glass-panel p-6 rounded-2xl text-left w-full hover:bg-rose-500/20 transition-colors group flex flex-col justify-between h-full"
+              className="bg-slate-900/30 backdrop-blur-xl border border-slate-800/80 rounded-3xl p-6 text-left w-full transition-all duration-300 relative overflow-hidden flex flex-col justify-between h-full group cursor-pointer hover:border-rose-500/40 hover:bg-slate-900/50 hover:shadow-[0_0_30px_rgba(251,113,133,0.08)]"
           >
-              <div>
+              <div className="absolute top-0 left-0 right-0 h-[2px] bg-gradient-to-r from-rose-500/30 via-rose-500/10 to-transparent" />
+              <div className="w-full">
                   <div className="flex items-center gap-3 mb-4">
-                      <div className="bg-rose-500/20 text-rose-400 p-2.5 rounded-xl group-hover:scale-110 transition-transform">
+                      <div className="bg-rose-500/10 text-rose-400 p-2.5 rounded-xl group-hover:scale-110 group-hover:bg-rose-500/20 transition-all shadow-inner">
                           <Scale size={24} />
                       </div>
-                      <h3 className="text-[var(--tw-hint)] font-medium text-base">
+                      <h3 className="text-slate-400 font-medium text-base">
                           Подлежит удержанию
                       </h3>
                   </div>
-                  <div className="text-3xl lg:text-4xl font-bold text-rose-400 mb-2">{formatCurrency(totalDed)}</div>
+                  <div className="text-3xl lg:text-4xl font-extrabold text-rose-400 mb-2 drop-shadow-[0_0_15px_rgba(251,113,133,0.15)]">{formatCurrency(totalDed)}</div>
               </div>
               {!isTwa && (
-                  <div className="mt-4 pt-4 border-t border-slate-700/50 text-rose-500/80 text-sm font-medium flex items-center gap-2 group-hover:text-rose-400 transition-colors w-full">
+                  <div className="mt-4 pt-4 border-t border-slate-800/80 text-rose-500/80 text-sm font-semibold flex items-center gap-2 group-hover:text-rose-400 transition-colors w-full">
                       <Download size={16} /> Скачать справку
                   </div>
               )}
           </motion.button>
 
+          {/* Dashboard 3: Net Balance */}
           <motion.button 
-              whileHover={{ y: -5 }} 
+              whileHover={{ y: -5, scale: 1.01 }} 
+              whileTap={{ scale: 0.99 }}
               onClick={() => handleExport('b2c-comp')} 
-              className="glass-panel p-6 rounded-2xl text-left w-full hover:bg-purple-500/20 transition-colors group flex flex-col justify-between h-full"
+              className="bg-slate-900/30 backdrop-blur-xl border border-slate-800/80 rounded-3xl p-6 text-left w-full transition-all duration-300 relative overflow-hidden flex flex-col justify-between h-full group cursor-pointer hover:border-purple-500/40 hover:bg-slate-900/50 hover:shadow-[0_0_30px_rgba(168,85,247,0.08)]"
           >
-              <div>
-                  <div className="flex items-center gap-3 mb-4">
-                      <div className="bg-purple-500/20 text-purple-400 p-2.5 rounded-xl group-hover:scale-110 transition-transform">
-                          <Scale size={24} />
+              <div className="absolute top-0 left-0 right-0 h-[2px] bg-gradient-to-r from-purple-500/30 via-indigo-500/20 to-transparent" />
+              <div className="w-full">
+                  <div className="flex justify-between items-center mb-4">
+                      <div className="flex items-center gap-3">
+                          <div className="bg-purple-500/10 text-purple-400 p-2.5 rounded-xl group-hover:scale-110 group-hover:bg-purple-500/20 transition-all shadow-inner">
+                              <Scale size={24} />
+                          </div>
+                          <h3 className="text-slate-400 font-medium text-base">
+                              Итоговый баланс
+                          </h3>
                       </div>
-                      <h3 className="text-[var(--tw-hint)] font-medium text-base">
-                          ИТОГОВЫЙ БАЛАНС
-                      </h3>
+                      {isPositive ? (
+                          <span className="text-[9px] font-extrabold bg-emerald-500/10 text-emerald-400 px-2 py-1 rounded-md border border-emerald-500/20 tracking-wider uppercase select-none">К выплате</span>
+                      ) : (
+                          <span className="text-[9px] font-extrabold bg-rose-500/10 text-rose-400 px-2 py-1 rounded-md border border-rose-500/20 tracking-wider uppercase select-none">К удержанию</span>
+                      )}
                   </div>
-                  <div className="text-3xl lg:text-4xl font-bold text-purple-400 mb-2">{formatCurrency(Math.abs(finalBalance))}</div>
+                  <div className={`text-3xl lg:text-4xl font-extrabold mb-2 drop-shadow-sm`}>
+                      {isPositive ? (
+                          <span className="text-transparent bg-clip-text bg-gradient-to-r from-emerald-400 to-blue-400 drop-shadow-[0_0_15px_rgba(52,211,153,0.15)]">
+                              {formatCurrency(Math.abs(finalBalance))}
+                          </span>
+                      ) : (
+                          <span className="text-transparent bg-clip-text bg-gradient-to-r from-rose-400 to-amber-500 drop-shadow-[0_0_15px_rgba(239,68,68,0.15)]">
+                              {formatCurrency(Math.abs(finalBalance))}
+                          </span>
+                      )}
+                  </div>
               </div>
               {!isTwa && (
-                  <div className="mt-4 pt-4 border-t border-slate-700/50 text-purple-400/80 text-sm font-medium flex items-center gap-2 group-hover:text-purple-400 transition-colors w-full">
-                      <FileText size={16} /> Скачать расширенное обоснование
+                  <div className="mt-4 pt-4 border-t border-slate-800/80 text-purple-400/80 text-sm font-semibold flex items-center gap-2 group-hover:text-purple-400 transition-colors w-full">
+                      <FileText size={16} /> Скачать обоснование
                   </div>
               )}
           </motion.button>
@@ -513,15 +539,16 @@ export default function Calculator() {
         <div className="lg:col-span-4 space-y-6">
             
             {/* Параметры учреждения */}
-            <div id="tour-inst-data" className="glass-panel rounded-2xl p-5">
+            <div id="tour-inst-data" className="bg-slate-900/30 backdrop-blur-xl border border-slate-800/80 rounded-3xl p-5 shadow-xl shadow-black/20 relative overflow-hidden group">
+                <div className="absolute top-0 left-0 right-0 h-[2px] bg-gradient-to-r from-amber-500/30 to-transparent" />
                 <div className="flex justify-between items-center cursor-pointer" onClick={() => setIsInstOpen(!isInstOpen)}>
-                    <h2 className="text-lg font-bold text-[var(--foreground)] flex items-center gap-2">
+                    <h2 className="text-lg font-bold text-slate-100 flex items-center gap-2">
                         <div className="w-1.5 h-5 bg-amber-500 rounded-full"></div>
                         Параметры учреждения
-                        {isInstOpen ? <ChevronUp size={18} className="text-[var(--tw-hint)] ml-2" /> : <ChevronDown size={18} className="text-[var(--tw-hint)] ml-2" />}
+                        {isInstOpen ? <ChevronUp size={18} className="text-slate-400 ml-2" /> : <ChevronDown size={18} className="text-slate-400 ml-2" />}
                     </h2>
                     <div className="flex items-center gap-2">
-                        <button onClick={(e) => { e.stopPropagation(); toggleInstLock(); }} className={`p-2 rounded-lg transition-colors ${isInstLocked ? 'bg-amber-500/20 text-amber-500' : 'text-[var(--tw-hint)] hover:text-amber-500'}`} title="Сохранить">
+                        <button onClick={(e) => { e.stopPropagation(); toggleInstLock(); }} className={`p-2 rounded-lg transition-colors cursor-pointer ${isInstLocked ? 'bg-amber-500/20 text-amber-500' : 'text-slate-400 hover:text-amber-500'}`} title="Сохранить">
                             {isInstLocked ? <Lock size={16} /> : <Unlock size={16} />}
                         </button>
                     </div>
@@ -582,7 +609,8 @@ export default function Calculator() {
             </div>
 
             {/* Employee Details Card */}
-            <div id="tour-employee-details" className="glass-panel rounded-2xl p-5">
+            <div id="tour-employee-details" className="bg-slate-900/30 backdrop-blur-xl border border-slate-800/80 rounded-3xl p-5 shadow-xl shadow-black/20 relative overflow-hidden group">
+              <div className="absolute top-0 left-0 right-0 h-[2px] bg-gradient-to-r from-blue-500/30 to-transparent" />
               <h2 className="text-lg font-bold text-slate-100 mb-5 flex items-center gap-2">
                 <div className="w-1.5 h-5 bg-blue-500 rounded-full"></div>
                 Данные сотрудника
@@ -612,7 +640,7 @@ export default function Calculator() {
                 <div>
                   <label className="block text-xs text-slate-400 mb-1">Основание увольнения</label>
                   <select
-                      className="w-full bg-slate-950/45 backdrop-blur-md border border-slate-800/80 rounded-xl p-3 text-slate-100 placeholder-slate-500 outline-none focus:border-blue-500/50 focus:ring-1 focus:ring-blue-500/10 transition-all"
+                      className="w-full bg-slate-950/45 backdrop-blur-md border border-slate-800/80 rounded-xl p-3 text-slate-100 placeholder-slate-500 outline-none focus:border-blue-500/50 focus:ring-1 focus:ring-blue-500/10 transition-all text-xs font-semibold"
                       value={dismissalGroup}
                       onChange={(e) => setDismissalGroup(e.target.value)}
                   >
@@ -623,7 +651,7 @@ export default function Calculator() {
                 </div>
                 
                 <div className="grid grid-cols-2 gap-3">
-                  <div id="tour-gender">
+                  <div id="tour-gender" className="w-full col-span-2">
                     <label className="block text-xs text-slate-400 mb-1">Пол</label>
                     <div className="flex p-1 bg-slate-950/45 backdrop-blur-md rounded-xl border border-slate-800/80">
                         <motion.button 
@@ -649,7 +677,8 @@ export default function Calculator() {
             </div>
             
             {/* Periods Card */}
-            <div id="tour-periods" className="glass-panel rounded-2xl p-5">
+            <div id="tour-periods" className="bg-slate-900/30 backdrop-blur-xl border border-slate-800/80 rounded-3xl p-5 shadow-xl shadow-black/20 relative overflow-hidden group">
+              <div className="absolute top-0 left-0 right-0 h-[2px] bg-gradient-to-r from-indigo-500/30 to-transparent" />
               <div className="flex justify-between items-center mb-5">
                   <h2 className="text-lg font-bold text-slate-100 flex items-center gap-2">
                   <div className="w-1.5 h-5 bg-indigo-500 rounded-full"></div>
@@ -700,9 +729,9 @@ export default function Calculator() {
                           </div>
 
                           <div>
-                              <label className="block text-[10px] uppercase font-bold text-[var(--tw-hint)] mb-1">Норма</label>
+                              <label className="block text-[10px] uppercase font-bold text-slate-500 mb-1">Норма</label>
                               <select 
-                                  className="w-full bg-slate-950/45 backdrop-blur-md border border-slate-800/80 rounded-xl p-2.5 text-xs text-slate-100 placeholder-slate-500 outline-none focus:border-blue-500/50 focus:ring-1 focus:ring-blue-500/10 transition-all"
+                                  className="w-full bg-slate-950/45 backdrop-blur-md border border-slate-800/80 rounded-xl p-2.5 text-xs text-slate-100 placeholder-slate-500 outline-none focus:border-blue-500/50 focus:ring-1 focus:ring-blue-500/10 transition-all text-xs"
                                   value={period.norm}
                                   onChange={(e) => updatePeriod(period.id, 'norm', parseInt(e.target.value))}
                               >
@@ -732,7 +761,8 @@ export default function Calculator() {
         </div>
         
         <div className="lg:col-span-8 space-y-8">
-            <div id="tour-issue-log" className="bg-slate-800/50 backdrop-blur-xl rounded-2xl border border-slate-700/50 p-6 glow-box">
+            <div id="tour-issue-log" className="bg-slate-900/40 backdrop-blur-xl rounded-[1.75rem] border border-slate-800/80 p-6 shadow-xl shadow-black/25 relative overflow-hidden group">
+                <div className="absolute top-0 left-0 right-0 h-[2px] bg-gradient-to-r from-teal-500/30 via-teal-500/10 to-transparent" />
                 <h2 className="text-xl font-bold text-white mb-6 flex items-center gap-2">
                     <div className="w-2 h-6 bg-teal-500 rounded-full"></div>
                     Журнал выдачи со склада
@@ -751,7 +781,8 @@ export default function Calculator() {
                 />
             </div>
 
-            <div className="bg-slate-800/50 backdrop-blur-xl rounded-2xl border border-slate-700/50 p-6 glow-box">
+            <div className="bg-slate-900/40 backdrop-blur-xl rounded-[1.75rem] border border-slate-800/80 p-6 shadow-xl shadow-black/25 relative overflow-hidden group">
+                <div className="absolute top-0 left-0 right-0 h-[2px] bg-gradient-to-r from-purple-500/30 via-purple-500/10 to-transparent" />
                 <h2 className="text-xl font-bold text-white mb-6 flex items-center gap-2">
                     <div className="w-2 h-6 bg-purple-500 rounded-full"></div>
                     Итоговый расчет по предметам

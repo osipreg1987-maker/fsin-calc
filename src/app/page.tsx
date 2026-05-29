@@ -37,65 +37,168 @@ export default function LandingPage() {
       </nav>
 
       {/* Hero Section */}
-      <section className="relative z-10 px-4 py-20 md:py-32 max-w-7xl mx-auto flex flex-col items-center text-center">
-        <motion.div 
-          initial={{ opacity: 0, y: 30 }}
-          animate={{ opacity: 1, y: 0 }}
-          transition={{ duration: 0.6 }}
-          className="space-y-8 max-w-4xl"
-        >
-          <div className="inline-flex items-center gap-2 px-4 py-2 rounded-full bg-blue-500/10 border border-blue-500/20 text-blue-400 text-sm font-bold tracking-wide uppercase">
-            <Zap size={16} />
-            Для сотрудников и пенсионеров ФСИН
-          </div>
-
-          <h1 className="text-5xl md:text-7xl font-extrabold text-transparent bg-clip-text bg-gradient-to-br from-white via-slate-200 to-slate-500 leading-tight tracking-tight pb-2">
-            Точный расчет, который <br />
-            <span className="bg-clip-text bg-gradient-to-r from-blue-400 via-indigo-400 to-purple-400">работает на вас</span>
-          </h1>
-
-          <p className="text-xl md:text-2xl text-slate-400 font-medium max-w-2xl mx-auto leading-relaxed">
-            Узнайте точную сумму компенсации по актуальным ценам за 2 минуты. Без таблиц, формул и бюрократии.
-          </p>
+      <section className="relative z-10 px-4 py-16 md:py-28 max-w-7xl mx-auto">
+        <div className="grid grid-cols-1 lg:grid-cols-12 gap-12 lg:gap-8 items-center">
           
-          <div className="pt-8 flex flex-col sm:flex-row gap-4 justify-center items-center">
-            <motion.button 
-              whileHover={{ scale: 1.03 }}
-              whileTap={{ scale: 0.97 }}
-              onClick={handleStart}
-              className="group relative bg-gradient-to-r from-blue-600 to-indigo-600 hover:from-blue-500 hover:to-indigo-500 text-white px-8 py-4 rounded-2xl font-bold text-lg shadow-lg shadow-blue-500/25 hover:shadow-blue-500/35 border border-blue-500/30 flex items-center justify-center gap-3 overflow-hidden transition-all duration-300 cursor-pointer"
-            >
-              <span className="relative z-10">Начать расчет бесплатно</span>
-              <ArrowRight size={20} className="relative z-10 group-hover:translate-x-1 transition-transform" />
-            </motion.button>
-            <motion.a 
-              whileHover={{ scale: 1.03 }}
-              whileTap={{ scale: 0.97 }}
-              href="#about" 
-              className="bg-slate-900/40 border border-slate-800 text-slate-300 hover:text-white hover:bg-slate-800/60 rounded-2xl font-medium px-6 py-4 flex items-center gap-2 transition-all backdrop-blur-md cursor-pointer"
-            >
-              Узнать больше <ChevronRight size={18} />
-            </motion.a>
-          </div>
+          {/* Left Column: Text Content */}
+          <motion.div 
+            initial={{ opacity: 0, x: -30 }}
+            animate={{ opacity: 1, x: 0 }}
+            transition={{ duration: 0.6 }}
+            className="lg:col-span-7 space-y-8 text-center lg:text-left flex flex-col items-center lg:items-start"
+          >
+            <div className="inline-flex items-center gap-2 px-4 py-2 rounded-full bg-blue-500/10 border border-blue-500/20 text-blue-400 text-sm font-bold tracking-wide uppercase">
+              <Zap size={16} />
+              Для сотрудников и пенсионеров ФСИН
+            </div>
 
-          <div className="flex flex-col sm:flex-row items-center justify-center gap-6 sm:gap-8 pt-12 text-sm text-slate-300 font-medium">
-            <div className="flex items-center gap-2 bg-slate-900/40 backdrop-blur-md px-5 py-3 rounded-2xl border border-slate-800/60 shadow-md">
-              <ShieldCheck size={18} className="text-emerald-400" />
-              <span>Абсолютно анонимно</span>
+            <h1 className="text-4xl sm:text-5xl md:text-6xl lg:text-7xl font-extrabold text-transparent bg-clip-text bg-gradient-to-br from-white via-slate-200 to-slate-500 leading-tight tracking-tight pb-1">
+              Точный расчет, который <br />
+              <span className="bg-clip-text bg-gradient-to-r from-blue-400 via-indigo-400 to-purple-400">работает на вас</span>
+            </h1>
+
+            <p className="text-lg sm:text-xl text-slate-400 font-medium max-w-2xl leading-relaxed">
+              Узнайте точную сумму компенсации по актуальным ценам за 2 минуты. Без сложных формул, ручной рутины и ошибок.
+            </p>
+            
+            <div className="pt-4 flex flex-col sm:flex-row gap-4 justify-center lg:justify-start items-center w-full">
+              <motion.button 
+                whileHover={{ scale: 1.03 }}
+                whileTap={{ scale: 0.97 }}
+                onClick={handleStart}
+                className="group relative bg-gradient-to-r from-blue-600 to-indigo-600 hover:from-blue-500 hover:to-indigo-500 text-white px-8 py-4 rounded-2xl font-bold text-lg shadow-lg shadow-blue-500/25 hover:shadow-blue-500/35 border border-blue-500/30 flex items-center justify-center gap-3 overflow-hidden transition-all duration-300 cursor-pointer w-full sm:w-auto"
+              >
+                <span className="relative z-10">Начать расчет бесплатно</span>
+                <ArrowRight size={20} className="relative z-10 group-hover:translate-x-1 transition-transform" />
+              </motion.button>
+              <motion.a 
+                whileHover={{ scale: 1.03 }}
+                whileTap={{ scale: 0.97 }}
+                href="#about" 
+                className="bg-slate-900/40 border border-slate-800 text-slate-300 hover:text-white hover:bg-slate-800/60 rounded-2xl font-medium px-6 py-4 flex items-center justify-center gap-2 transition-all backdrop-blur-md cursor-pointer w-full sm:w-auto"
+              >
+                Узнать больше <ChevronRight size={18} />
+              </motion.a>
             </div>
-            <div className="flex items-center gap-2 bg-slate-900/40 backdrop-blur-md px-5 py-3 rounded-2xl border border-slate-800/60 shadow-md">
-              <Clock size={18} className="text-blue-400" />
-              <span>Занимает 2 минуты</span>
+
+            <div className="flex flex-col sm:flex-row items-center justify-center lg:justify-start gap-4 pt-8 text-xs sm:text-sm text-slate-300 font-medium w-full">
+              <div className="flex items-center gap-2 bg-slate-900/40 backdrop-blur-md px-4 py-2.5 rounded-xl border border-slate-800/60 shadow-md">
+                <ShieldCheck size={16} className="text-emerald-400" />
+                <span>Абсолютно анонимно</span>
+              </div>
+              <div className="flex items-center gap-2 bg-slate-900/40 backdrop-blur-md px-4 py-2.5 rounded-xl border border-slate-800/60 shadow-md">
+                <Clock size={16} className="text-blue-400" />
+                <span>Занимает 2 минуты</span>
+              </div>
+              <div className="flex items-center gap-2 bg-slate-900/40 backdrop-blur-md px-4 py-2.5 rounded-xl border border-slate-800/60 shadow-md">
+                <FileText size={16} className="text-indigo-400" />
+                <span>Готовая справка</span>
+              </div>
             </div>
-            <div className="flex items-center gap-2 bg-slate-900/40 backdrop-blur-md px-5 py-3 rounded-2xl border border-slate-800/60 shadow-md">
-              <FileText size={18} className="text-indigo-400" />
-              <span>Готовая справка</span>
+          </motion.div>
+
+          {/* Right Column: Interactive Premium Calculator Preview Mockup */}
+          <motion.div 
+            initial={{ opacity: 0, x: 30, scale: 0.95 }}
+            animate={{ opacity: 1, x: 0, scale: 1 }}
+            transition={{ duration: 0.8, delay: 0.2 }}
+            className="lg:col-span-5 w-full relative group"
+          >
+            {/* Soft ambient glowing background behind the mockup */}
+            <div className="absolute inset-0 bg-gradient-to-tr from-blue-500/20 via-indigo-500/10 to-purple-500/20 rounded-[2rem] blur-2xl opacity-60 group-hover:opacity-80 transition-opacity duration-500" />
+            
+            {/* The interactive mockup card */}
+            <div className="[perspective:1000px] w-full">
+              <motion.div 
+                whileHover={{ rotateY: -8, rotateX: 4, scale: 1.02 }}
+                transition={{ type: "spring", stiffness: 100, damping: 15 }}
+                className="relative bg-slate-900/60 backdrop-blur-2xl p-6 md:p-8 rounded-[2rem] border border-slate-800/90 shadow-2xl shadow-black/55 overflow-hidden w-full flex flex-col gap-5 select-none"
+              >
+                {/* Card top border overhead spotlight highlight */}
+                <div className="absolute top-0 left-0 right-0 h-[1px] bg-gradient-to-r from-blue-500/40 via-indigo-500/30 to-transparent" />
+                
+                {/* Mockup Header */}
+                <div className="flex justify-between items-center pb-4 border-b border-slate-800/80">
+                  <div className="flex items-center gap-2">
+                    <div className="w-2.5 h-2.5 rounded-full bg-rose-500/70" />
+                    <div className="w-2.5 h-2.5 rounded-full bg-amber-500/70" />
+                    <div className="w-2.5 h-2.5 rounded-full bg-green-500/70" />
+                    <span className="text-xs text-slate-500 font-bold ml-2 font-mono">fsin-calc.pro/dashboard</span>
+                  </div>
+                  <div className="text-[10px] font-bold bg-emerald-500/10 border border-emerald-500/20 text-emerald-400 px-2 py-0.5 rounded-md uppercase tracking-wider">
+                    Арматурная карта №41
+                  </div>
+                </div>
+
+                {/* Mockup Content - Calculator items */}
+                <div className="space-y-3">
+                  {/* Item Row 1 */}
+                  <div className="flex justify-between items-center p-3 rounded-xl bg-slate-950/40 border border-slate-850 hover:bg-slate-950/60 transition-colors duration-200">
+                    <div className="flex flex-col gap-0.5">
+                      <span className="text-xs text-slate-200 font-bold">Куртка зимняя черная</span>
+                      <span className="text-[10px] text-slate-500">Норма: 1 шт / 3 года. Выдача: 2021 г.</span>
+                    </div>
+                    <div className="flex items-center gap-3">
+                      <span className="text-[10px] font-bold bg-rose-500/10 text-rose-400 px-2 py-0.5 rounded border border-rose-500/25">Недонос 14 мес</span>
+                      <span className="text-xs font-extrabold text-blue-400">4,200 ₽</span>
+                    </div>
+                  </div>
+
+                  {/* Item Row 2 */}
+                  <div className="flex justify-between items-center p-3 rounded-xl bg-slate-950/40 border border-slate-850 hover:bg-slate-950/60 transition-colors duration-200">
+                    <div className="flex flex-col gap-0.5">
+                      <span className="text-xs text-slate-200 font-bold">Костюм летний (куртка, брюки)</span>
+                      <span className="text-[10px] text-slate-500">Норма: 2 шт / 2 года. Выдача: 2023 г.</span>
+                    </div>
+                    <div className="flex items-center gap-3">
+                      <span className="text-[10px] font-bold bg-purple-500/10 text-purple-400 px-2 py-0.5 rounded border border-purple-500/25">Недонос 8 мес</span>
+                      <span className="text-xs font-extrabold text-blue-400">3,100 ₽</span>
+                    </div>
+                  </div>
+
+                  {/* Item Row 3 */}
+                  <div className="flex justify-between items-center p-3 rounded-xl bg-slate-950/40 border border-slate-850 hover:bg-slate-950/60 transition-colors duration-200">
+                    <div className="flex flex-col gap-0.5">
+                      <span className="text-xs text-slate-400 font-medium">Ботинки с высокими берцами</span>
+                      <span className="text-[10px] text-slate-600">Норма: 1 шт / 2 года. Срок носки истек.</span>
+                    </div>
+                    <div className="flex items-center gap-3">
+                      <span className="text-[10px] font-bold bg-emerald-500/10 text-emerald-400 px-2 py-0.5 rounded border border-emerald-500/25">Выплачено</span>
+                      <span className="text-xs font-extrabold text-slate-500">0 ₽</span>
+                    </div>
+                  </div>
+                </div>
+
+                {/* Total Calculation summary box inside mockup */}
+                <div className="mt-2 bg-gradient-to-r from-blue-900/30 via-indigo-900/20 to-purple-900/10 border border-blue-500/20 p-4 rounded-2xl flex justify-between items-center shadow-lg shadow-blue-950/10">
+                  <div className="flex flex-col gap-0.5">
+                    <span className="text-[10px] text-blue-300 font-bold uppercase tracking-wider">Итого к выплате</span>
+                    <span className="text-xs text-slate-400">Денежная компенсация (27 позиций)</span>
+                  </div>
+                  <motion.div 
+                    animate={{ scale: [1, 1.03, 1] }}
+                    transition={{ duration: 2.5, repeat: Infinity, ease: "easeInOut" }}
+                    className="text-2xl font-extrabold text-transparent bg-clip-text bg-gradient-to-r from-emerald-400 to-blue-400 drop-shadow-sm"
+                  >
+                    84,350 ₽
+                  </motion.div>
+                </div>
+
+                {/* Subtle design cue at the bottom: "Нажмите для подробностей" */}
+                <div className="flex justify-between items-center text-[10px] text-slate-500 font-bold px-1 mt-1">
+                  <span>* На основе актуальных нормативов</span>
+                  <span className="text-blue-400 flex items-center gap-1 group-hover:text-blue-300 transition-colors">
+                    Посмотреть детали <ArrowRight size={10} className="group-hover:translate-x-0.5 transition-transform" />
+                  </span>
+                </div>
+              </motion.div>
             </div>
-          </div>
-        </motion.div>
+          </motion.div>
+
+        </div>
       </section>
 
-      {/* Bento Grid: Target Audiences */}
+      {/* Bento Grid: Target Audiences with cascading entry animations */}
       <section id="about" className="relative z-10 py-24 bg-slate-950/40 border-y border-slate-900/80 backdrop-blur-md shadow-2xl">
         <div className="max-w-7xl mx-auto px-4">
           <motion.div 
@@ -115,12 +218,12 @@ export default function LandingPage() {
             
             {/* Audience 1: Logistics (Тыл) */}
             <motion.div 
-              initial={{ opacity: 0, scale: 0.95 }}
-              whileInView={{ opacity: 1, scale: 1 }}
-              whileHover={{ scale: 1.02 }}
+              initial={{ opacity: 0, y: 45 }}
+              whileInView={{ opacity: 1, y: 0 }}
               viewport={{ once: true }}
-              transition={{ duration: 0.3 }}
-              className="bg-slate-900/30 backdrop-blur-xl border border-slate-800/80 p-8 rounded-3xl hover:border-blue-500/40 hover:bg-slate-900/50 shadow-xl shadow-black/25 flex flex-col transition-all duration-300 relative overflow-hidden group"
+              transition={{ duration: 0.7, ease: "easeOut" }}
+              whileHover={{ scale: 1.02 }}
+              className="bg-slate-900/30 backdrop-blur-xl border border-slate-800/80 p-8 rounded-3xl hover:border-blue-500/40 hover:bg-slate-900/50 shadow-xl shadow-black/25 flex flex-col transition-all duration-300 relative overflow-hidden group cursor-default"
             >
               <div className="absolute top-0 right-0 w-32 h-32 bg-blue-500/10 rounded-full blur-[40px] group-hover:bg-blue-500/20 transition-colors" />
               <div className="relative z-10 flex-1">
@@ -131,11 +234,11 @@ export default function LandingPage() {
                 <div className="space-y-4">
                   <div>
                     <span className="text-rose-400 text-xs font-bold uppercase tracking-wider block mb-1">Боль:</span>
-                    <p className="text-slate-400 text-sm leading-relaxed">Ручной расчет одной справки-компенсации занимает от 1 до 3 часов. Сверка сроков носки по десяткам позиций выматывает.</p>
+                    <p className="text-slate-400 text-sm leading-relaxed font-medium">Ручной расчет одной справки-компенсации занимает от 1 до 3 часов. Сверка сроков носки по десяткам позиций выматывает.</p>
                   </div>
                   <div>
                     <span className="text-emerald-400 text-xs font-bold uppercase tracking-wider block mb-1">Решение:</span>
-                    <p className="text-slate-300 text-sm leading-relaxed">Автоматическая генерация готовой Excel-справки за 2 минуты без математических ошибок и опечаток.</p>
+                    <p className="text-slate-300 text-sm leading-relaxed font-medium">Автоматическая генерация готовой Excel-справки за 2 минуты без математических ошибок и опечаток.</p>
                   </div>
                 </div>
               </div>
@@ -143,12 +246,12 @@ export default function LandingPage() {
 
             {/* Audience 2: Retiring/Leaving */}
             <motion.div 
-              initial={{ opacity: 0, scale: 0.95 }}
-              whileInView={{ opacity: 1, scale: 1 }}
-              whileHover={{ scale: 1.02 }}
+              initial={{ opacity: 0, y: 45 }}
+              whileInView={{ opacity: 1, y: 0 }}
               viewport={{ once: true }}
-              transition={{ duration: 0.3 }}
-              className="bg-slate-900/30 backdrop-blur-xl border border-slate-800/80 p-8 rounded-3xl hover:border-purple-500/40 hover:bg-slate-900/50 shadow-xl shadow-black/25 flex flex-col transition-all duration-300 relative overflow-hidden group"
+              transition={{ duration: 0.7, delay: 0.15, ease: "easeOut" }}
+              whileHover={{ scale: 1.02 }}
+              className="bg-slate-900/30 backdrop-blur-xl border border-slate-800/80 p-8 rounded-3xl hover:border-purple-500/40 hover:bg-slate-900/50 shadow-xl shadow-black/25 flex flex-col transition-all duration-300 relative overflow-hidden group cursor-default"
             >
               <div className="absolute top-0 right-0 w-32 h-32 bg-purple-500/10 rounded-full blur-[40px] group-hover:bg-purple-500/20 transition-colors" />
               <div className="relative z-10 flex-1">
@@ -159,11 +262,11 @@ export default function LandingPage() {
                 <div className="space-y-4">
                   <div>
                     <span className="text-rose-400 text-xs font-bold uppercase tracking-wider block mb-1">Боль:</span>
-                    <p className="text-slate-400 text-sm leading-relaxed">Страх, что бухгалтерия или тыл недосчитали компенсацию, и вы потеряете честно заработанные десятки тысяч рублей.</p>
+                    <p className="text-slate-400 text-sm leading-relaxed font-medium">Страх, что бухгалтерия или тыл недосчитали компенсацию, и вы потеряете честно заработанные десятки тысяч рублей.</p>
                   </div>
                   <div>
                     <span className="text-emerald-400 text-xs font-bold uppercase tracking-wider block mb-1">Решение:</span>
-                    <p className="text-slate-300 text-sm leading-relaxed">Возможность самостоятельно и анонимно проверить правильность расчетов перед подписанием рапорта.</p>
+                    <p className="text-slate-300 text-sm leading-relaxed font-medium">Возможность самостоятельно и анонимно проверить правильность расчетов перед подписанием рапорта.</p>
                   </div>
                 </div>
               </div>
@@ -171,12 +274,12 @@ export default function LandingPage() {
 
             {/* Audience 3: Auditors/Inspectors */}
             <motion.div 
-              initial={{ opacity: 0, scale: 0.95 }}
-              whileInView={{ opacity: 1, scale: 1 }}
-              whileHover={{ scale: 1.02 }}
+              initial={{ opacity: 0, y: 45 }}
+              whileInView={{ opacity: 1, y: 0 }}
               viewport={{ once: true }}
-              transition={{ duration: 0.3 }}
-              className="bg-slate-900/30 backdrop-blur-xl border border-slate-800/80 p-8 rounded-3xl hover:border-emerald-500/40 hover:bg-slate-900/50 shadow-xl shadow-black/25 flex flex-col transition-all duration-300 relative overflow-hidden group"
+              transition={{ duration: 0.7, delay: 0.3, ease: "easeOut" }}
+              whileHover={{ scale: 1.02 }}
+              className="bg-slate-900/30 backdrop-blur-xl border border-slate-800/80 p-8 rounded-3xl hover:border-emerald-500/40 hover:bg-slate-900/50 shadow-xl shadow-black/25 flex flex-col transition-all duration-300 relative overflow-hidden group cursor-default"
             >
               <div className="absolute top-0 right-0 w-32 h-32 bg-emerald-500/10 rounded-full blur-[40px] group-hover:bg-emerald-500/20 transition-colors" />
               <div className="relative z-10 flex-1">
@@ -187,11 +290,11 @@ export default function LandingPage() {
                 <div className="space-y-4">
                   <div>
                     <span className="text-rose-400 text-xs font-bold uppercase tracking-wider block mb-1">Боль:</span>
-                    <p className="text-slate-400 text-sm leading-relaxed">Долгая и муторная проверка чужих расчетов на предмет незаконных переплат или недоплат из бюджета.</p>
+                    <p className="text-slate-400 text-sm leading-relaxed font-medium">Долгая и муторная проверка чужих расчетов на предмет незаконных переплат или недоплат из бюджета.</p>
                   </div>
                   <div>
                     <span className="text-emerald-400 text-xs font-bold uppercase tracking-wider block mb-1">Решение:</span>
-                    <p className="text-slate-300 text-sm leading-relaxed">Быстрый аудит и перерасчет "в два клика" для выявления нарушений в уже насчитанных справках.</p>
+                    <p className="text-slate-300 text-sm leading-relaxed font-medium">Быстрый аудит и перерасчет "в два клика" для выявления нарушений в уже насчитанных справках.</p>
                   </div>
                 </div>
               </div>

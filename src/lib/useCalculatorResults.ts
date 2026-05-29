@@ -72,7 +72,7 @@ export function useCalculatorResults({ periods, gender, itemTotals, customPrices
 
                 earnedQty += qty;
                 earnedMoney += money;
-                periodDetails.push({ type: pp.type, norm: pp.norm, months, wearMonths, qty, money, pIndex: pp.pIndex, isTail: pp.isTail });
+                periodDetails.push({ type: pp.type, norm: pp.norm, months, wearMonths, qty, money, pIndex: pp.pIndex, isTail: pp.isTail, start: pp.start, end: pp.end });
             });
 
             // 2. Считаем Выдано (Полная стоимость)

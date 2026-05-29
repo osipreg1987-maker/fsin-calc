@@ -1,42 +1,110 @@
 // @ts-nocheck
 export const declineFio = (fio, gcase) => {
     if (!fio) return '';
-    const parts = fio.trim().split(/\s+/);
-    if (parts.length < 2) return fio;
-    const declineWord = (word, type, gcase) => {
-        let w = word.toLowerCase();
-        let isGen = gcase === 'genitive';
-        if (type === 'last') {
-            if (w.endsWith('ов') || w.endsWith('ев') || w.endsWith('ин') || w.endsWith('ын')) return word + (isGen ? 'а' : 'у');
-            if (w.endsWith('ова') || w.endsWith('ева') || w.endsWith('ина') || w.endsWith('ына')) return word.slice(0, -1) + (isGen ? 'ой' : 'ой');
-            if (w.endsWith('ский') || w.endsWith('цкий')) return word.slice(0, -2) + (isGen ? 'ого' : 'ому');
-            if (w.endsWith('ская') || w.endsWith('цкая')) return word.slice(0, -2) + (isGen ? 'ой' : 'ой');
-        }
-        if (type === 'first') {
-            if (w.endsWith('а') || w.endsWith('я')) {
-                if (w.endsWith('ия')) return word.slice(0, -1) + (isGen ? 'и' : 'и');
-                return word.slice(0, -1) + (isGen ? (w.endsWith('я')?'и':'ы') : 'е');
-            }
-            if (w.endsWith('й') || w.endsWith('ь')) return word.slice(0, -1) + (isGen ? 'я' : 'ю');
-            if (/[бвгджзклмнпрстфхцчшщ]$/.test(w)) return word + (isGen ? 'а' : 'у');
-        }
-        if (type === 'middle') {
-            if (w.endsWith('ич')) return word + (isGen ? 'а' : 'у');
-            if (w.endsWith('на')) return word.slice(0, -1) + (isGen ? 'ы' : 'е');
-        }
-        return word;
+    const cleanFio = fio.trim();
+    const parts = cleanFio.split(/\s+/);
+    if (parts.length < 2) return cleanFio;
+
+    const initialsRegex = /^[A-ZА-ЯЁ]\.[A-ZА-ЯЁ]\.$/i;
+    const initialSingleRegex = /^[A-ZА-ЯЁ]\.$/i;
+    let isGen = gcase === 'genitive';
+
+    const declineLastName = (lastName) => {
+        const w = lastName.toLowerCase();
+        if (w.endsWith('ов') || w.endsWith('ев') || w.endsWith('ин') || w.endsWith('ын')) return lastName + (isGen ? 'а' : 'у');
+        if (w.endsWith('ова') || w.endsWith('ева') || w.endsWith('ина') || w.endsWith('ына')) return lastName.slice(0, -1) + (isGen ? 'ой' : 'ой');
+        if (w.endsWith('ский') || w.endsWith('цкий')) return lastName.slice(0, -2) + (isGen ? 'ого' : 'ому');
+        if (w.endsWith('ская') || w.endsWith('цкая')) return lastName.slice(0, -2) + (isGen ? 'ой' : 'ой');
+        return lastName;
     };
-    let result = [];
-    if (parts.length >= 3) {
-        result.push(declineWord(parts[0], 'last', gcase));
-        result.push(declineWord(parts[1], 'first', gcase));
-        result.push(declineWord(parts[2], 'middle', gcase));
-        for(let i=3; i<parts.length; i++) result.push(parts[i]);
-    } else {
-        result.push(declineWord(parts[0], 'last', gcase));
-        result.push(declineWord(parts[1], 'first', gcase));
+
+    // Case 1: Initials first, e.g. "Д.А. Речкалов"
+    if (initialsRegex.test(parts[0])) {
+        const declinedLastName = declineLastName(parts[1]);
+        return `${parts[0]} ${declinedLastName}`;
     }
-    return result.join(' ');
+    
+    // Case 2: Initials first split, e.g. "Д. А. Речкалов"
+    if (parts.length > 2 && initialSingleRegex.test(parts[0]) && initialSingleRegex.test(parts[1])) {
+        const declinedLastName = declineLastName(parts[2]);
+        return `${parts[0]}${parts[1]} ${declinedLastName}`;
+    }
+
+    // Case 3: Surname and initials, e.g. "Речкалов Д.А."
+    const lastPart = parts[parts.length - 1];
+    if (initialsRegex.test(lastPart)) {
+        const declinedLastName = declineLastName(parts[0]);
+        return `${lastPart} ${declinedLastName}`;
+    }
+
+    // Case 4: Full FIO: Surname Name Patronymic (e.g. "Речкалов Дмитрий Анатольевич")
+    if (parts.length >= 3) {
+        const surname = parts[0];
+        const name = parts[1];
+        const patronymic = parts[2];
+        const declinedSurname = declineLastName(surname);
+        
+        // Return declined initials + surname for dative, or declined full name for genitive
+        if (gcase === 'dative') {
+            const nInit = name[0].toUpperCase() + ".";
+            const pInit = patronymic[0].toUpperCase() + ".";
+            return `${nInit}${pInit} ${declinedSurname}`;
+        } else {
+            // Genitive declension for full name
+            const declineWord = (word, type) => {
+                let w = word.toLowerCase();
+                if (type === 'first') {
+                    if (w.endsWith('а') || w.endsWith('я')) return word.slice(0, -1) + (w.endsWith('я') ? 'и' : 'ы');
+                    if (w.endsWith('й') || w.endsWith('ь')) return word.slice(0, -1) + 'я';
+                    if (/[бвгджзклмнпрстфхцчшщ]$/.test(w)) return word + 'а';
+                }
+                if (type === 'middle') {
+                    if (w.endsWith('ич')) return word + 'а';
+                    if (w.endsWith('на')) return word.slice(0, -1) + 'ы';
+                }
+                return word;
+            };
+            return `${declinedSurname} ${declineWord(name, 'first')} ${declineWord(patronymic, 'middle')}`;
+        }
+    }
+
+    return cleanFio;
+};
+
+// Format FIO into "Initials Surname" (e.g., "А.А. Осипов")
+export const formatFioWithInitialsFirst = (fio) => {
+    if (!fio) return "ФИО";
+    const cleanFio = fio.trim();
+    const parts = cleanFio.split(/\s+/);
+    if (parts.length < 2) return cleanFio;
+
+    const initialsRegex = /^[A-ZА-ЯЁ]\.[A-ZА-ЯЁ]\.$/i;
+    const initialSingleRegex = /^[A-ZА-ЯЁ]\.$/i;
+    
+    if (initialsRegex.test(parts[0]) || (parts.length > 2 && initialSingleRegex.test(parts[0]) && initialSingleRegex.test(parts[1]))) {
+        return parts.join(" ");
+    }
+
+    const lastPart = parts[parts.length - 1];
+    if (initialsRegex.test(lastPart)) {
+        return `${lastPart} ${parts.slice(0, parts.length - 1).join(" ")}`;
+    }
+
+    if (parts.length >= 3) {
+        const surname = parts[0];
+        const name = parts[1];
+        const patronymic = parts[2];
+        const nInit = name[0].toUpperCase() + ".";
+        const pInit = patronymic[0].toUpperCase() + ".";
+        return `${nInit}${pInit} ${surname}`;
+    } else if (parts.length === 2) {
+        const surname = parts[0];
+        const name = parts[1];
+        const nInit = name[0].toUpperCase() + ".";
+        return `${nInit} ${surname}`;
+    }
+
+    return cleanFio;
 };
 
 export const declineRank = (rank, gcase) => {
@@ -82,62 +150,62 @@ export const generateExcelHtml = (type, data) => {
         <head>
             <meta charset="utf-8">
             <style>
-                table { border-collapse: collapse; width: 100%; font-family: 'Times New Roman', Times, serif; font-size: 12pt; }
-                td, th { border: 1px solid black; padding: 4px; text-align: center; vertical-align: middle; }
+                table { border-collapse: collapse; width: 100%; font-family: 'Times New Roman', Times, serif; font-size: 11pt; }
+                td, th { border: 1px solid black; padding: 5px; text-align: center; vertical-align: middle; }
                 .no-border { border: none !important; text-align: center; }
                 .no-border.left { text-align: left; }
                 .bold { font-weight: bold; }
-                .red { color: red; }
+                .red { color: #dc2626; }
                 .center { text-align: center; }
                 .right { text-align: right; }
                 .left { text-align: left; }
                 .underline { text-decoration: underline; }
-                .italic { font-style: italic; }
-                .bg-light { background-color: #f0f0f0; }
+                .italic { font-style: italic; color: #475569; }
+                .bg-header { background-color: #f1f5f9; font-weight: bold; }
+                .bg-item { background-color: #f8fafc; font-weight: bold; }
+                .indent { padding-left: 20px; }
             </style>
         </head>
         <body>
             <table>
                 <colgroup>
                     <col width="40" />
-                    <col width="300" />
-                    <col width="60" />
-                    <col width="60" />
-                    <col width="60" />
-                    <col width="80" />
-                    <col width="80" />
-                    <col width="80" />
-                    <col width="80" />
-                    <col width="80" />
+                    <col width="320" />
+                    <col width="50" />
+                    <col width="120" />
+                    <col width="120" />
+                    <col width="120" />
+                    <col width="120" />
+                    <col width="120" />
+                    <col width="90" />
+                    <col width="110" />
                 </colgroup>
                 <tr><td colspan="10" style="border: none;">${instData.institution} ${instData.region}</td></tr>
                 <tr><td colspan="10" style="border: none;"></td></tr>
-                <tr><td colspan="10" style="border: none;" class="center bold">Справка-обоснование на выплату денежной компенсации</td></tr>
-                <tr><td colspan="10" style="border: none;" class="center bold">вместо положенных предметов форменного обмундирования</td></tr>
-                <tr><td colspan="10" style="border: none;" class="center bold underline">${declineFio(employeeFio, 'dative') || '_________________________________'}</td></tr>
+                <tr><td colspan="10" style="border: none;" class="center bold" style="font-size: 13pt;">СПРАВКА-ОБОСНОВАНИЕ РАСЧЕТА КОМПЕНСАЦИИ</td></tr>
+                <tr><td colspan="10" style="border: none;" class="center bold" style="font-size: 11pt;">вместо положенных предметов вещевого имущества личного пользования</td></tr>
+                <tr><td colspan="10" style="border: none;" class="center bold underline" style="font-size: 12pt;">Кому: ${declineFio(employeeFio, 'dative') || '_________________________________'}</td></tr>
                 <tr><td colspan="10" style="border: none;" class="center bold underline red">${declineRank(employeeRank, 'dative') || '_________________________________'}</td></tr>
-                <tr><td colspan="10" style="border: none;" class="left">Арматурная карточка № _____</td></tr>
-                <tr><td colspan="10" style="border: none;" class="left">Обоснование для выплаты компенсации:</td></tr>
-                <tr><td colspan="10" style="border: none;" class="left">- ч. 2 ст. 69 Федерального закона от 19.07.2018 № 197-ФЗ</td></tr>
-                <tr><td colspan="10" style="border: none;" class="left">- Постановление Правительства РФ от 10.02.2021 г. № 150</td></tr>
-                <tr><td colspan="10" style="border: none;" class="left">- Приказ Минюста РФ № 211 и Приказ ФСИН № 676 (Нормы снабжения и сроки носки)</td></tr>
-                <tr><td colspan="10" style="border: none;" class="left red">Дата увольнения: ${dismissalDate ? formatDateToMMYYYY(dismissalDate) : '_________________'}</td></tr>
                 <tr><td colspan="10" style="border: none;"></td></tr>
-                <tr>
-                    <td class="bold">№</td>
-                    <td class="bold">Наименование / Периоды службы</td>
-                    <td class="bold">Ед.<br>изм.</td>
-                    <td class="bold">Норма<br>(мес)</td>
-                    <td class="bold">Срок<br>(мес)</td>
-                    <td class="bold">Положено<br>(шт)</td>
-                    <td class="bold">Удержано<br>(шт)</td>
-                    <td class="bold">К выплате<br>(шт)</td>
-                    <td class="bold">Цена<br>(руб)</td>
-                    <td class="bold">Сумма<br>(руб)</td>
+                <tr><td colspan="10" style="border: none;" class="left"><b>Обоснование для выплаты компенсации:</b> ч. 2 ст. 69 Федерального закона от 19.07.2018 № 197-ФЗ, Постановление Правительства РФ № 150 от 10.02.2021 г., Приказы Минюста РФ № 211 и ФСИН № 676.</td></tr>
+                <tr><td colspan="10" style="border: none;" class="left red"><b>Дата окончания службы (увольнения):</b> ${dismissalDate ? formatDateToMMYYYY(dismissalDate) : '_________________'}</td></tr>
+                <tr><td colspan="10" style="border: none;"></td></tr>
+                <tr class="bg-header">
+                    <td>№</td>
+                    <td>Наименование вещевого имущества / Расчетные периоды</td>
+                    <td>Ед.<br>изм.</td>
+                    <td>Срок носки<br>(по норме)</td>
+                    <td>Прослужено<br>в период</td>
+                    <td>Положено по<br>выслуге (шт)</td>
+                    <td>Выдано со склада /<br>Амортизация (шт)</td>
+                    <td>К выплате<br>(недополучено)</td>
+                    <td>Цена<br>предмета (руб)</td>
+                    <td>Сумма к<br>выплате (руб)</td>
                 </tr>
         `;
 
         const targetResults = results.filter((r: any) => r.comp > 0);
+        const formattedEmployeeFio = formatFioWithInitialsFirst(employeeFio);
         
         targetResults.forEach((r: any, idx: number) => {
             let unit = 'шт.';
@@ -151,31 +219,41 @@ export const generateExcelHtml = (type, data) => {
             let totalDeductions = (r.issuedCount || 0) + amortQty;
             
             html += `
-                <tr class="bg-light">
+                <tr class="bg-item">
                     <td class="bold">${idx + 1}</td>
                     <td class="bold left">${safeName}</td>
-                    <td class="bold">${unit}</td>
-                    <td class="bold">-</td>
-                    <td class="bold">-</td>
-                    <td class="bold" style="mso-number-format:'0.00';">${earnedQty.toFixed(2).replace('.', ',')}</td>
-                    <td class="bold" style="mso-number-format:'0.00';">${totalDeductions > 0 ? totalDeductions.toFixed(2).replace('.', ',') : '-'}</td>
-                    <td class="bold" style="mso-number-format:'0';">${qty}</td>
-                    <td class="bold" style="mso-number-format:'0.00';">${r.price || 0}</td>
-                    <td class="bold" style="mso-number-format:'0.00';">${(r.comp || 0).toFixed(2).replace('.', ',')}</td>
+                    <td>${unit}</td>
+                    <td>-</td>
+                    <td>-</td>
+                    <td style="mso-number-format:'0.00';">${earnedQty.toFixed(2).replace('.', ',')}</td>
+                    <td style="mso-number-format:'0.00';">${totalDeductions > 0 ? totalDeductions.toFixed(2).replace('.', ',') : '-'}</td>
+                    <td class="bold red" style="mso-number-format:'0';">${qty}</td>
+                    <td style="mso-number-format:'0.00';">${r.price || 0}</td>
+                    <td class="bold red" style="mso-number-format:'0.00';">${(r.comp || 0).toFixed(2).replace('.', ',')}</td>
                 </tr>
             `;
 
             // Period details
             if (r.periodDetails && r.periodDetails.length > 0) {
                 r.periodDetails.forEach((p: any) => {
+                    const normMonths = p.wearMonths || 24;
+                    const normYears = Math.round(normMonths / 12);
+                    const monthsInPeriod = p.months || 0;
+                    const earned = p.qty || 0;
+                    
+                    const startD = p.start ? (typeof p.start === 'string' ? new Date(p.start) : p.start) : null;
+                    const endD = p.end ? (typeof p.end === 'string' ? new Date(p.end) : p.end) : null;
+                    const startStr = startD ? formatDateToMMYYYY(startD.toISOString().split('T')[0]) : '';
+                    const endStr = endD ? formatDateToMMYYYY(endD.toISOString().split('T')[0]) : '';
+                    
                     html += `
                         <tr>
                             <td></td>
-                            <td class="left italic" style="padding-left: 20px;">Период: ${p.start || ''} - ${p.end || ''} (Пост. ${p.type || '150'})</td>
+                            <td class="left italic indent">↳ Срок службы: с ${startStr} по ${endStr} (Пост. ${p.type || '150'})</td>
                             <td></td>
-                            <td style="mso-number-format:'0';">${Math.round((p.norm || 0) * 12)}</td>
-                            <td style="mso-number-format:'0';">${p.monthsInPeriod || 0}</td>
-                            <td style="mso-number-format:'0.00';">${(p.earned || 0).toFixed(2).replace('.', ',')}</td>
+                            <td>${normYears} г. (${normMonths} мес.)</td>
+                            <td>${monthsInPeriod} мес.</td>
+                            <td style="mso-number-format:'0.00';">${earned.toFixed(2).replace('.', ',')}</td>
                             <td></td>
                             <td></td>
                             <td></td>
@@ -188,36 +266,36 @@ export const generateExcelHtml = (type, data) => {
             // Deductions
             if (r.issuedCount > 0) {
                 html += `
-                    <tr>
-                        <td></td>
-                        <td class="left italic" style="padding-left: 20px;">Удержание: Выдано ранее</td>
-                        <td></td>
-                        <td></td>
-                        <td></td>
-                        <td></td>
-                        <td style="mso-number-format:'0';">${r.issuedCount}</td>
-                        <td></td>
-                        <td></td>
-                        <td></td>
-                    </tr>
+                        <tr>
+                            <td></td>
+                            <td class="left italic indent">↳ Выдано со склада (ранее получено лично в носку)</td>
+                            <td></td>
+                            <td></td>
+                            <td></td>
+                            <td></td>
+                            <td style="mso-number-format:'0.00';">${r.issuedCount.toFixed(2).replace('.', ',')}</td>
+                            <td></td>
+                            <td></td>
+                            <td></td>
+                        </tr>
                 `;
             }
 
             if (r.amortMoney > 0) {
                 const amortQty = r.amortMoney / r.price;
                 html += `
-                    <tr>
-                        <td></td>
-                        <td class="left italic" style="padding-left: 20px;">Удержание: Износ одежды</td>
-                        <td></td>
-                        <td></td>
-                        <td></td>
-                        <td></td>
-                        <td style="mso-number-format:'0.00';">${amortQty.toFixed(2).replace('.', ',')}</td>
-                        <td></td>
-                        <td></td>
-                        <td></td>
-                    </tr>
+                        <tr>
+                            <td></td>
+                            <td class="left italic indent">↳ Амортизация (удержан износ одежды за время носки)</td>
+                            <td></td>
+                            <td></td>
+                            <td></td>
+                            <td></td>
+                            <td style="mso-number-format:'0.00';">${amortQty.toFixed(2).replace('.', ',')}</td>
+                            <td></td>
+                            <td></td>
+                            <td></td>
+                        </tr>
                 `;
             }
         });
@@ -226,21 +304,20 @@ export const generateExcelHtml = (type, data) => {
         const totalQty = targetResults.reduce((sum: number, r: any) => sum + Math.round(r.comp / r.price), 0);
 
         html += `
-                <tr>
-                    <td colspan="7" class="right bold">Итого:</td>
+                <tr class="bg-header">
+                    <td colspan="7" class="right bold">Итого к выплате:</td>
                     <td class="bold red center" style="mso-number-format:'0';">${totalQty}</td>
                     <td style="border: none;"></td>
                     <td class="bold red" style="mso-number-format:'0.00';">${totalSum.toFixed(2).replace('.', ',')}</td>
                 </tr>
-                <tr><td colspan="10" class="center">Количество предметов: ${totalQty}</td></tr>
-                <tr><td colspan="10" class="center">Сумма к выплате: ${totalSum.toFixed(2).replace('.', ',')} руб.</td></tr>
+                <tr><td colspan="10" class="center bold">Итого начислено компенсаций к выплате: ${totalQty} предметов на сумму ${totalSum.toFixed(2).replace('.', ',')} руб.</td></tr>
                 
                 <tr><td colspan="10" style="border: none;"></td></tr>
-                <tr><td colspan="10" style="border: none;" class="left italic">Настоящий расчет произведен на основании данных из Арматурной карточки и является законным обоснованием для выплаты денежной компенсации за недополученное вещевое имущество.</td></tr>
+                <tr><td colspan="10" style="border: none;" class="left italic">Расчет является официальной справкой-обоснованием, составлен строго в соответствии с нормами вещевого снабжения ФСИН РФ и формулами пропорционального исчисления сроков носки.</td></tr>
                 <tr><td colspan="10" style="border: none;"></td></tr>
                 <tr>
-                    <td colspan="5" style="border: none;" class="left">${employeeRank || '________________________________'}</td>
-                    <td colspan="5" style="border: none;" class="right">${employeeFio || '________________'}</td>
+                    <td colspan="5" style="border: none;" class="left"><b>${employeeRank || 'капитан внутренней службы'}</b></td>
+                    <td colspan="5" style="border: none;" class="right"><b>${formattedEmployeeFio}</b></td>
                 </tr>
             </table>
         </body>

@@ -2,6 +2,7 @@ import { Telegraf, Markup } from 'telegraf';
 import { createClient } from '@supabase/supabase-js';
 import * as dotenv from 'dotenv';
 import * as path from 'path';
+import * as fs from 'fs';
 import { calculateCore } from '../src/lib/botCalculatorCore';
 import { generateExcelHtml } from '../src/lib/exportHelpers';
 
@@ -65,6 +66,8 @@ bot.start(async (ctx) => {
             "Для начала свяжите свой аккаунт на сайте с Telegram!\n\n" +
             "Команды:\n" +
             "/my_archive - Показать последние расчеты\n" +
+            "/raport - Скачать шаблон рапорта\n" +
+            "/instruction - Инструкция по спорам\n" +
             "/calc - Открыть калькулятор",
             Markup.keyboard([
                 [Markup.button.webApp('🧮 Открыть калькулятор', 'https://03521a07d8f1c8.lhr.life')]
@@ -137,6 +140,32 @@ bot.command('calc', (ctx) => {
     ]).resize());
 });
 
+bot.command('raport', async (ctx) => {
+    try {
+        const filePath = path.resolve(process.cwd(), 'public', 'Рапорт_на_компенсацию.docx');
+        if (fs.existsSync(filePath)) {
+            await ctx.replyWithDocument({ source: filePath, filename: 'Рапорт_на_компенсацию.docx' }, { caption: 'Вот ваш шаблон рапорта на компенсацию!' });
+        } else {
+            await ctx.reply('❌ Файл рапорта временно недоступен.');
+        }
+    } catch (e) {
+        console.error(e);
+        ctx.reply("❌ Произошла ошибка при отправке файла.");
+    }
+});
+
+bot.command('instruction', async (ctx) => {
+    ctx.reply(
+        "📖 **Инструкция по спорным ситуациям**\n\n" +
+        "Если бухгалтерия отказывается выплачивать компенсацию или требует удержать лишнее, " +
+        "вы можете ознакомиться с подробной инструкцией, где собрана вся необходимая юридическая база.\n\n" +
+        "Нажмите кнопку ниже, чтобы прочитать инструкцию на сайте:",
+        Markup.inlineKeyboard([
+            [Markup.button.url('Читать инструкцию', 'https://03521a07d8f1c8.lhr.life/instructions')]
+        ])
+    );
+});
+
 // Обработка нажатий на кнопки скачивания Excel
 bot.action(/xls_(comp|ded|b2c-comp)_(.+)/, async (ctx) => {
     try {
@@ -197,7 +226,34 @@ bot.on('web_app_data', async (ctx) => {
         const dataStr = ctx.message.web_app_data.data;
         const payload = JSON.parse(dataStr);
         
-        ctx.reply("⏳ Принял расчет! Генерирую Excel файлы...");
+        ctx.reply("⏳ Принял расчет! Сохраняю в архив и генерирую Excel файлы...");
+        
+        const telegramId = ctx.from.id.toString();
+        
+        // Пытаемся найти пользователя и сохранить расчет в его облачный архив
+        try {
+            const { data: sub } = await supabase
+                .from('subscriptions')
+                .select('user_id')
+                .eq('telegram_id', telegramId)
+                .single();
+
+            if (sub && sub.user_id) {
+                await supabase.from('archives').insert({
+                    user_id: sub.user_id,
+                    employee_fio: payload.employeeFio || 'Сотрудник',
+                    employee_rank: payload.employeeRank || '',
+                    dismissal_group: payload.dismissalGroup || '1',
+                    dism_date: payload.dismDate,
+                    gender: payload.gender || 'male',
+                    periods: payload.periods || [],
+                    item_totals: payload.itemTotals || {},
+                    custom_prices: payload.customPrices || {}
+                });
+            }
+        } catch (e) {
+            console.error("Ошибка при сохранении в архив:", e);
+        }
 
         const calculated = calculateCore({
             periods: payload.periods,

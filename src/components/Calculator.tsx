@@ -9,6 +9,7 @@ import 'driver.js/dist/driver.css';
 import IssueLogTable from './IssueLogTable';
 import ResultsTable from './ResultsTable';
 import ProModal from './ProModal';
+import PaywallModal from './PaywallModal';
 import TelegramLinkButton from './TelegramLinkButton';
 import { useCalculatorResults } from '../lib/useCalculatorResults';
 import { formatCurrency, getRoundedMonths } from '../lib/helpers';
@@ -44,6 +45,7 @@ export default function Calculator() {
   const [proModalTitle, setProModalTitle] = useState('');
   const [isTwa, setIsTwa] = useState(false);
   const [isLoadingUnlock, setIsLoadingUnlock] = useState(false);
+  const [isPaywallOpen, setIsPaywallOpen] = useState(false);
 
   const { user, subscription, signOut, isLoading } = useAuth();
   const router = useRouter();
@@ -442,12 +444,7 @@ export default function Calculator() {
 
   const handleExport = (type: 'comp' | 'ded' | 'b2c-comp') => {
       if (!isUnlocked) {
-          const paywallEl = document.getElementById('paywall-card');
-          if (paywallEl) {
-              paywallEl.scrollIntoView({ behavior: 'smooth', block: 'center' });
-          } else {
-              document.getElementById('results-section')?.scrollIntoView({ behavior: 'smooth' });
-          }
+          setIsPaywallOpen(true);
           return;
       }
       exportToExcel(type, {
@@ -461,12 +458,7 @@ export default function Calculator() {
 
   const handleReportExport = () => {
       if (!isUnlocked) {
-          const paywallEl = document.getElementById('paywall-card');
-          if (paywallEl) {
-              paywallEl.scrollIntoView({ behavior: 'smooth', block: 'center' });
-          } else {
-              document.getElementById('results-section')?.scrollIntoView({ behavior: 'smooth' });
-          }
+          setIsPaywallOpen(true);
           return;
       }
       generateWordReport({
@@ -898,7 +890,7 @@ export default function Calculator() {
                 <ResultsTable 
                     results={results} 
                     isUnlocked={isUnlocked}
-                    onUnlock={handleUnlockSingleCalculation}
+                    onUnlock={() => setIsPaywallOpen(true)}
                     onUnlockPro={handleUnlockPro}
                     isLoadingUnlock={isLoadingUnlock}
                     dismissalGroup={dismissalGroup}
@@ -977,6 +969,16 @@ export default function Calculator() {
         isOpen={isProModalOpen} 
         onClose={() => setIsProModalOpen(false)} 
         title={proModalTitle} 
+      />
+
+      <PaywallModal 
+        isOpen={isPaywallOpen}
+        onClose={() => setIsPaywallOpen(false)}
+        onUnlockSingle={handleUnlockSingleCalculation}
+        onUnlockPro={handleUnlockPro}
+        isLoadingUnlock={isLoadingUnlock}
+        resultsCount={results.length}
+        finalBalance={finalBalance}
       />
 
       {/* Floating Bottom Bar */}

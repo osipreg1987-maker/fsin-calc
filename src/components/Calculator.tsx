@@ -423,8 +423,12 @@ export default function Calculator() {
 
       {/* Dashboards */}
       <div className="grid grid-cols-1 md:grid-cols-3 gap-4 mb-8">
-          <motion.div whileHover={{ y: -5 }} className="glass-panel p-0 rounded-2xl overflow-hidden flex flex-col">
-              <button onClick={() => handleExport('comp')} className="p-6 text-left w-full hover:bg-emerald-500/5 transition-colors group flex-1">
+          <motion.button 
+              whileHover={{ y: -5 }} 
+              onClick={() => handleExport('comp')} 
+              className="glass-panel p-6 rounded-2xl text-left w-full hover:bg-emerald-500/10 transition-colors group flex flex-col justify-between h-full"
+          >
+              <div>
                   <div className="flex items-center gap-3 mb-4">
                       <div className="bg-emerald-500/20 text-emerald-400 p-2.5 rounded-xl">
                           <Scale size={24} />
@@ -434,18 +438,18 @@ export default function Calculator() {
                       </h3>
                   </div>
                   <div className="text-3xl lg:text-4xl font-bold text-emerald-400 mb-2">{formatCurrency(totalComp)}</div>
-                  {!isTwa && (
-                      <div className="mt-4 text-emerald-500/80 text-sm font-medium flex items-center gap-2 group-hover:text-emerald-400 transition-colors">
-                          <Download size={16} /> Скачать справку
-                      </div>
-                  )}
-              </button>
-          </motion.div>
+              </div>
+              {!isTwa && (
+                  <div className="mt-4 pt-4 border-t border-slate-700/50 text-emerald-500/80 text-sm font-medium flex items-center gap-2 group-hover:text-emerald-400 transition-colors w-full">
+                      <Download size={16} /> Скачать справку
+                  </div>
+              )}
+          </motion.button>
 
           <motion.button 
               whileHover={{ y: -5 }} 
               onClick={() => handleExport('ded')} 
-              className="glass-panel p-6 rounded-2xl text-left w-full hover:bg-rose-500/5 transition-colors group flex flex-col justify-between"
+              className="glass-panel p-6 rounded-2xl text-left w-full hover:bg-rose-500/10 transition-colors group flex flex-col justify-between h-full"
           >
               <div>
                   <div className="flex items-center gap-3 mb-4">
@@ -459,7 +463,7 @@ export default function Calculator() {
                   <div className="text-3xl lg:text-4xl font-bold text-[var(--foreground)] mb-2">{formatCurrency(totalDed)}</div>
               </div>
               {!isTwa && (
-                  <div className="mt-4 text-rose-500/80 text-sm font-medium flex items-center gap-2 group-hover:text-rose-400 transition-colors">
+                  <div className="mt-4 pt-4 border-t border-slate-700/50 text-rose-500/80 text-sm font-medium flex items-center gap-2 group-hover:text-rose-400 transition-colors w-full">
                       <Download size={16} /> Скачать справку
                   </div>
               )}
@@ -468,7 +472,7 @@ export default function Calculator() {
           <motion.button 
               whileHover={{ y: -5 }} 
               onClick={() => handleExport('b2c-comp')} 
-              className={`glass-panel p-6 rounded-2xl text-left w-full transition-colors group flex flex-col justify-between ${isPositive ? 'bg-emerald-500/5 hover:bg-emerald-500/10' : 'bg-rose-500/5 hover:bg-rose-500/10'}`}
+              className="glass-panel p-6 rounded-2xl text-left w-full hover:bg-purple-500/10 transition-colors group flex flex-col justify-between h-full"
           >
               <div>
                   <div className="flex items-center gap-3 mb-4">
@@ -479,13 +483,10 @@ export default function Calculator() {
                           ИТОГОВЫЙ БАЛАНС
                       </h3>
                   </div>
-                  <div className={`text-3xl lg:text-4xl font-bold mb-1 ${isPositive ? 'text-emerald-500' : 'text-rose-500'}`}>{formatCurrency(Math.abs(finalBalance))}</div>
-                  <div className={`text-sm ${isPositive ? 'text-emerald-500/70' : 'text-rose-500/70'}`}>
-                      {isPositive ? 'К выплате сотруднику' : 'Взыскать в бюджет'}
-                  </div>
+                  <div className={`text-3xl lg:text-4xl font-bold mb-2 ${isPositive ? 'text-emerald-500' : 'text-rose-500'}`}>{formatCurrency(Math.abs(finalBalance))}</div>
               </div>
               {!isTwa && (
-                  <div className="mt-4 text-purple-400/80 text-sm font-medium flex items-center gap-2 group-hover:text-purple-400 transition-colors">
+                  <div className="mt-4 pt-4 border-t border-slate-700/50 text-purple-400/80 text-sm font-medium flex items-center gap-2 group-hover:text-purple-400 transition-colors w-full">
                       <FileText size={16} /> Скачать расширенное обоснование
                   </div>
               )}

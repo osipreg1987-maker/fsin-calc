@@ -442,7 +442,7 @@ export default function Calculator() {
 
   const handleExport = (type: 'comp' | 'ded' | 'b2c-comp') => {
       if (!isUnlocked) {
-          handleUnlockSingleCalculation();
+          document.getElementById('results-section')?.scrollIntoView({ behavior: 'smooth' });
           return;
       }
       exportToExcel(type, {
@@ -456,7 +456,7 @@ export default function Calculator() {
 
   const handleReportExport = () => {
       if (!isUnlocked) {
-          handleUnlockSingleCalculation();
+          document.getElementById('results-section')?.scrollIntoView({ behavior: 'smooth' });
           return;
       }
       generateWordReport({
@@ -879,7 +879,7 @@ export default function Calculator() {
                 />
             </div>
 
-            <div className="bg-slate-900/40 backdrop-blur-xl rounded-[1.75rem] border border-slate-800/80 p-6 shadow-xl shadow-black/25 relative overflow-hidden group">
+            <div id="results-section" className="bg-slate-900/40 backdrop-blur-xl rounded-[1.75rem] border border-slate-800/80 p-6 shadow-xl shadow-black/25 relative overflow-hidden group">
                 <div className="absolute top-0 left-0 right-0 h-[2px] bg-gradient-to-r from-purple-500/30 via-purple-500/10 to-transparent" />
                 <h2 className="text-xl font-bold text-white mb-6 flex items-center gap-2">
                     <div className="w-2 h-6 bg-purple-500 rounded-full"></div>

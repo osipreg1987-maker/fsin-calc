@@ -67,17 +67,34 @@ export function useCalculatorResults({ periods, gender, itemTotals, customPrices
                 if (!wearMonths) return;
 
                 const months = getRoundedMonths(pp.start, pp.end);
-                const qty = months / wearMonths;
-                const money = qty * item.price;
+                // Применяем стандартное математическое округление количества до 2 знаков после запятой
+                const qty = Math.round((months / wearMonths) * 100) / 100;
+                // Начисляем деньги строго на основе округленного количества предметов
+                const money = Math.round(qty * item.price * 100) / 100;
 
                 earnedQty += qty;
                 earnedMoney += money;
-                periodDetails.push({ type: pp.type, norm: pp.norm, months, wearMonths, qty, money, pIndex: pp.pIndex, isTail: pp.isTail, start: pp.start, end: pp.end });
+                periodDetails.push({ 
+                    type: pp.type, 
+                    norm: pp.norm, 
+                    months, 
+                    wearMonths, 
+                    qty, 
+                    money, 
+                    pIndex: pp.pIndex, 
+                    isTail: pp.isTail, 
+                    start: pp.start, 
+                    end: pp.end 
+                });
             });
+
+            // Округляем суммарные показатели начисления до 2 знаков
+            earnedQty = Math.round(earnedQty * 100) / 100;
+            earnedMoney = Math.round(earnedMoney * 100) / 100;
 
             // 2. Считаем Выдано (Полная стоимость)
             const issuedQty = Number(itemTotals[item.id]) || 0;
-            const issuedMoney = issuedQty * item.price;
+            const issuedMoney = Math.round(issuedQty * item.price * 100) / 100;
 
             // 3. Считаем Амортизацию (Удержание за неистекший срок)
             let amortMoney = 0;
@@ -108,7 +125,9 @@ export function useCalculatorResults({ periods, gender, itemTotals, customPrices
             const localDeductionLines = [];
 
             if (wearMonthsForDed > 0 && issuedQty > earnedQty) {
-                let totalDeductionMonths = Math.round((issuedQty - earnedQty) * wearMonthsForDed);
+                // Вычисляем разницу в количестве с точностью до 2 знаков
+                const diffQty = Math.round((issuedQty - earnedQty) * 100) / 100;
+                let totalDeductionMonths = Math.round(diffQty * wearMonthsForDed);
                 const priceToUse = customPrices[item.id] || item.price;
                 
                 if (totalDeductionMonths > 0) {
@@ -130,8 +149,10 @@ export function useCalculatorResults({ periods, gender, itemTotals, customPrices
                         
                         let issueDateStr = `${issueDate.getFullYear()}-${String(issueDate.getMonth() + 1).padStart(2, '0')}-${String(issueDate.getDate()).padStart(2, '0')}`;
                         
-                        const pricePerMonth = priceToUse / wearMonthsForDed;
-                        const residualValue = dedMonths * pricePerMonth;
+                        // Рассчитываем долю недоноса с математическим округлением до 2 знаков
+                        const dedQty = Math.round((dedMonths / wearMonthsForDed) * 100) / 100;
+                        // Рассчитываем сумму износа по округленной доле недоноса
+                        const residualValue = Math.round(dedQty * priceToUse * 100) / 100;
                         
                         localDeductionLines.push({
                             name: item.name,
@@ -140,17 +161,16 @@ export function useCalculatorResults({ periods, gender, itemTotals, customPrices
                             issueDateStr: issueDateStr,
                             monthsLeft: dedMonths,
                             price: priceToUse,
-                            pricePerMonth: pricePerMonth,
-                            residualValue: residualValue
+                            pricePerMonth: priceToUse / wearMonthsForDed,
+                            residualValue: residualValue,
+                            dedQty: dedQty
                         });
                         
                         amortMoney += residualValue;
                         
-                        // formatDateToMMYYYY is simple here
                         const parts = issueDateStr.split('-');
                         const formattedIssueDate = parts.length === 3 ? `${parts[1]}.${parts[0]}` : issueDateStr;
                         
-                        // We use a simplified currency formatter for this string
                         const formattedVal = new Intl.NumberFormat('ru-RU', { style: 'currency', currency: 'RUB', minimumFractionDigits: 2 }).format(residualValue);
                         amortDetails.push(`Недонос ${dedMonths} мес. (выдано: ${formattedIssueDate}) - ${formattedVal}`);
                         
@@ -159,6 +179,9 @@ export function useCalculatorResults({ periods, gender, itemTotals, customPrices
                     }
                 }
             }
+
+            // Округляем общую амортизацию предмета
+            amortMoney = Math.round(amortMoney * 100) / 100;
 
             // 4. Логика Трех Групп
             const baseComp = Math.max(0, earnedMoney - issuedMoney);
@@ -178,7 +201,7 @@ export function useCalculatorResults({ periods, gender, itemTotals, customPrices
                 ded = baseDed;
             }
 
-            const balance = comp - ded;
+            const balance = Math.round((comp - ded) * 100) / 100;
 
             if (comp > 0 || ded > 0 || earnedMoney > 0 || issuedMoney > 0) {
                 res.push({
@@ -208,4 +231,3 @@ export function useCalculatorResults({ periods, gender, itemTotals, customPrices
 
     return { activeItemsList, groupedItems, results, totalComp, totalDed, finalBalance, isPositive };
 }
-

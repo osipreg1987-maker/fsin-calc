@@ -4,7 +4,7 @@ import { useEffect, useState } from 'react';
 import { useRouter } from 'next/navigation';
 import { supabase } from '../../lib/supabaseClient';
 import { motion } from 'framer-motion';
-import { Users, CreditCard, CheckCircle, XCircle, Clock, ShieldAlert } from 'lucide-react';
+import { Users, CreditCard, CheckCircle, XCircle, Clock, ShieldAlert, Trash2 } from 'lucide-react';
 
 export default function AdminDashboard() {
   const [users, setUsers] = useState<any[]>([]);
@@ -70,6 +70,70 @@ export default function AdminDashboard() {
         }
         return u;
       }));
+    } catch (err: any) {
+      alert('Ошибка: ' + err.message);
+    }
+  };
+
+  const handleUpdateCalculationsLimit = async (userId: string, limit: number) => {
+    try {
+      const { data: { session } } = await supabase.auth.getSession();
+      if (!session) return;
+
+      const res = await fetch('/api/admin/grant-pro', {
+        method: 'POST',
+        headers: {
+          'Authorization': `Bearer ${session.access_token}`,
+          'Content-Type': 'application/json'
+        },
+        body: JSON.stringify({ targetUserId: userId, guaranteedCalculations: limit })
+      });
+
+      if (!res.ok) {
+        const err = await res.json();
+        alert('Ошибка обновления лимита: ' + err.error);
+        return;
+      }
+
+      // Обновляем список локально
+      setUsers(users.map(u => {
+        if (u.id === userId) {
+          return { ...u, guaranteed_calculations: limit };
+        }
+        return u;
+      }));
+    } catch (err: any) {
+      alert('Ошибка: ' + err.message);
+    }
+  };
+
+  const handleDeleteUser = async (userId: string, email: string) => {
+    if (!confirm(`Вы действительно хотите НАВСЕГДА удалить пользователя ${email}? Это действие сотрет все его данные, подписки и архивы!`)) {
+        return;
+    }
+    
+    try {
+      const { data: { session } } = await supabase.auth.getSession();
+      if (!session) return;
+
+      const res = await fetch('/api/admin/delete-user', {
+        method: 'POST',
+        headers: {
+          'Authorization': `Bearer ${session.access_token}`,
+          'Content-Type': 'application/json'
+        },
+        body: JSON.stringify({ targetUserId: userId })
+      });
+
+      if (!res.ok) {
+        const err = await res.json();
+        alert('Ошибка удаления: ' + err.error);
+        return;
+      }
+
+      // Обновляем список локально
+      setUsers(users.filter(u => u.id !== userId));
+      alert('Пользователь успешно удален!');
     } catch (err: any) {
       alert('Ошибка: ' + err.message);
     }
@@ -153,6 +217,7 @@ export default function AdminDashboard() {
                   <th className="py-4 px-6 font-medium">Регистрация</th>
                   <th className="py-4 px-6 font-medium">Telegram</th>
                   <th className="py-4 px-6 font-medium">Статус</th>
+                  <th className="py-4 px-6 font-medium">Лимит расчетов</th>
                   <th className="py-4 px-6 font-medium text-right">Действия</th>
                 </tr>
               </thead>
@@ -186,22 +251,58 @@ export default function AdminDashboard() {
                         </span>
                       )}
                     </td>
+                    <td className="py-4 px-6">
+                      <div className="flex items-center gap-2">
+                        <span className="text-slate-400 text-xs font-bold shrink-0">
+                          {u.pro_calculations_made || 0} из
+                        </span>
+                        <input 
+                          type="number" 
+                          className="w-16 bg-slate-950 border border-slate-850 focus:border-indigo-500 rounded px-2 py-1 text-center text-xs font-black text-slate-100 focus:outline-none transition-all"
+                          defaultValue={u.guaranteed_calculations || 0}
+                          onBlur={async (e) => {
+                            const val = parseInt(e.target.value);
+                            if (isNaN(val) || val < 0) return;
+                            if (val === u.guaranteed_calculations) return;
+                            await handleUpdateCalculationsLimit(u.id, val);
+                          }}
+                          onKeyDown={async (e) => {
+                            if (e.key === 'Enter') {
+                              const val = parseInt((e.target as HTMLInputElement).value);
+                              if (isNaN(val) || val < 0) return;
+                              await handleUpdateCalculationsLimit(u.id, val);
+                              (e.target as HTMLInputElement).blur();
+                            }
+                          }}
+                        />
+                      </div>
+                    </td>
                     <td className="py-4 px-6 text-right">
-                      {u.is_pro ? (
+                      <div className="flex items-center justify-end gap-2.5">
+                        {u.is_pro ? (
+                          <button 
+                            onClick={() => handleGrantPro(u.id, 'revoke')}
+                            className="text-xs px-3 py-1.5 rounded bg-slate-800 hover:bg-slate-700 text-rose-400 font-bold transition-colors cursor-pointer"
+                          >
+                            Отозвать PRO
+                          </button>
+                        ) : (
+                          <button 
+                            onClick={() => handleGrantPro(u.id, 'grant')}
+                            className="text-xs px-3 py-1.5 rounded bg-purple-500/20 text-purple-400 hover:bg-purple-500/30 font-bold transition-colors cursor-pointer"
+                          >
+                            Выдать PRO
+                          </button>
+                        )}
+                        
                         <button 
-                          onClick={() => handleGrantPro(u.id, 'revoke')}
-                          className="text-xs px-3 py-1.5 rounded bg-slate-800 text-rose-400 hover:bg-slate-700 transition-colors"
+                          onClick={() => handleDeleteUser(u.id, u.email)}
+                          className="p-2 rounded bg-rose-500/10 hover:bg-rose-500/20 text-rose-400 hover:text-rose-300 border border-rose-500/20 hover:border-rose-500/40 transition-colors cursor-pointer"
+                          title="Удалить пользователя"
                         >
-                          Отозвать PRO
+                          <Trash2 size={13} />
                         </button>
-                      ) : (
-                        <button 
-                          onClick={() => handleGrantPro(u.id, 'grant')}
-                          className="text-xs px-3 py-1.5 rounded bg-purple-500/20 text-purple-400 hover:bg-purple-500/30 transition-colors"
-                        >
-                          Выдать PRO
-                        </button>
-                      )}
+                      </div>
                     </td>
                   </tr>
                 ))}

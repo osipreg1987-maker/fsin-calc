@@ -20,38 +20,38 @@ export async function POST(req: Request) {
         }
 
         const body = await req.json();
-        const { targetUserId, action, guaranteedCalculations } = body;
+        const { targetUserId } = body;
 
         if (!targetUserId) {
             return NextResponse.json({ error: 'Missing parameters' }, { status: 400 });
         }
 
-        let updateData: any = {};
-        if (action === 'grant') {
-            // Выдаем PRO на 30 дней от текущего момента
-            const until = new Date();
-            until.setDate(until.getDate() + 30);
-            updateData = { is_pro: true, pro_until: until.toISOString() };
-        } else if (action === 'revoke') {
-            updateData = { is_pro: false, pro_until: null };
-        }
+        // 1. Удаляем архивы пользователя
+        const { error: arcErr } = await supabase
+            .from('archives')
+            .delete()
+            .eq('user_id', targetUserId);
+            
+        if (arcErr) console.error("Error deleting archives:", arcErr);
 
-        if (guaranteedCalculations !== undefined) {
-            updateData.guaranteed_calculations = parseInt(guaranteedCalculations);
-        }
-
-        const { data, error } = await supabase
+        // 2. Удаляем подписку
+        const { error: subErr } = await supabase
             .from('subscriptions')
-            .update(updateData)
-            .eq('user_id', targetUserId)
-            .select()
-            .single();
+            .delete()
+            .eq('user_id', targetUserId);
+            
+        if (subErr) console.error("Error deleting subscription:", subErr);
 
-        if (error) throw error;
+        // 3. Удаляем пользователя из auth.users
+        const { error: deleteErr } = await supabase.auth.admin.deleteUser(targetUserId);
+        
+        if (deleteErr) {
+            throw deleteErr;
+        }
 
-        return NextResponse.json({ success: true, user: data });
+        return NextResponse.json({ success: true });
     } catch (error: any) {
-        console.error('Admin Grant Error:', error);
+        console.error('Admin Delete User Error:', error);
         return NextResponse.json({ error: error.message }, { status: 500 });
     }
 }

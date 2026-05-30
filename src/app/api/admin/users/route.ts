@@ -57,6 +57,8 @@ export async function GET(req: Request) {
                 is_pro: sub ? sub.is_pro : false,
                 pro_until: sub ? sub.pro_until : null,
                 telegram_id: sub ? sub.telegram_id : null,
+                pro_calculations_made: sub ? sub.pro_calculations_made : 0,
+                guaranteed_calculations: sub ? sub.guaranteed_calculations : 0,
             };
         });
 

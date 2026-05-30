@@ -34,10 +34,10 @@ export default function CalculatorPage() {
           <div className="flex flex-col md:flex-row justify-between items-center gap-6 relative">
             <div className="flex-1 space-y-2 text-left">
               <h1 className="text-3xl md:text-4xl lg:text-[2.65rem] font-black text-transparent bg-clip-text bg-gradient-to-r from-blue-400 via-indigo-300 to-purple-400 tracking-tight leading-[1.12]">
-                ФСИН: калькулятор расчета компенсации
+                Калькулятор расчёта компенсации
               </h1>
-              <p className="text-[11px] md:text-xs text-slate-400 font-bold max-w-2xl leading-normal uppercase tracking-wider">
-                за неполученное вещевое довольствие в период прохождения службы
+              <p className="text-[11px] md:text-xs text-slate-400 font-bold max-w-2xl leading-normal tracking-wider">
+                За неполученное вещевое довольствие сотрудника ФСИН в период прохождения службы
               </p>
               
               {isAdmin && (

@@ -1003,7 +1003,7 @@ export default function Calculator() {
                                           Друзей пришло: <strong className="text-slate-200 font-bold">{subscription.referred_friends_count || 0}</strong>
                                         </div>
                                         <div className="text-emerald-400 font-bold">
-                                          Бонус: +{subscription.referred_friends_count || 0} мес. PRO
+                                          Бонус: +{(subscription.referred_friends_count || 0) * 3} мес. PRO
                                         </div>
                                       </div>
                                     )}

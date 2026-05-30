@@ -228,7 +228,9 @@ export default function LandingPage() {
               <div className="bg-emerald-500/10 border border-emerald-500/20 p-5 rounded-2xl">
                 <span className="text-emerald-400 text-xs font-black uppercase tracking-widest block mb-1">Решение:</span>
                 <p className="text-sm font-normal text-slate-200">
-                  Внесите данные арматурной карточки один раз — и система мгновенно сгенерирует готовую Excel-справку с математически безупречными расчетами износа и сроков.
+                  Внесите данные арматурной карточки один раз — и система мгновенно сгенерирует готовую Excel-справку с математически безупречными расчетами износа и сроков. 
+                  <strong className="text-indigo-300 block mt-2 text-[11px] uppercase tracking-wider">💡 Обратите внимание:</strong> 
+                  Для заполнения калькулятора вам потребуется скан или фото арматурной карточки для ввода выданного имущества — запросите её предварительно у сотрудников тыловой службы вашего учреждения.
                 </p>
               </div>
             </div>

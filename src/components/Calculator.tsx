@@ -533,7 +533,7 @@ export default function Calculator() {
       }
   };
 
-  const handleUnlockPro = async () => {
+  const handleUnlockPro = async (planType: 'monthly' | 'half-year' = 'monthly') => {
       if (!user) {
           alert("Для оплаты подписки необходимо авторизоваться!");
           router.push('/auth');
@@ -544,7 +544,7 @@ export default function Calculator() {
           const response = await fetch('/api/checkout', {
               method: 'POST',
               headers: { 'Content-Type': 'application/json' },
-              body: JSON.stringify({ planType: 'monthly' })
+              body: JSON.stringify({ planType })
           });
           const resData = await response.json();
           if (resData.url) {
@@ -806,6 +806,71 @@ export default function Calculator() {
       <div className="grid grid-cols-1 lg:grid-cols-12 gap-6 pb-24">
         <div className="lg:col-span-4 space-y-6">
             
+            {/* Статус подписки PRO */}
+            {user && (
+                <div className="bg-slate-900/30 backdrop-blur-xl border border-slate-800/80 rounded-3xl p-5 shadow-xl shadow-black/20 relative overflow-hidden group">
+                    <div className="absolute top-0 left-0 right-0 h-[2px] bg-gradient-to-r from-amber-500/35 via-amber-500/10 to-transparent" />
+                    
+                    <h2 className="text-lg font-bold text-slate-100 flex items-center gap-2 mb-4">
+                        <Crown className={isPro ? "text-amber-400 animate-pulse" : "text-slate-500"} size={18} />
+                        Статус подписки
+                    </h2>
+                    
+                    {isPro ? (
+                        <div className="space-y-3">
+                            <div className="flex items-center justify-between text-xs">
+                                <span className="text-slate-400">Режим:</span>
+                                <span className="text-amber-400 font-extrabold uppercase tracking-wider bg-amber-500/10 border border-amber-500/20 px-2 py-0.5 rounded-md text-[10px]">PRO Активен</span>
+                            </div>
+                            
+                            {subscription?.pro_until && (
+                                <div className="space-y-1 pt-2 border-t border-slate-800/50">
+                                    <div className="flex justify-between items-center text-xs">
+                                        <span className="text-slate-400">Осталось времени:</span>
+                                        <span className="text-slate-200 font-bold">
+                                            {Math.max(0, Math.ceil((new Date(subscription.pro_until).getTime() - Date.now()) / (1000 * 60 * 60 * 24)))} дн.
+                                        </span>
+                                    </div>
+                                    <div className="text-[10px] text-slate-500">
+                                        Действует до: {new Date(subscription.pro_until).toLocaleDateString()}
+                                    </div>
+                                </div>
+                            )}
+                            
+                            {subscription?.guaranteed_calculations !== undefined && subscription.guaranteed_calculations > 0 && (
+                                <div className="space-y-1 pt-2 border-t border-slate-800/50">
+                                    <div className="flex justify-between items-center text-xs">
+                                        <span className="text-slate-400">Уникальные расчеты:</span>
+                                        <span className="text-emerald-400 font-black">
+                                            {Math.max(0, subscription.guaranteed_calculations - (subscription.pro_calculations_made || 0))} из {subscription.guaranteed_calculations}
+                                        </span>
+                                    </div>
+                                    <div className="text-[10px] text-slate-500 leading-normal">
+                                        Квота гарантированных расчетов. PRO не сгорит, пока не израсходован этот остаток!
+                                    </div>
+                                </div>
+                            )}
+                        </div>
+                    ) : (
+                        <div className="space-y-3">
+                            <div className="flex items-center justify-between text-xs">
+                                <span className="text-slate-400">Режим:</span>
+                                <span className="text-slate-400 font-bold uppercase tracking-wider bg-slate-850 border border-slate-800 px-2 py-0.5 rounded-md text-[10px]">Базовый (Бесплатный)</span>
+                            </div>
+                            <p className="text-[11px] text-slate-400 leading-relaxed">
+                                Скачивание Word-рапортов и Excel-справок заблокировано.
+                             </p>
+                             <button 
+                                 onClick={() => setIsPaywallOpen(true)}
+                                 className="w-full py-2 bg-gradient-to-r from-amber-500 to-yellow-500 hover:from-amber-450 hover:to-yellow-450 text-slate-950 font-black rounded-xl text-xs uppercase tracking-wider cursor-pointer shadow-md transition-all text-center"
+                             >
+                                 Активировать PRO 👑
+                             </button>
+                         </div>
+                     )}
+                 </div>
+             )}
+
             {/* Параметры учреждения */}
             <div id="tour-inst-data" className="bg-slate-900/30 backdrop-blur-xl border border-slate-800/80 rounded-3xl p-5 shadow-xl shadow-black/20 relative overflow-hidden group">
                 <div className="absolute top-0 left-0 right-0 h-[2px] bg-gradient-to-r from-amber-500/30 to-transparent" />

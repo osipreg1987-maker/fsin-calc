@@ -3,15 +3,16 @@
 
 import React, { useState } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
-import { X, Check } from 'lucide-react';
+import { X, Check, Crown } from 'lucide-react';
 import { formatCurrency } from '../lib/helpers';
 import { useAuth } from '../context/AuthContext';
+import TelegramLinkButton from './TelegramLinkButton';
 
 interface PaywallModalProps {
   isOpen: boolean;
   onClose: () => void;
   onUnlockSingle: () => void;
-  onUnlockPro: () => void;
+  onUnlockPro: (plan: 'monthly' | 'half-year') => void;
   isLoadingUnlock: boolean;
   resultsCount: number;
   finalBalance: number;
@@ -26,14 +27,47 @@ export default function PaywallModal({
   resultsCount,
   finalBalance
 }: PaywallModalProps) {
-  const [selectedPlan, setSelectedPlan] = useState<'single' | 'monthly'>('single');
+  const [selectedPlan, setSelectedPlan] = useState<'single' | 'monthly' | 'half-year'>('single');
   const { subscription } = useAuth();
+  
   const isReferred = !!(subscription?.referred_by_id && !subscription?.referral_reward_claimed);
+  const isTelegramLinked = !!subscription?.telegram_id;
 
-  const price = isReferred ? '590 ₽' : '790 ₽';
-  const originalPrice = isReferred ? '790 ₽' : '990 ₽';
-  const ribbonText = isReferred ? 'Скидка друга 200 ₽' : 'Скидка 20%';
-  const subtext = isReferred ? '🎁 Применена скидка от друга!' : '🎁 Скидка за привязку Telegram!';
+  // Monthly PRO pricing
+  let monthlyPrice = '990 ₽';
+  let monthlyOriginal = null;
+  let monthlyRibbon = null;
+  let monthlySubtext = '🎁 Привяжите Telegram для скидки 20%';
+  
+  if (isReferred) {
+      monthlyPrice = '590 ₽';
+      monthlyOriginal = '990 ₽';
+      monthlyRibbon = 'Друг: -400 ₽';
+      monthlySubtext = '🎁 Применена скидка от друга!';
+  } else if (isTelegramLinked) {
+      monthlyPrice = '790 ₽';
+      monthlyOriginal = '990 ₽';
+      monthlyRibbon = 'Скидка 20%';
+      monthlySubtext = '🎁 Скидка за Telegram!';
+  }
+
+  // Half-Year PRO pricing
+  let halfYearPrice = '3 999 ₽';
+  let halfYearOriginal = null;
+  let halfYearRibbon = null;
+  let halfYearSubtext = '🎁 Скидка 20% в Telegram!';
+
+  if (isReferred) {
+      halfYearPrice = '2 990 ₽';
+      halfYearOriginal = '3 999 ₽';
+      halfYearRibbon = 'Друг: -1009 ₽';
+      halfYearSubtext = '🎁 Применена скидка от друга!';
+  } else if (isTelegramLinked) {
+      halfYearPrice = '3 190 ₽';
+      halfYearOriginal = '3 999 ₽';
+      halfYearRibbon = 'Скидка 20%';
+      halfYearSubtext = '🎁 Скидка за Telegram!';
+  }
 
   return (
     <AnimatePresence>
@@ -52,7 +86,7 @@ export default function PaywallModal({
             animate={{ scale: 1, opacity: 1, y: 0 }}
             exit={{ scale: 0.9, opacity: 0, y: 20 }}
             transition={{ type: "spring", damping: 25, stiffness: 300 }}
-            className="bg-slate-900 border-2 border-indigo-500/30 rounded-[2.5rem] w-full max-w-2xl shadow-[0_20px_50px_rgba(99,102,241,0.3)] overflow-hidden relative z-10 p-6 md:p-8"
+            className="bg-slate-900 border-2 border-indigo-500/30 rounded-[2.5rem] w-full max-w-4xl shadow-[0_20px_50px_rgba(99,102,241,0.3)] overflow-hidden relative z-10 p-6 md:p-8"
           >
             {/* Close button */}
             <div className="absolute top-5 right-5 z-20">
@@ -83,13 +117,31 @@ export default function PaywallModal({
                 Калькулятор нашел недополученное имущество на сумму:
               </p>
               
-              <div className="text-3xl font-black text-emerald-400 mt-1.5 drop-shadow-[0_2px_15px_rgba(16,185,129,0.25)]">
+              <div className="text-3.5xl font-black text-emerald-400 mt-1.5 drop-shadow-[0_2px_15px_rgba(16,185,129,0.25)]">
                 {formatCurrency(finalBalance)}
               </div>
             </div>
 
+            {/* Telegram Link Promo callout if not linked */}
+            {!isTelegramLinked && (
+                <div className="bg-sky-950/40 border border-sky-500/20 p-4.5 rounded-2xl flex flex-col md:flex-row items-center justify-between gap-4 mt-6 text-left relative overflow-hidden shadow-lg shadow-black/20">
+                    <div className="absolute top-0 right-0 bg-[#0088cc] text-white text-[7px] font-black px-2.5 py-0.5 rounded-bl-lg uppercase tracking-wider select-none">
+                        Акция
+                    </div>
+                    <div className="space-y-1">
+                        <h4 className="text-xs font-bold text-sky-400">🔗 Скидка 20% за привязку Telegram!</h4>
+                        <p className="text-[10px] text-slate-350 leading-relaxed max-w-xl font-medium">
+                            Привяжите аккаунт Telegram, и стоимость подписки моментально снизится: 1 месяц — до <strong>790 ₽</strong> (вместо 990 ₽), а 6 месяцев — до <strong>3 190 ₽</strong>! В Telegram вам также будут мгновенно приходить уведомления об изменениях в приказах ФСИН, обновлении цен и новостях сервиса.
+                        </p>
+                    </div>
+                    <div className="shrink-0">
+                        <TelegramLinkButton />
+                    </div>
+                </div>
+            )}
+
             {/* Tariff Selection Grid */}
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-4 my-6">
+            <div className="grid grid-cols-1 md:grid-cols-3 gap-4.5 my-6">
               {/* Plan 1: Single */}
               <div 
                 onClick={() => setSelectedPlan('single')}
@@ -105,7 +157,7 @@ export default function PaywallModal({
                     Разблокировать <strong>этот конкретный расчет</strong>. Скачивание Word-рапорта и Excel-справки доступно в архиве в течение 6 месяцев.
                   </p>
                 </div>
-                <div className="text-[10px] text-indigo-400 font-bold mt-4">Доступ к скачиванию: 6 месяцев</div>
+                <div className="text-[10px] text-indigo-400 font-bold mt-4 pt-2 border-t border-slate-850">Доступ к скачиванию: 6 месяцев</div>
               </div>
 
               {/* Plan 2: Monthly PRO */}
@@ -113,26 +165,58 @@ export default function PaywallModal({
                 onClick={() => setSelectedPlan('monthly')}
                 className={`cursor-pointer text-left p-4.5 rounded-2xl border-2 transition-all duration-300 relative overflow-hidden flex flex-col justify-between ${selectedPlan === 'monthly' ? 'border-amber-500 bg-amber-500/10 shadow-[0_0_20px_rgba(245,158,11,0.2)]' : 'border-slate-800 bg-slate-950/45 hover:border-slate-700'}`}
               >
-                <div className="absolute top-0 right-0 bg-gradient-to-l from-rose-500 to-amber-500 text-white text-[8px] font-black px-2.5 py-0.5 rounded-bl-xl uppercase tracking-wider">
-                  {ribbonText}
-                </div>
+                {monthlyRibbon && (
+                  <div className="absolute top-0 right-0 bg-gradient-to-l from-rose-500 to-amber-500 text-white text-[8px] font-black px-2.5 py-0.5 rounded-bl-xl uppercase tracking-wider">
+                    {monthlyRibbon}
+                  </div>
+                )}
                 {selectedPlan === 'monthly' && (
                   <span className="absolute bottom-3.5 right-3.5 w-4 h-4 rounded-full bg-amber-500 border border-amber-400 flex items-center justify-center text-[10px] text-slate-950">✓</span>
                 )}
                 <div>
                   <div className="text-[10px] font-extrabold uppercase tracking-wider text-amber-400 flex items-center gap-1">
-                    🔥 Безлимитный PRO (Месяц)
+                    🔥 PRO 1 Месяц
                   </div>
                   <div className="text-2xl font-black text-white mt-1 flex items-baseline gap-1.5">
-                    <span>{price}</span>
-                    <span className="text-xs text-slate-500 line-through font-bold">{originalPrice}</span>
+                    <span>{monthlyPrice}</span>
+                    {monthlyOriginal && <span className="text-xs text-slate-500 line-through font-bold">{monthlyOriginal}</span>}
                   </div>
                   <p className="text-[11px] text-slate-400 mt-2.5 font-medium leading-relaxed">
-                    <strong>Полный безлимит</strong> расчетов. Документы в архиве хранятся постоянно, пока активна подписка PRO.
+                    <strong>Полный безлимит</strong> на месяц. 5 гарантированных расчетов остаются активными постоянно без сгорания подписки!
                   </p>
                 </div>
-                <div className="text-[9px] text-rose-400 font-bold mt-4 bg-rose-500/10 border border-rose-500/20 px-2 py-0.5 rounded-md w-fit">
-                  {subtext}
+                <div className="text-[9px] text-amber-400 font-bold mt-4 bg-amber-500/10 border border-amber-500/20 px-2 py-0.5 rounded-md w-fit">
+                  {monthlySubtext}
+                </div>
+              </div>
+
+              {/* Plan 3: Half-Year PRO */}
+              <div 
+                onClick={() => setSelectedPlan('half-year')}
+                className={`cursor-pointer text-left p-4.5 rounded-2xl border-2 transition-all duration-300 relative overflow-hidden flex flex-col justify-between ${selectedPlan === 'half-year' ? 'border-purple-500 bg-purple-500/10 shadow-[0_0_20px_rgba(168,85,247,0.2)]' : 'border-slate-800 bg-slate-950/45 hover:border-slate-700'}`}
+              >
+                {halfYearRibbon && (
+                  <div className="absolute top-0 right-0 bg-gradient-to-l from-indigo-500 to-purple-500 text-white text-[8px] font-black px-2.5 py-0.5 rounded-bl-xl uppercase tracking-wider">
+                    {halfYearRibbon}
+                  </div>
+                )}
+                {selectedPlan === 'half-year' && (
+                  <span className="absolute bottom-3.5 right-3.5 w-4 h-4 rounded-full bg-purple-500 border border-purple-400 flex items-center justify-center text-[10px] text-white">✓</span>
+                )}
+                <div>
+                  <div className="text-[10px] font-extrabold uppercase tracking-wider text-purple-400 flex items-center gap-1">
+                    👑 PRO 6 Месяцев
+                  </div>
+                  <div className="text-2xl font-black text-white mt-1 flex items-baseline gap-1.5">
+                    <span>{halfYearPrice}</span>
+                    {halfYearOriginal && <span className="text-xs text-slate-500 line-through font-bold">{halfYearOriginal}</span>}
+                  </div>
+                  <p className="text-[11px] text-slate-400 mt-2.5 font-medium leading-relaxed">
+                    <strong>Максимальная выгода</strong>. 30 гарантированных расчетов не сгорают. Отличный выбор для тыловиков и ревизоров!
+                  </p>
+                </div>
+                <div className="text-[9px] text-purple-400 font-bold mt-4 bg-purple-500/10 border border-purple-500/20 px-2 py-0.5 rounded-md w-fit">
+                  {halfYearSubtext}
                 </div>
               </div>
             </div>
@@ -161,9 +245,9 @@ export default function PaywallModal({
             <motion.button 
               whileHover={{ scale: 1.02 }}
               whileTap={{ scale: 0.98 }}
-              onClick={selectedPlan === 'single' ? onUnlockSingle : onUnlockPro}
+              onClick={selectedPlan === 'single' ? onUnlockSingle : () => onUnlockPro(selectedPlan)}
               disabled={isLoadingUnlock}
-              className={`w-full font-black py-4 px-4 rounded-2xl flex items-center justify-center gap-2 transition-all cursor-pointer disabled:opacity-75 text-sm uppercase tracking-wide ${selectedPlan === 'single' ? 'bg-gradient-to-tr from-blue-600 to-indigo-600 hover:from-blue-500 hover:to-indigo-500 text-white shadow-[0_4px_25px_rgba(79,70,229,0.35)] border border-indigo-500/30' : 'bg-gradient-to-tr from-amber-500 to-yellow-500 hover:from-amber-450 hover:to-yellow-450 text-slate-950 shadow-[0_4px_25px_rgba(245,158,11,0.35)] border border-amber-500/30'}`}
+              className={`w-full font-black py-4 px-4 rounded-2xl flex items-center justify-center gap-2 transition-all cursor-pointer disabled:opacity-75 text-sm uppercase tracking-wide ${selectedPlan === 'single' ? 'bg-gradient-to-tr from-blue-600 to-indigo-600 hover:from-blue-500 hover:to-indigo-500 text-white shadow-[0_4px_25px_rgba(79,70,229,0.35)] border border-indigo-500/30' : selectedPlan === 'monthly' ? 'bg-gradient-to-tr from-amber-500 to-yellow-500 hover:from-amber-450 hover:to-yellow-450 text-slate-950 shadow-[0_4px_25px_rgba(245,158,11,0.35)] border border-amber-500/30' : 'bg-gradient-to-tr from-purple-650 to-indigo-650 hover:from-purple-600 hover:to-indigo-600 text-white shadow-[0_4px_25px_rgba(168,85,247,0.35)] border border-purple-500/30'}`}
             >
               {isLoadingUnlock ? (
                 <>
@@ -175,8 +259,10 @@ export default function PaywallModal({
                 </>
               ) : selectedPlan === 'single' ? (
                 <span>Разблокировать расчет за 390 ₽</span>
+              ) : selectedPlan === 'monthly' ? (
+                <span>Активировать PRO за {monthlyPrice}</span>
               ) : (
-                <span>Активировать PRO за {price}</span>
+                <span>Активировать PRO за {halfYearPrice}</span>
               )}
             </motion.button>
 
@@ -184,9 +270,13 @@ export default function PaywallModal({
             <p className="text-[10px] text-slate-500 italic mt-4 text-center">
               {selectedPlan === 'single' 
                 ? 'Разовый расчет. Доступ к скачиванию документов в вашем архиве предоставляется на 6 месяцев.' 
-                : isReferred 
-                  ? 'Специальная акция: применена реферальная скидка от вашего друга. Хранение архива и доступ к PRO-функциям — постоянно на период действия подписки.'
-                  : 'Специальная акция: скидка 20% активирована. Хранение архива и доступ к PRO-функциям — постоянно на период действия подписки.'}
+                : selectedPlan === 'monthly'
+                  ? isReferred 
+                    ? 'Специальная акция: применена реферальная скидка от вашего друга. Хранение архива и доступ к PRO-функциям — постоянно на период действия подписки.'
+                    : 'Специальная акция: скидка активирована. Хранение архива и доступ к PRO-функциям — постоянно на период действия подписки.'
+                  : isReferred
+                    ? 'Максимальный пакет: применена реферальная скидка от вашего друга. Хранение архива и доступ к PRO-функциям — постоянно на период действия подписки.'
+                    : 'Максимальный пакет: скидка активирована. Хранение архива и доступ к PRO-функциям — постоянно на период действия подписки.'}
             </p>
           </motion.div>
         </motion.div>

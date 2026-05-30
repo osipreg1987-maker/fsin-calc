@@ -13,6 +13,7 @@ type Subscription = {
   referred_by_id?: string | null;
   referral_reward_claimed?: boolean;
   referred_friends_count?: number;
+  telegram_id?: string | null;
 };
 
 type AuthContextType = {
@@ -78,10 +79,11 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
         referral_code: data.referral_code,
         referred_by_id: data.referred_by_id,
         referral_reward_claimed: data.referral_reward_claimed,
-        referred_friends_count: data.referred_friends_count || 0
+        referred_friends_count: data.referred_friends_count || 0,
+        telegram_id: data.telegram_id
       });
     } else {
-      setSubscription({ is_pro: false, pro_until: null, pro_calculations_made: 0, guaranteed_calculations: 0 });
+      setSubscription({ is_pro: false, pro_until: null, pro_calculations_made: 0, guaranteed_calculations: 0, telegram_id: null });
     }
   };
 

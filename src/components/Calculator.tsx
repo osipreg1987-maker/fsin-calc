@@ -185,9 +185,8 @@ export default function Calculator() {
   }, [searchParams, user]);
 
   const getReferralLink = () => {
-    if (typeof window === 'undefined') return '';
     const code = subscription?.referral_code || '';
-    return `${window.location.origin}/?ref=${code}`;
+    return `https://www.fsin-calculator.ru/?ref=${code}`;
   };
 
   const handleCopyReferralLink = () => {

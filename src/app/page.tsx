@@ -1,11 +1,25 @@
 "use client";
-
+ 
+import { useEffect } from 'react';
 import { motion } from 'framer-motion';
 import { useRouter } from 'next/navigation';
 import { ShieldCheck, Calculator, Clock, Scale, ArrowRight, FileText, CheckCircle2, ChevronRight, Zap, Smartphone, MessageSquare } from 'lucide-react';
-
+ 
 export default function LandingPage() {
   const router = useRouter();
+
+  useEffect(() => {
+    if (typeof window !== 'undefined') {
+      const urlParams = new URLSearchParams(window.location.search);
+      const ref = urlParams.get('ref');
+      if (ref) {
+        localStorage.setItem('fsin_ref_code', ref);
+        // Clean up URL parameters without refreshing
+        const newUrl = window.location.pathname;
+        window.history.replaceState({}, '', newUrl);
+      }
+    }
+  }, []);
 
   const handleStart = () => {
     router.push('/calc');
@@ -34,9 +48,12 @@ export default function LandingPage() {
 
       {/* Floating Sticky Capsule Navbar */}
       <nav className="sticky top-4 z-50 max-w-7xl mx-auto my-4 bg-slate-950/45 backdrop-blur-md border border-slate-800/80 rounded-2xl p-4 md:px-8 shadow-lg shadow-black/30 flex justify-between items-center transition-all duration-300">
-        <div className="flex items-center gap-2 font-bold text-xl tracking-wide">
-          <Scale className="text-blue-400" />
-          <span className="text-slate-100">ФСИН <span className="text-blue-400">Вещевка</span></span>
+        <div className="flex items-center gap-3 font-bold tracking-wide shrink-0">
+          <img src="/images/fsin_emblem.png" alt="ФСИН" className="w-8 h-8 md:w-9 md:h-9 object-contain filter drop-shadow-[0_2px_10px_rgba(79,70,229,0.3)] select-none" />
+          <div className="flex flex-col text-left">
+            <span className="text-slate-100 font-extrabold text-sm md:text-base leading-tight">Профессиональный калькулятор</span>
+            <span className="text-[9px] md:text-[11px] text-blue-400 font-bold uppercase tracking-wider leading-none mt-0.5">для сотрудников и пенсионеров ФСИН</span>
+          </div>
         </div>
         <motion.button 
           whileHover={{ scale: 1.05 }}
@@ -486,7 +503,7 @@ export default function LandingPage() {
 
                 <div className="flex items-center justify-between p-3.5 rounded-2xl bg-emerald-500/5 border border-emerald-500/20">
                   <div>
-                    <span className="text-[10px] text-slate-400 uppercase font-black block">ФСИН: Вещевка Pro</span>
+                    <span className="text-[10px] text-slate-400 uppercase font-black block">Профессиональный расчет</span>
                     <span className="text-lg font-black text-emerald-400">84 350 ₽</span>
                   </div>
                   <div className="text-[10px] bg-emerald-500/10 text-emerald-400 px-2.5 py-1 rounded-lg border border-emerald-500/20 font-bold">
@@ -883,9 +900,9 @@ export default function LandingPage() {
       {/* Footer */}
       <footer className="relative z-10 border-t border-slate-900 bg-slate-950 py-16 text-center px-4">
         <div className="max-w-7xl mx-auto flex flex-col items-center gap-6">
-          <div className="flex items-center gap-2 font-bold text-xl text-slate-300">
-            <Scale className="text-blue-500" />
-            ФСИН Вещевка
+          <div className="flex items-center gap-3 font-bold text-lg text-slate-300">
+            <img src="/images/fsin_emblem.png" alt="ФСИН" className="w-8 h-8 object-contain filter opacity-80 select-none" />
+            <span>Профессиональный калькулятор ФСИН</span>
           </div>
           <p className="text-slate-500">© {new Date().getFullYear()} Все расчеты носят информационный характер.</p>
           <div className="bg-slate-900/40 backdrop-blur-md border border-slate-850 px-6 py-3.5 rounded-2xl text-sm text-slate-300 flex items-center gap-2 shadow-inner shadow-black/10">

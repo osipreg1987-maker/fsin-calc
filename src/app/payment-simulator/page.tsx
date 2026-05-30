@@ -26,6 +26,15 @@ function PaymentSimulatorContent() {
     try {
       let error;
       
+      if (planType.startsWith('donate-')) {
+        setStatus('success');
+        setTimeout(() => {
+          router.push('/calc?just_donated=true');
+          router.refresh(); 
+        }, 2000);
+        return;
+      }
+      
       // Вызываем SQL-функцию (RPC) для безопасного обновления подписки пользователя (PRO)
       console.log("Вызов RPC simulate_payment для PRO подписки");
       const result = await supabase.rpc('simulate_payment');
@@ -108,12 +117,20 @@ function PaymentSimulatorContent() {
 
   const getPrice = () => {
     if (planType === 'monthly') return '990 ₽';
+    if (planType === 'half-year') return '2 990 ₽';
+    if (planType === 'donate-coffee') return '190 ₽';
+    if (planType === 'donate-pizza') return '490 ₽';
+    if (planType === 'donate-server') return '1 490 ₽';
     return '390 ₽';
   };
 
   const getPlanTitle = () => {
     if (planType === 'monthly') return 'PRO Тариф (Месячный)';
-    if (planType === 'single') return 'Разовый расчет (Без ограничений)';
+    if (planType === 'half-year') return 'PRO Тариф (Полугодовой)';
+    if (planType === 'single') return 'Разовый расчет (Мини-PRO)';
+    if (planType === 'donate-coffee') return '☕ Угостить кофе (Спонсорство)';
+    if (planType === 'donate-pizza') return '🍕 Накормить пиццей (Спонсорство)';
+    if (planType === 'donate-server') return '🚀 Спонсировать сервер (Спонсорство)';
     return 'FSIN Calc Тариф';
   };
 

@@ -3,7 +3,7 @@
 
 import { useState, useEffect, useMemo } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
-import { Save, LogOut, User, Download, Plus, Trash2, HelpCircle, Archive, Crown, ChevronDown, ChevronUp, Lock, Unlock, FileText, X, Scale, ArrowRight, Check, Calculator as CalculatorIcon } from 'lucide-react';
+import { Save, LogOut, User, Download, Plus, Trash2, HelpCircle, Archive, Crown, ChevronDown, ChevronUp, Lock, Unlock, FileText, X, Scale, ArrowRight, Check, Calculator as CalculatorIcon, Heart } from 'lucide-react';
 import { driver } from 'driver.js';
 import 'driver.js/dist/driver.css';
 import IssueLogTable from './IssueLogTable';
@@ -53,6 +53,7 @@ export default function Calculator() {
   const [showJustPaidModal, setShowJustPaidModal] = useState(false);
   const [justPaidPlanType, setJustPaidPlanType] = useState<'monthly' | 'half-year' | null>(null);
   const [isActivatingPro, setIsActivatingPro] = useState(false);
+  const [showDonatedModal, setShowDonatedModal] = useState(false);
 
   const searchParams = useSearchParams();
   const { user, subscription, signOut, isLoading, fetchSubscription } = useAuth();
@@ -170,8 +171,12 @@ export default function Calculator() {
         };
         activate();
       }
+
+      if (searchParams.get('just_donated') === 'true') {
+        setShowDonatedModal(true);
+      }
       
-      if (ref || searchParams.get('just_paid') === 'true' || buyPro) {
+      if (ref || searchParams.get('just_paid') === 'true' || buyPro || searchParams.get('just_donated') === 'true') {
         // Clean up search params gracefully without full reload
         const newUrl = window.location.pathname;
         window.history.replaceState({}, '', newUrl);
@@ -182,7 +187,7 @@ export default function Calculator() {
   const getReferralLink = () => {
     if (typeof window === 'undefined') return '';
     const code = subscription?.referral_code || '';
-    return `${window.location.origin}/auth?ref=${code}`;
+    return `${window.location.origin}/?ref=${code}`;
   };
 
   const handleCopyReferralLink = () => {
@@ -206,8 +211,8 @@ export default function Calculator() {
               { element: '#tour-gender', popover: { title: 'Шаг 3: Укажите ваш пол', description: 'Это очень важно! Нормы положенности, а также сроки носки (особенно для офисного и полевого обмундирования) отличаются для мужчин и женщин.' } },
               { element: '#tour-periods', popover: { title: 'Шаг 4: Периоды службы', description: 'Добавьте периоды вашей службы. Обязательно добавляйте НОВЫЙ период (через кнопку "Добавить период"), если вы переходили из Младшего начальствующего состава (МНС) в Офицеры, так как нормы для них кардинально разные!' } },
               { element: '#tour-issue-log', popover: { title: 'Шаг 5: Арматурная карточка', description: 'Перенесите сюда данные из вашей арматурной карточки: просто выберите те вещи, которые вы ФАКТИЧЕСКИ получили на складе. Калькулятор сам рассчитает износ (недонос) и итоговую сумму компенсации за то, что вам недодали!' } },
-              { element: '#tour-dashboards', popover: { title: 'Шаг 6: Скачивание справок', description: 'Нажмите на любую из этих панелей, чтобы скачать нужную справку (на выплату, удержание или обоснование). Файлы формируются мгновенно!' } },
-              { element: '#tour-export', popover: { title: 'Шаг 7: Рапорт и инструкции', description: 'Здесь вы можете скачать готовый шаблон рапорта, а также найти подробную инструкцию для спорных ситуаций с бухгалтерией.' } }
+              { element: '#tour-perform-calc', popover: { title: 'Шаг 6: Выполнение расчета ⚡', description: 'Нажмите эту кнопку, чтобы запустить вычисления! Система мгновенно сопоставит ваши периоды службы, пол, звание и нормативы положенности ФСИН, зафиксирует данные сотрудника в облаке и разблокирует возможность экспорта готовых справок.' } },
+              { element: '#tour-export', popover: { title: 'Шаг 7: Скачивание рапорта и инструкции', description: 'Здесь вы можете скачать профессионально составленный рапорт на выплату компенсации в формате Word, а также изучить подробную юридическую инструкцию для защиты ваших законных прав в спорах с бухгалтерией.' } }
           ],
           onDestroyStarted: () => {
               localStorage.setItem('fsin_tour_completed', 'true');
@@ -569,6 +574,27 @@ export default function Calculator() {
       } catch (err) {
           console.error("Ошибка при оплате PRO:", err);
           alert("Не удалось запустить оплату подписки.");
+      } finally {
+          setIsLoadingUnlock(false);
+      }
+  };
+  const handleDonate = async (tier: 'coffee' | 'pizza' | 'server', amount: number) => {
+      setIsLoadingUnlock(true);
+      try {
+          const response = await fetch('/api/checkout', {
+              method: 'POST',
+              headers: { 'Content-Type': 'application/json' },
+              body: JSON.stringify({ planType: `donate-${tier}`, amount })
+          });
+          const resData = await response.json();
+          if (resData.url) {
+              window.location.href = resData.url;
+          } else {
+              throw new Error(resData.error || 'Не удалось запустить поддержку');
+          }
+      } catch (err) {
+          console.error("Ошибка при поддержке:", err);
+          alert("Не удалось запустить процесс поддержки. Пожалуйста, попробуйте позже.");
       } finally {
           setIsLoadingUnlock(false);
       }
@@ -1301,6 +1327,76 @@ export default function Calculator() {
                     </div>
                 )}
             </div>
+
+            {/* Donation Sidebar Card */}
+            <div className="bg-slate-900/30 backdrop-blur-xl border border-slate-800/80 rounded-3xl p-5 shadow-xl shadow-black/20 relative overflow-hidden group">
+                {/* Ambient Glow */}
+                <div className="absolute top-0 left-0 right-0 h-[2px] bg-gradient-to-r from-pink-500/35 via-purple-500/20 to-transparent" />
+                
+                <h2 className="text-lg font-bold text-slate-100 flex items-center gap-2 mb-3">
+                    <Heart className="text-pink-500 animate-pulse" size={18} />
+                    Поддержать проект
+                </h2>
+                <p className="text-[11px] text-slate-400 leading-relaxed mb-4 font-medium">
+                    Калькулятор развивается благодаря вашей поддержке. Будем искренне благодарны за любой вклад в проект!
+                </p>
+
+                <div className="space-y-2">
+                    <motion.button
+                        whileHover={{ scale: 1.02 }}
+                        whileTap={{ scale: 0.98 }}
+                        onClick={() => handleDonate('coffee', 190)}
+                        className="w-full p-3 bg-slate-950/45 hover:bg-slate-950/70 border border-slate-850 hover:border-pink-500/30 rounded-2xl flex items-center justify-between transition-all cursor-pointer text-left group"
+                    >
+                        <div className="flex items-center gap-2.5">
+                            <span className="text-xl">☕</span>
+                            <div>
+                                <div className="text-xs font-bold text-slate-200 group-hover:text-pink-400 transition-colors">Угостить кофе</div>
+                                <div className="text-[9px] text-slate-500">Поддержите бодрость создателей</div>
+                            </div>
+                        </div>
+                        <div className="bg-pink-500/10 text-pink-400 border border-pink-500/20 px-2.5 py-1 rounded-lg text-xs font-black">
+                            190 ₽
+                        </div>
+                    </motion.button>
+
+                    <motion.button
+                        whileHover={{ scale: 1.02 }}
+                        whileTap={{ scale: 0.98 }}
+                        onClick={() => handleDonate('pizza', 490)}
+                        className="w-full p-3 bg-slate-950/45 hover:bg-slate-950/70 border border-slate-850 hover:border-amber-500/30 rounded-2xl flex items-center justify-between transition-all cursor-pointer text-left group"
+                    >
+                        <div className="flex items-center gap-2.5">
+                            <span className="text-xl">🍕</span>
+                            <div>
+                                <div className="text-xs font-bold text-slate-200 group-hover:text-amber-450 transition-colors">Купить пиццу</div>
+                                <div className="text-[9px] text-slate-500">Заряд энергии на новые функции</div>
+                            </div>
+                        </div>
+                        <div className="bg-amber-500/10 text-amber-400 border border-amber-500/20 px-2.5 py-1 rounded-lg text-xs font-black">
+                            490 ₽
+                        </div>
+                    </motion.button>
+
+                    <motion.button
+                        whileHover={{ scale: 1.02 }}
+                        whileTap={{ scale: 0.98 }}
+                        onClick={() => handleDonate('server', 1490)}
+                        className="w-full p-3 bg-slate-950/45 hover:bg-slate-950/70 border border-slate-850 hover:border-purple-500/30 rounded-2xl flex items-center justify-between transition-all cursor-pointer text-left group"
+                    >
+                        <div className="flex items-center gap-2.5">
+                            <span className="text-xl">🚀</span>
+                            <div>
+                                <div className="text-xs font-bold text-slate-200 group-hover:text-purple-400 transition-colors">Спонсировать сервер</div>
+                                <div className="text-[9px] text-slate-500">Оплата хостинга и баз данных</div>
+                            </div>
+                        </div>
+                        <div className="bg-purple-500/10 text-purple-400 border border-purple-500/20 px-2.5 py-1 rounded-lg text-xs font-black">
+                            1 490 ₽
+                        </div>
+                    </motion.button>
+                </div>
+            </div>
         </div>
         
         <div className="lg:col-span-8 space-y-8">
@@ -1349,6 +1445,7 @@ export default function Calculator() {
                     </motion.div>
                 ) : (
                     <motion.button
+                        id="tour-perform-calc"
                         whileHover={{ scale: 1.02 }}
                         whileTap={{ scale: 0.98 }}
                         onClick={handlePerformCalculation}
@@ -1472,6 +1569,65 @@ export default function Calculator() {
                 className="w-full bg-gradient-to-tr from-amber-500 to-yellow-500 hover:from-amber-450 hover:to-yellow-450 text-slate-950 font-black py-3.5 px-4 rounded-xl text-xs uppercase tracking-wider cursor-pointer shadow-md transition-all font-bold"
               >
                 Отлично, к расчетам!
+              </button>
+            </motion.div>
+          </motion.div>
+        )}
+      </AnimatePresence>
+
+      {/* Donation Success Modal */}
+      <AnimatePresence>
+        {showDonatedModal && (
+          <motion.div
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            exit={{ opacity: 0 }}
+            className="fixed inset-0 z-[100] flex items-center justify-center bg-slate-950/85 backdrop-blur-md p-4 overflow-y-auto"
+          >
+            <motion.div
+              initial={{ scale: 0.9, opacity: 0, y: 20 }}
+              animate={{ scale: 1, opacity: 1, y: 0 }}
+              exit={{ scale: 0.9, opacity: 0, y: 20 }}
+              transition={{ type: "spring", damping: 25, stiffness: 300 }}
+              className="bg-slate-900 border-2 border-pink-500/30 rounded-[2.5rem] w-full max-w-lg shadow-[0_20px_50px_rgba(236,72,153,0.25)] overflow-hidden relative z-10 p-6 md:p-8 text-center"
+            >
+              <div className="absolute top-5 right-5 z-20">
+                <button 
+                  onClick={() => setShowDonatedModal(false)} 
+                  className="text-slate-400 hover:text-white bg-slate-800/40 hover:bg-slate-800 p-2 rounded-full transition-all cursor-pointer"
+                >
+                  <X size={18} />
+                </button>
+              </div>
+
+              {/* Glowing lights */}
+              <div className="absolute top-[-10%] left-[50%] translate-x-[-50%] w-64 h-64 bg-pink-500/10 rounded-full blur-[60px] pointer-events-none" />
+
+              <div className="w-16 h-16 bg-pink-500/15 text-pink-400 border border-pink-500/25 rounded-2xl mx-auto flex items-center justify-center mb-6 shadow-inner animate-bounce">
+                <Heart size={32} className="text-pink-500" fill="currentColor" />
+              </div>
+
+              <h2 className="text-2xl font-black text-white leading-tight">
+                Огромное вам спасибо! 💖
+              </h2>
+              <p className="text-xs text-slate-400 mt-2 leading-relaxed">
+                Ваша поддержка невероятно важна для развития проекта. Благодаря вам мы можем оплачивать качественные серверы, базы данных и создавать новые крутые функции для сотрудников ФСИН!
+              </p>
+
+              <div className="my-6 p-4 bg-slate-950/45 border border-slate-800/80 rounded-2xl text-left relative overflow-hidden">
+                <h4 className="text-xs font-bold text-pink-400 uppercase tracking-wider flex items-center gap-1.5">
+                  ☕ Вы помогаете проекту расти
+                </h4>
+                <p className="text-[11px] text-slate-300 mt-2 font-medium leading-relaxed">
+                  Мы ценим каждого пользователя, а тех, кто находит возможность поддержать нас финансово — ценим вдвойне. Ваше доброе дело вернется вам сторицей!
+                </p>
+              </div>
+
+              <button
+                onClick={() => setShowDonatedModal(false)}
+                className="w-full bg-gradient-to-tr from-pink-500 to-rose-500 hover:from-pink-450 hover:to-rose-450 text-white font-black py-3.5 px-4 rounded-xl text-xs uppercase tracking-wider cursor-pointer shadow-md transition-all font-bold"
+              >
+                Отлично, продолжить!
               </button>
             </motion.div>
           </motion.div>

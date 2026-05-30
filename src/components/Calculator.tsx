@@ -41,6 +41,7 @@ export default function Calculator() {
   const [isInstOpen, setIsInstOpen] = useState(true);
   const [archive, setArchive] = useState<any[]>([]);
   const [isArchiveOpen, setIsArchiveOpen] = useState(false);
+  const [isReferralOpen, setIsReferralOpen] = useState(false);
   const [isProModalOpen, setIsProModalOpen] = useState(false);
   const [proModalTitle, setProModalTitle] = useState('');
   const [isTwa, setIsTwa] = useState(false);
@@ -807,69 +808,156 @@ export default function Calculator() {
         <div className="lg:col-span-4 space-y-6">
             
             {/* Статус подписки PRO */}
-            {user && (
-                <div className="bg-slate-900/30 backdrop-blur-xl border border-slate-800/80 rounded-3xl p-5 shadow-xl shadow-black/20 relative overflow-hidden group">
-                    <div className="absolute top-0 left-0 right-0 h-[2px] bg-gradient-to-r from-amber-500/35 via-amber-500/10 to-transparent" />
-                    
-                    <h2 className="text-lg font-bold text-slate-100 flex items-center gap-2 mb-4">
-                        <Crown className={isPro ? "text-amber-400 animate-pulse" : "text-slate-500"} size={18} />
-                        Статус подписки
-                    </h2>
-                    
-                    {isPro ? (
-                        <div className="space-y-3">
-                            <div className="flex items-center justify-between text-xs">
-                                <span className="text-slate-400">Режим:</span>
-                                <span className="text-amber-400 font-extrabold uppercase tracking-wider bg-amber-500/10 border border-amber-500/20 px-2 py-0.5 rounded-md text-[10px]">PRO Активен</span>
-                            </div>
-                            
-                            {subscription?.pro_until && (
-                                <div className="space-y-1 pt-2 border-t border-slate-800/50">
-                                    <div className="flex justify-between items-center text-xs">
-                                        <span className="text-slate-400">Осталось времени:</span>
-                                        <span className="text-slate-200 font-bold">
-                                            {Math.max(0, Math.ceil((new Date(subscription.pro_until).getTime() - Date.now()) / (1000 * 60 * 60 * 24)))} дн.
-                                        </span>
-                                    </div>
-                                    <div className="text-[10px] text-slate-500">
-                                        Действует до: {new Date(subscription.pro_until).toLocaleDateString()}
-                                    </div>
-                                </div>
-                            )}
-                            
-                            {subscription?.guaranteed_calculations !== undefined && subscription.guaranteed_calculations > 0 && (
-                                <div className="space-y-1 pt-2 border-t border-slate-800/50">
-                                    <div className="flex justify-between items-center text-xs">
-                                        <span className="text-slate-400">Уникальные расчеты:</span>
-                                        <span className="text-emerald-400 font-black">
-                                            {Math.max(0, subscription.guaranteed_calculations - (subscription.pro_calculations_made || 0))} из {subscription.guaranteed_calculations}
-                                        </span>
-                                    </div>
-                                    <div className="text-[10px] text-slate-500 leading-normal">
-                                        Квота гарантированных расчетов. PRO не сгорит, пока не израсходован этот остаток!
-                                    </div>
-                                </div>
-                            )}
+            <div className="bg-slate-900/30 backdrop-blur-xl border border-slate-800/80 rounded-3xl p-5 shadow-xl shadow-black/20 relative overflow-hidden group">
+                <div className="absolute top-0 left-0 right-0 h-[2px] bg-gradient-to-r from-amber-500/35 via-amber-500/10 to-transparent" />
+                
+                <h2 className="text-lg font-bold text-slate-100 flex items-center gap-2 mb-4">
+                    <Crown className={isPro ? "text-amber-400 animate-pulse" : "text-slate-500"} size={18} />
+                    Статус подписки
+                </h2>
+                
+                {!user ? (
+                    <div className="space-y-3">
+                        <div className="flex items-center justify-between text-xs">
+                            <span className="text-slate-400">Режим:</span>
+                            <span className="text-slate-400 font-bold uppercase tracking-wider bg-slate-850 border border-slate-800 px-2 py-0.5 rounded-md text-[10px]">Гостевой (Бесплатный)</span>
                         </div>
-                    ) : (
-                        <div className="space-y-3">
-                            <div className="flex items-center justify-between text-xs">
-                                <span className="text-slate-400">Режим:</span>
-                                <span className="text-slate-400 font-bold uppercase tracking-wider bg-slate-850 border border-slate-800 px-2 py-0.5 rounded-md text-[10px]">Базовый (Бесплатный)</span>
+                        <p className="text-[11px] text-slate-400 leading-relaxed font-medium">
+                            Авторизуйтесь, чтобы включить облачный архив, скачивать рапорты в 1 клик и убрать ограничения.
+                        </p>
+                        <button 
+                            onClick={() => router.push('/auth')}
+                            className="w-full py-2.5 bg-indigo-650 hover:bg-indigo-600 text-white font-black rounded-xl text-xs uppercase tracking-wider cursor-pointer shadow-md transition-all text-center"
+                        >
+                            Войти в систему
+                        </button>
+                    </div>
+                ) : isPro ? (
+                    <div className="space-y-3">
+                        <div className="flex items-center justify-between text-xs">
+                            <span className="text-slate-400">Режим:</span>
+                            <span className="text-amber-400 font-extrabold uppercase tracking-wider bg-amber-500/10 border border-amber-500/20 px-2 py-0.5 rounded-md text-[10px]">PRO Активен</span>
+                        </div>
+                        
+                        {subscription?.pro_until && (
+                            <div className="space-y-1 pt-2 border-t border-slate-800/50">
+                                <div className="flex justify-between items-center text-xs">
+                                    <span className="text-slate-400">Осталось времени:</span>
+                                    <span className="text-slate-200 font-bold">
+                                        {Math.max(0, Math.ceil((new Date(subscription.pro_until).getTime() - Date.now()) / (1000 * 60 * 60 * 24)))} дн.
+                                    </span>
+                                </div>
+                                <div className="text-[10px] text-slate-500">
+                                    Действует до: {new Date(subscription.pro_until).toLocaleDateString()}
+                                </div>
                             </div>
-                            <p className="text-[11px] text-slate-400 leading-relaxed">
-                                Скачивание Word-рапортов и Excel-справок заблокировано.
-                             </p>
-                             <button 
-                                 onClick={() => setIsPaywallOpen(true)}
-                                 className="w-full py-2 bg-gradient-to-r from-amber-500 to-yellow-500 hover:from-amber-450 hover:to-yellow-450 text-slate-950 font-black rounded-xl text-xs uppercase tracking-wider cursor-pointer shadow-md transition-all text-center"
-                             >
-                                 Активировать PRO 👑
-                             </button>
-                         </div>
-                     )}
-                 </div>
-             )}
+                        )}
+                        
+                        {subscription?.guaranteed_calculations !== undefined && subscription.guaranteed_calculations > 0 && (
+                            <div className="space-y-1 pt-2 border-t border-slate-800/50">
+                                <div className="flex justify-between items-center text-xs">
+                                    <span className="text-slate-400">Уникальные расчеты:</span>
+                                    <span className="text-emerald-400 font-black">
+                                        {Math.max(0, subscription.guaranteed_calculations - (subscription.pro_calculations_made || 0))} из {subscription.guaranteed_calculations}
+                                    </span>
+                                </div>
+                                <div className="text-[10px] text-slate-500 leading-normal">
+                                    Квота гарантированных расчетов. PRO не сгорит, пока не израсходован этот остаток!
+                                </div>
+                            </div>
+                        )}
+                    </div>
+                ) : (
+                    <div className="space-y-3">
+                        <div className="flex items-center justify-between text-xs">
+                            <span className="text-slate-400">Режим:</span>
+                            <span className="text-slate-400 font-bold uppercase tracking-wider bg-slate-850 border border-slate-800 px-2 py-0.5 rounded-md text-[10px]">Базовый (Бесплатный)</span>
+                        </div>
+                        <p className="text-[11px] text-slate-400 leading-relaxed font-medium">
+                            Скачивание Word-рапортов и Excel-справок заблокировано.
+                         </p>
+                         <button 
+                             onClick={() => setIsPaywallOpen(true)}
+                             className="w-full py-2 bg-gradient-to-r from-amber-500 to-yellow-500 hover:from-amber-450 hover:to-yellow-450 text-slate-950 font-black rounded-xl text-xs uppercase tracking-wider cursor-pointer shadow-md transition-all text-center"
+                         >
+                             Активировать PRO 👑
+                         </button>
+                     </div>
+                )}
+
+                {/* Integrated Referral Accordion */}
+                <div className="mt-4 pt-4 border-t border-slate-800/60">
+                    <button 
+                        type="button"
+                        onClick={() => setIsReferralOpen(!isReferralOpen)}
+                        className="w-full flex justify-between items-center text-xs font-bold text-indigo-400 hover:text-indigo-300 transition-colors"
+                    >
+                        <span className="flex items-center gap-1.5">
+                            <span className="w-1.5 h-1.5 bg-indigo-400 rounded-full animate-ping" />
+                            👥 Продлить PRO бесплатно
+                        </span>
+                        {isReferralOpen ? <ChevronUp size={14} /> : <ChevronDown size={14} />}
+                    </button>
+                    
+                    <AnimatePresence>
+                        {isReferralOpen && (
+                            <motion.div
+                                initial={{ height: 0, opacity: 0, marginTop: 0 }}
+                                animate={{ height: 'auto', opacity: 1, marginTop: 12 }}
+                                exit={{ height: 0, opacity: 0, marginTop: 0 }}
+                                className="overflow-hidden space-y-3"
+                            >
+                                <p className="text-[11px] text-slate-400 leading-relaxed">
+                                    {isPro 
+                                      ? 'Порекомендуйте калькулятор сослуживцам! За каждого друга вы получите до 3 месяцев безлимитного PRO бесплатно, а ваш друг — скидку до 1000 ₽!' 
+                                      : 'Позовите коллегу на службу! Друг получит скидку до 1000 ₽ на PRO подписку, а вы — 1 месяц безлимитного PRO бесплатно, когда он сделает любую оплату подписки!'
+                                    }
+                                </p>
+                                
+                                {!user ? (
+                                  <button 
+                                    onClick={() => router.push('/auth')} 
+                                    className="w-full py-2.5 bg-indigo-650/20 hover:bg-indigo-655/35 border border-indigo-500/25 hover:border-indigo-400 text-indigo-300 font-bold rounded-xl text-xs transition-all cursor-pointer text-center"
+                                  >
+                                    Войти, чтобы пригласить друзей
+                                  </button>
+                                ) : (
+                                  <div className="space-y-3 pt-1">
+                                    <div>
+                                      <span className="block text-[9px] uppercase font-bold text-slate-500 mb-1">Ваша реферальная ссылка:</span>
+                                      <div className="flex gap-2">
+                                        <input 
+                                          type="text" 
+                                          readOnly 
+                                          value={getReferralLink()} 
+                                          className="flex-1 bg-slate-950/45 backdrop-blur-md border border-slate-800/80 rounded-lg p-2 text-xs text-slate-300 outline-none select-all"
+                                        />
+                                        <button 
+                                          onClick={handleCopyReferralLink}
+                                          className="bg-indigo-600 hover:bg-indigo-500 text-white px-2.5 py-1.5 rounded-lg text-xs font-bold transition-all shrink-0 cursor-pointer flex items-center justify-center min-w-[80px]"
+                                        >
+                                          {copied ? 'Скопировано!' : 'Копировать'}
+                                        </button>
+                                      </div>
+                                    </div>
+                                    
+                                    {subscription?.referral_code && (
+                                      <div className="pt-2.5 border-t border-slate-850 flex justify-between items-center text-xs">
+                                        <div className="text-slate-400">
+                                          Друзей пришло: <strong className="text-slate-200 font-bold">{subscription.referred_friends_count || 0}</strong>
+                                        </div>
+                                        <div className="text-emerald-400 font-bold">
+                                          Бонус: +{subscription.referred_friends_count || 0} мес. PRO
+                                        </div>
+                                      </div>
+                                    )}
+                                  </div>
+                                )}
+                            </motion.div>
+                        )}
+                    </AnimatePresence>
+                </div>
+            </div>
 
             {/* Параметры учреждения */}
             <div id="tour-inst-data" className="bg-slate-900/30 backdrop-blur-xl border border-slate-800/80 rounded-3xl p-5 shadow-xl shadow-black/20 relative overflow-hidden group">
@@ -1012,89 +1100,6 @@ export default function Calculator() {
               </div>
             </div>
 
-            {/* Cloud Archive Card */}
-            <div className="bg-slate-900/30 backdrop-blur-xl border border-slate-800/80 rounded-3xl p-5 shadow-xl shadow-black/20 relative overflow-hidden group">
-                <div className="absolute top-0 left-0 right-0 h-[2px] bg-gradient-to-r from-indigo-500/30 to-transparent" />
-                
-                <div className="flex justify-between items-center mb-5">
-                    <h2 className="text-lg font-bold text-slate-100 flex items-center gap-2">
-                        <Archive className="text-indigo-400" size={18} />
-                        Архив расчетов
-                        {user && archive.length > 0 && (
-                            <span className="text-[10px] bg-indigo-500/20 text-indigo-300 border border-indigo-500/25 px-2 py-0.5 rounded-full font-black">
-                                {archive.length}
-                            </span>
-                        )}
-                    </h2>
-                </div>
-
-                {/* Permanent "+ Новый расчет" Button */}
-                <motion.button 
-                    whileHover={{ scale: 1.02 }}
-                    whileTap={{ scale: 0.98 }}
-                    onClick={startNewCalculation}
-                    className="w-full py-3 mb-4 bg-gradient-to-r from-blue-600/15 via-indigo-600/10 to-purple-600/15 hover:from-blue-600/25 hover:to-purple-600/25 border border-blue-500/25 hover:border-blue-400 text-blue-400 hover:text-white rounded-xl text-xs font-bold transition-all flex items-center justify-center gap-2 cursor-pointer"
-                >
-                    <Plus size={14} />
-                    Новый расчет
-                </motion.button>
-
-                {!user ? (
-                    <div className="p-4 bg-slate-950/45 border border-slate-850 rounded-2xl text-center space-y-3 shadow-inner">
-                        <Lock className="w-8 h-8 text-slate-500 mx-auto opacity-60" />
-                        <p className="text-[11px] text-slate-400 leading-relaxed">
-                            Авторизуйтесь, чтобы включить облачный архив расчетов и сохранять свои справки в 1 клик.
-                        </p>
-                        <button 
-                            onClick={() => router.push('/auth')} 
-                            className="w-full py-2 bg-indigo-600 hover:bg-indigo-500 text-white font-bold rounded-lg text-xs transition-all cursor-pointer"
-                        >
-                            Войти в систему
-                        </button>
-                    </div>
-                ) : archive.length === 0 ? (
-                    <div className="p-4 bg-slate-950/20 border border-dashed border-slate-800 rounded-2xl text-center text-[11px] text-slate-500 py-6">
-                        Архив пуст. Сделайте свой первый расчет!
-                    </div>
-                ) : (
-                    <div className="space-y-2 max-h-[320px] overflow-y-auto pr-1 custom-scrollbar">
-                        {archive.map(record => {
-                            const isActive = isLocked && employeeFio.trim().toLowerCase() === record.employee_fio.trim().toLowerCase();
-                            return (
-                                <div 
-                                    key={record.id} 
-                                    onClick={() => loadFromArchive(record)}
-                                    className={`flex justify-between items-center p-3 rounded-xl transition-all cursor-pointer group text-left relative overflow-hidden ${
-                                        isActive 
-                                            ? 'bg-indigo-650/15 border border-indigo-500 shadow-[0_0_15px_rgba(99,102,241,0.12)]' 
-                                            : 'bg-slate-950/45 hover:bg-slate-950/70 border border-slate-850 hover:border-slate-750'
-                                    }`}
-                                >
-                                    {isActive && (
-                                        <div className="absolute top-0 bottom-0 left-0 w-[3px] bg-indigo-500" />
-                                    )}
-                                    <div className="flex-1 min-w-0 pr-2">
-                                        <div className={`font-bold text-xs truncate ${isActive ? 'text-indigo-300' : 'text-slate-200 group-hover:text-indigo-400 transition-colors'}`}>
-                                            {record.employee_fio}
-                                        </div>
-                                        <div className="text-[10px] text-slate-500 truncate mt-0.5">
-                                            {record.employee_rank || 'Звание не указано'} • {record.dism_date ? new Date(record.dism_date).toLocaleDateString() : 'Нейтральный'}
-                                        </div>
-                                    </div>
-                                    <button 
-                                        onClick={(e) => removeFromArchive(e, record.id)} 
-                                        className="p-1.5 text-slate-500 hover:text-rose-400 hover:bg-rose-500/10 rounded-lg transition-all shrink-0 cursor-pointer animate-none"
-                                        title="Удалить"
-                                    >
-                                        <Trash2 size={13} />
-                                    </button>
-                                </div>
-                            );
-                        })}
-                    </div>
-                )}
-            </div>
-
             {/* Periods Card */}
             <div id="tour-periods" className="bg-slate-900/30 backdrop-blur-xl border border-slate-800/80 rounded-3xl p-5 shadow-xl shadow-black/20 relative overflow-hidden group">
               <div className="absolute top-0 left-0 right-0 h-[2px] bg-gradient-to-r from-indigo-500/30 to-transparent" />
@@ -1183,59 +1188,87 @@ export default function Calculator() {
               </div>
             </div>
 
-            {/* Referral Program Widget */}
+            {/* Cloud Archive Card */}
             <div className="bg-slate-900/30 backdrop-blur-xl border border-slate-800/80 rounded-3xl p-5 shadow-xl shadow-black/20 relative overflow-hidden group">
-              <div className="absolute top-0 left-0 right-0 h-[2px] bg-gradient-to-r from-purple-500/30 via-indigo-500/10 to-transparent" />
-              <h2 className="text-lg font-bold text-slate-100 mb-2 flex items-center gap-2">
-                <div className="w-1.5 h-5 bg-gradient-to-br from-purple-500 to-indigo-500 rounded-full"></div>
-                {isPro ? 'Продлить PRO бесплатно 👥' : 'Получить PRO бесплатно 👥'}
-              </h2>
-              <p className="text-xs text-slate-400 mb-4 leading-relaxed">
-                {isPro 
-                  ? 'Порекомендуйте калькулятор сослуживцам! За каждого друга вы получите до 3 месяцев безлимитного PRO бесплатно, а ваш друг — скидку до 1000 ₽!' 
-                  : 'Позовите коллегу на службу! Друг получит скидку до 1000 ₽ на PRO подписку, а вы — 1 месяц безлимитного PRO бесплатно, когда он сделает любую оплату подписки!'
-                }
-              </p>
-              
-              {!user ? (
-                <button 
-                  onClick={() => router.push('/auth')} 
-                  className="w-full py-2.5 bg-indigo-600/20 hover:bg-indigo-600/30 border border-indigo-500/30 hover:border-indigo-500/50 text-indigo-300 font-bold rounded-xl text-xs transition-all cursor-pointer text-center"
-                >
-                  Войти в систему, чтобы пригласить друзей
-                </button>
-              ) : (
-                <div className="space-y-4">
-                  <div>
-                    <label className="block text-[9px] uppercase font-bold text-slate-500 mb-1">Ваша ссылка для приглашения:</label>
-                    <div className="flex gap-2">
-                      <input 
-                        type="text" 
-                        readOnly 
-                        value={getReferralLink()} 
-                        className="flex-1 bg-slate-950/45 backdrop-blur-md border border-slate-800/80 rounded-lg p-2 text-xs text-slate-300 outline-none select-all"
-                      />
-                      <button 
-                        onClick={handleCopyReferralLink}
-                        className="bg-indigo-600 hover:bg-indigo-500 text-white px-3 py-2 rounded-lg text-xs font-bold transition-all shrink-0 cursor-pointer flex items-center justify-center min-w-[90px]"
-                      >
-                        {copied ? 'Скопировано!' : 'Копировать'}
-                      </button>
-                    </div>
-                  </div>
-                  
-                  {subscription?.referral_code && (
-                    <div className="pt-3 border-t border-slate-800/60 flex justify-between items-center text-xs">
-                      <div className="text-slate-400">
-                        Друзей пришло: <strong className="text-slate-200 font-bold">{subscription.referred_friends_count || 0}</strong>
-                      </div>
-                      <div className="text-emerald-400 font-bold">
-                        Бонус: +{subscription.referred_friends_count || 0} мес. PRO
-                      </div>
-                    </div>
-                  )}
+                <div className="absolute top-0 left-0 right-0 h-[2px] bg-gradient-to-r from-indigo-500/30 to-transparent" />
+                
+                <div className="flex justify-between items-center mb-5">
+                    <h2 className="text-lg font-bold text-slate-100 flex items-center gap-2">
+                        <Archive className="text-indigo-400" size={18} />
+                        Архив расчетов
+                        {user && archive.length > 0 && (
+                            <span className="text-[10px] bg-indigo-500/20 text-indigo-300 border border-indigo-500/25 px-2 py-0.5 rounded-full font-black">
+                                {archive.length}
+                            </span>
+                        )}
+                    </h2>
                 </div>
-              )}
+
+                {/* Permanent "+ Новый расчет" Button */}
+                <motion.button 
+                    whileHover={{ scale: 1.02 }}
+                    whileTap={{ scale: 0.98 }}
+                    onClick={startNewCalculation}
+                    className="w-full py-3 mb-4 bg-gradient-to-r from-blue-600/15 via-indigo-600/10 to-purple-600/15 hover:from-blue-600/25 hover:to-purple-600/25 border border-blue-500/25 hover:border-blue-400 text-blue-400 hover:text-white rounded-xl text-xs font-bold transition-all flex items-center justify-center gap-2 cursor-pointer"
+                >
+                    <Plus size={14} />
+                    Новый расчет
+                </motion.button>
+
+                {!user ? (
+                    <div className="p-4 bg-slate-950/45 border border-slate-850 rounded-2xl text-center space-y-3 shadow-inner">
+                        <Lock className="w-8 h-8 text-slate-500 mx-auto opacity-60" />
+                        <p className="text-[11px] text-slate-400 leading-relaxed">
+                            Авторизуйтесь, чтобы включить облачный архив расчетов и сохранять свои справки в 1 клик.
+                        </p>
+                        <button 
+                            onClick={() => router.push('/auth')} 
+                            className="w-full py-2 bg-indigo-600 hover:bg-indigo-500 text-white font-bold rounded-lg text-xs transition-all cursor-pointer"
+                        >
+                            Войти в систему
+                        </button>
+                    </div>
+                ) : archive.length === 0 ? (
+                    <div className="p-4 bg-slate-950/20 border border-dashed border-slate-800 rounded-2xl text-center text-[11px] text-slate-500 py-6">
+                        Архив пуст. Сделайте свой первый расчет!
+                    </div>
+                ) : (
+                    <div className="space-y-2 max-h-[320px] overflow-y-auto pr-1 custom-scrollbar">
+                        {archive.map(record => {
+                            const isActive = isLocked && employeeFio.trim().toLowerCase() === record.employee_fio.trim().toLowerCase();
+                            return (
+                                <div 
+                                    key={record.id} 
+                                    onClick={() => loadFromArchive(record)}
+                                    className={`flex justify-between items-center p-3 rounded-xl transition-all cursor-pointer group text-left relative overflow-hidden ${
+                                        isActive 
+                                            ? 'bg-indigo-650/15 border border-indigo-500 shadow-[0_0_15px_rgba(99,102,241,0.12)]' 
+                                            : 'bg-slate-950/45 hover:bg-slate-950/70 border border-slate-850 hover:border-slate-750'
+                                    }`}
+                                >
+                                    {isActive && (
+                                        <div className="absolute top-0 bottom-0 left-0 w-[3px] bg-indigo-50" />
+                                    )}
+                                    <div className="flex-1 min-w-0 pr-2">
+                                        <div className={`font-bold text-xs truncate ${isActive ? 'text-indigo-300' : 'text-slate-200 group-hover:text-indigo-400 transition-colors'}`}>
+                                            {record.employee_fio}
+                                        </div>
+                                        <div className="text-[10px] text-slate-500 truncate mt-0.5">
+                                            {record.employee_rank || 'Звание не указано'} • {record.dism_date ? new Date(record.dism_date).toLocaleDateString() : 'Нейтральный'}
+                                        </div>
+                                    </div>
+                                    <button 
+                                        onClick={(e) => removeFromArchive(e, record.id)} 
+                                        className="p-1.5 text-slate-500 hover:text-rose-400 hover:bg-rose-500/10 rounded-lg transition-all shrink-0 cursor-pointer animate-none"
+                                        title="Удалить"
+                                    >
+                                        <Trash2 size={13} />
+                                    </button>
+                                </div>
+                            );
+                        })}
+                    </div>
+                )}
             </div>
         </div>
         

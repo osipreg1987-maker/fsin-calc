@@ -3,7 +3,7 @@
 
 import React from 'react';
 
-export default function IssueLogTable({ groupedItems, itemTotals, setItemTotals, customPrices, setCustomPrices, results, dismissalGroup, isPro, setIsProModalOpen }: any) {
+export default function IssueLogTable({ groupedItems, itemTotals, setItemTotals, customPrices, setCustomPrices, results, dismissalGroup, isPro, setIsProModalOpen, isLocked }: any) {
   return (
     <div className="overflow-x-auto w-full relative">
         <table className="w-full text-left border-collapse text-sm">
@@ -38,10 +38,11 @@ export default function IssueLogTable({ groupedItems, itemTotals, setItemTotals,
                                         <input 
                                             type="number" 
                                             min="0"
-                                            className="w-full bg-slate-950/40 backdrop-blur-md border border-slate-800 rounded-xl px-3 py-1.5 text-slate-200 placeholder-slate-500 outline-none focus:border-teal-500/50 focus:ring-1 focus:ring-teal-500/20 transition-all"
+                                            className="w-full bg-slate-950/40 backdrop-blur-md border border-slate-800 rounded-xl px-3 py-1.5 text-slate-200 placeholder-slate-500 outline-none focus:border-teal-500/50 focus:ring-1 focus:ring-teal-500/20 transition-all disabled:opacity-50 disabled:cursor-not-allowed"
                                             placeholder="0"
                                             value={itemTotals[item.id] || ''}
                                             onChange={(e) => setItemTotals({...itemTotals, [item.id]: e.target.value})}
+                                            disabled={isLocked}
                                         />
                                     </td>
                                     <td className="py-2 px-3 text-right relative">
@@ -51,9 +52,10 @@ export default function IssueLogTable({ groupedItems, itemTotals, setItemTotals,
                                                 <input 
                                                     type="number" 
                                                     placeholder="Цена бух."
-                                                    className="w-24 bg-slate-950/40 backdrop-blur-md border border-rose-950/50 rounded-xl px-3 py-1 text-rose-200 text-xs outline-none focus:border-rose-400/50 focus:ring-1 focus:ring-rose-400/20 transition-all pointer-events-auto"
+                                                    className="w-24 bg-slate-950/40 backdrop-blur-md border border-rose-950/50 rounded-xl px-3 py-1 text-rose-200 text-xs outline-none focus:border-rose-400/50 focus:ring-1 focus:ring-rose-400/20 transition-all pointer-events-auto disabled:opacity-50 disabled:cursor-not-allowed"
                                                     value={customPrices[item.id] || ''}
                                                     onChange={(e) => setCustomPrices({...customPrices, [item.id]: Number(e.target.value)})}
+                                                    disabled={isLocked}
                                                 />
                                             </div>
                                         )}

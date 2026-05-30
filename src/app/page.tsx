@@ -11,6 +11,10 @@ export default function LandingPage() {
     router.push('/calc');
   };
 
+  const handleStartPro = () => {
+    router.push('/calc?buy_pro=true');
+  };
+
   return (
     <div className="min-h-screen bg-slate-950 text-slate-200 font-sans selection:bg-blue-500/30 overflow-hidden relative">
       
@@ -661,12 +665,34 @@ export default function LandingPage() {
             initial={{ opacity: 0, y: 20 }}
             whileInView={{ opacity: 1, y: 0 }}
             viewport={{ once: true }}
-            className="mb-20 text-center"
+            className="mb-10 text-center"
           >
             <span className="text-blue-400 font-black tracking-widest uppercase text-xs sm:text-sm">Тарифы</span>
             <h2 className="text-4xl sm:text-5xl md:text-6xl font-black text-white mt-3 leading-[1.1] tracking-tight">
               Выберите подходящий <span className="text-slate-500 font-extrabold">формат работы</span>
             </h2>
+          </motion.div>
+
+          {/* Guaranteed Calculations Hybrid Billing Banner */}
+          <motion.div 
+            initial={{ opacity: 0, y: 15 }}
+            whileInView={{ opacity: 1, y: 0 }}
+            viewport={{ once: true }}
+            transition={{ delay: 0.1 }}
+            className="max-w-4xl mx-auto mb-16 bg-gradient-to-r from-blue-500/10 via-indigo-500/5 to-purple-500/10 border border-blue-500/20 p-6 rounded-3xl text-center backdrop-blur-md relative overflow-hidden group shadow-lg"
+          >
+            <div className="absolute top-0 left-0 right-0 h-[1px] bg-gradient-to-r from-transparent via-blue-500/35 to-transparent" />
+            <div className="flex flex-col sm:flex-row items-center justify-center gap-3">
+              <span className="bg-emerald-500 text-slate-950 font-black px-3 py-1 rounded-full text-[10px] uppercase tracking-wider shadow-md shadow-emerald-500/20 animate-pulse">
+                Уникальная гарантия 🛡️
+              </span>
+              <span className="text-base font-extrabold text-slate-100">
+                PRO-подписка никогда не сгорит просто так!
+              </span>
+            </div>
+            <p className="text-sm text-slate-300 mt-3 max-w-3xl mx-auto leading-relaxed">
+              Мы гарантируем ценность: ваши средства активны до тех пор, пока вы не совершите **минимум 5 расчетов** (для месячной подписки) или **30 расчетов** (для полугодовой подписки). Если за месяц у вас никто не уволился — подписка остается активной до проведения расчетов!
+            </p>
           </motion.div>
           
           <div className="grid grid-cols-1 md:grid-cols-3 gap-8 max-w-6xl mx-auto items-stretch">
@@ -733,10 +759,14 @@ export default function LandingPage() {
               <div className="absolute top-0 left-0 right-0 h-1 bg-gradient-to-r from-blue-500/40 via-indigo-500/40 to-purple-500/0" />
               
               <div className="absolute top-0 right-0 w-48 h-48 bg-blue-500/10 rounded-full blur-[40px] group-hover:bg-blue-500/15" />
-              <div className="absolute top-4 right-4 bg-blue-500 text-white text-[10px] font-extrabold px-3 py-1.5 rounded-full uppercase tracking-wider shadow-md shadow-blue-500/30">
+              <div className="absolute top-4 right-4 bg-blue-500 text-white text-[10px] font-extrabold px-3 py-1.5 rounded-full uppercase tracking-wider shadow-md shadow-blue-500/30 z-20">
                 Популярный
               </div>
-              <div className="relative z-10 flex-1 flex flex-col">
+              <div className="absolute top-4 left-4 bg-emerald-500/15 border border-emerald-500/20 text-emerald-400 text-[9px] font-black px-2.5 py-1 rounded-full uppercase tracking-wider flex items-center gap-1 shadow-md shadow-emerald-500/5 z-20">
+                <CheckCircle2 size={10} /> 5 расчетов гарантировано
+              </div>
+              
+              <div className="relative z-10 flex-1 flex flex-col mt-4">
                 <h3 className="text-2xl font-bold text-white mb-1">Для тыловиков и ревизоров</h3>
                 <div className="text-sm text-blue-300 font-bold mb-4">Ежемесячная подписка</div>
                 <div className="flex items-baseline gap-2 mb-6">
@@ -745,6 +775,10 @@ export default function LandingPage() {
                 </div>
                 <div className="text-blue-300 font-medium text-xs mb-6 leading-relaxed bg-blue-500/10 p-4 rounded-xl border border-blue-500/20 flex-grow">
                   Идеальный инструмент, который позволит вам быстро, чётко и безошибочно рассчитывать компенсации. Получите точный расчёт, который поможет не попасться на штрафы по проверке КРО.
+                  <div className="mt-3 text-emerald-400 font-bold flex items-start gap-1">
+                    <span>🔥</span>
+                    <span>Гарантия 5 расчетов: Подписка остается активной, пока вы не сделаете минимум 5 расчетов! Ваши деньги никогда не сгорят.</span>
+                  </div>
                 </div>
                 <ul className="space-y-4 mb-8">
                   <li className="flex items-start gap-3">
@@ -768,7 +802,7 @@ export default function LandingPage() {
               <motion.button 
                 whileHover={{ scale: 1.02 }}
                 whileTap={{ scale: 0.98 }}
-                onClick={handleStart} 
+                onClick={handleStartPro} 
                 className="w-full bg-gradient-to-r from-blue-600 to-indigo-600 hover:from-blue-500 hover:to-indigo-500 text-white py-3.5 rounded-xl font-bold transition-all shadow-lg shadow-blue-500/25 border border-blue-500/30 cursor-pointer"
               >
                 Оформить подписку
@@ -784,7 +818,11 @@ export default function LandingPage() {
               className="bg-slate-900/30 backdrop-blur-xl border border-slate-800/80 rounded-3xl p-8 hover:bg-slate-900/50 transition-all duration-300 hover:border-emerald-500/30 relative overflow-hidden flex flex-col group"
             >
               <div className="absolute top-0 right-0 w-32 h-32 bg-emerald-500/5 rounded-full blur-[40px] group-hover:bg-emerald-500/10 transition-all" />
-              <div className="relative z-10 flex-1 flex flex-col">
+              <div className="absolute top-4 left-4 bg-emerald-500/15 border border-emerald-500/20 text-emerald-400 text-[9px] font-black px-2.5 py-1 rounded-full uppercase tracking-wider flex items-center gap-1 shadow-md shadow-emerald-500/5 z-20">
+                <CheckCircle2 size={10} /> 30 расчетов гарантировано
+              </div>
+              
+              <div className="relative z-10 flex-1 flex flex-col mt-4">
                 <h3 className="text-2xl font-bold text-white mb-2">PRO на 6 месяцев</h3>
                 <div className="text-sm text-emerald-300 font-bold mb-4 font-sans">Пакетное предложение</div>
                 <div className="flex items-baseline gap-2 mb-6">
@@ -792,7 +830,11 @@ export default function LandingPage() {
                   <span className="text-slate-400 font-bold text-sm">руб. / за 6 мес.</span>
                 </div>
                 <div className="text-emerald-400 font-medium text-xs mb-6 leading-relaxed bg-emerald-500/10 p-4 rounded-xl border border-emerald-500/20 flex-grow">
-                  Идеальное решение для ревизоров (КРО). Экономьте десятки часов на рутинных проверках. Находите любые ошибки в расчетах за считанные секунды!
+                  Идеальный решение для ревизоров (КРО). Экономьте десятки часов на рутинных проверках. Находите любые ошибки в расчетах за считанные секунды!
+                  <div className="mt-3 text-emerald-400 font-bold flex items-start gap-1">
+                    <span>🔥</span>
+                    <span>Гарантия 30 расчетов: Подписка остается активной, пока вы не сделаете минимум 30 расчетов! Полная защита ваших средств.</span>
+                  </div>
                 </div>
                 <ul className="space-y-4 mb-8">
                   <li className="flex items-start gap-3">
@@ -816,7 +858,7 @@ export default function LandingPage() {
               <motion.button 
                 whileHover={{ scale: 1.02 }}
                 whileTap={{ scale: 0.98 }}
-                onClick={handleStart} 
+                onClick={handleStartPro} 
                 className="w-full bg-slate-800/50 hover:bg-emerald-600/80 border border-slate-700/50 text-slate-200 hover:text-white py-3 rounded-xl font-bold transition-all cursor-pointer"
               >
                 Получить доступ

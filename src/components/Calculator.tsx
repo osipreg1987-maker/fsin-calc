@@ -3,7 +3,7 @@
 
 import { useState, useEffect, useMemo } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
-import { Save, LogOut, User, Download, Plus, Trash2, HelpCircle, Archive, Crown, ChevronDown, ChevronUp, Lock, Unlock, FileText, X, Scale } from 'lucide-react';
+import { Save, LogOut, User, Download, Plus, Trash2, HelpCircle, Archive, Crown, ChevronDown, ChevronUp, Lock, Unlock, FileText, X, Scale, ArrowRight, Check, Calculator as CalculatorIcon } from 'lucide-react';
 import { driver } from 'driver.js';
 import 'driver.js/dist/driver.css';
 import IssueLogTable from './IssueLogTable';
@@ -46,6 +46,7 @@ export default function Calculator() {
   const [isTwa, setIsTwa] = useState(false);
   const [isLoadingUnlock, setIsLoadingUnlock] = useState(false);
   const [isPaywallOpen, setIsPaywallOpen] = useState(false);
+  const [isLocked, setIsLocked] = useState(false);
 
   const [copied, setCopied] = useState(false);
   const [showJustPaidModal, setShowJustPaidModal] = useState(false);
@@ -145,10 +146,18 @@ export default function Calculator() {
         localStorage.setItem('fsin_ref_code', ref);
       }
       
+      const buyPro = searchParams.get('buy_pro') === 'true';
+      if (buyPro) {
+        setIsPaywallOpen(true);
+      }
+      
       if (searchParams.get('just_paid') === 'true') {
         const plan = searchParams.get('planType') as 'monthly' | 'half-year';
         setJustPaidPlanType(plan);
         setShowJustPaidModal(true);
+      }
+      
+      if (ref || searchParams.get('just_paid') === 'true' || buyPro) {
         // Clean up search params gracefully without full reload
         const newUrl = window.location.pathname;
         window.history.replaceState({}, '', newUrl);
@@ -307,6 +316,78 @@ export default function Calculator() {
       setItemTotals(parsedTotals);
       setCustomPrices(parsedPrices);
       setIsArchiveOpen(false);
+      setIsLocked(true);
+  };
+
+  const startNewCalculation = () => {
+      setEmployeeFio('');
+      setEmployeeRank('');
+      setDismissalGroup('V');
+      setGender('M');
+      setPeriods([{ id: Math.random(), start: '', end: '', norm: 2 }]);
+      setItemTotals({});
+      setCustomPrices({});
+      setIsLocked(false);
+      if (typeof window !== 'undefined') {
+          localStorage.removeItem('fsin_calc_draft');
+      }
+  };
+
+  const handlePerformCalculation = async () => {
+      if (!employeeFio.trim()) {
+          alert("Пожалуйста, заполните ФИО сотрудника перед выполнением расчета!");
+          return;
+      }
+      
+      setIsLocked(true);
+      
+      if (user) {
+          const existing = archive.find(r => r.employee_fio.trim().toLowerCase() === employeeFio.trim().toLowerCase());
+          
+          if (!isPro && archive.length >= 1 && !existing) {
+              setProModalTitle('Безлимитный архив доступен в PRO');
+              setIsProModalOpen(true);
+              setIsLocked(false);
+              return;
+          }
+
+          const record = {
+              user_id: user.id,
+              employee_fio: employeeFio.trim(),
+              employee_rank: employeeRank,
+              dismissal_group: dismissalGroup,
+              dism_date: dismDate,
+              gender,
+              periods,
+              item_totals: itemTotals,
+              custom_prices: customPrices
+          };
+          
+          let res;
+          if (existing) {
+              res = await supabase.from('archives').update(record).eq('id', existing.id);
+          } else {
+              res = await supabase.from('archives').insert([record]);
+          }
+              
+          if (res.error) {
+              console.error("Ошибка автосохранения", res.error);
+              alert("Ошибка автосохранения в облако. Но расчет выполнен!");
+          } else {
+              fetchArchive();
+          }
+          
+          if (isPro) {
+              await incrementCalculationsCount();
+          }
+      }
+      
+      setTimeout(() => {
+          const resultsEl = document.getElementById('results-section');
+          if (resultsEl) {
+              resultsEl.scrollIntoView({ behavior: 'smooth' });
+          }
+      }, 100);
   };
   
   const removeFromArchive = async (e: any, id: string) => {
@@ -606,102 +687,121 @@ export default function Calculator() {
       )}
 
       {/* Dashboards */}
-      <div id="tour-dashboards" className="grid grid-cols-1 md:grid-cols-3 gap-4 mb-8">
-          {/* Dashboard 1: Compensation */}
-          <motion.button 
-              whileHover={{ y: -5, scale: 1.01 }} 
-              whileTap={{ scale: 0.99 }}
-              onClick={() => handleExport('comp')} 
-              className="bg-slate-900/30 backdrop-blur-xl border border-slate-800/80 rounded-3xl p-6 text-left w-full transition-all duration-300 relative overflow-hidden flex flex-col justify-between h-full group cursor-pointer hover:border-emerald-500/40 hover:bg-slate-900/50 hover:shadow-[0_0_30px_rgba(52,211,153,0.08)]"
-          >
-              <div className="absolute top-0 left-0 right-0 h-[2px] bg-gradient-to-r from-emerald-500/30 via-emerald-500/10 to-transparent" />
-              <div className="w-full">
-                  <div className="flex items-center gap-3 mb-4">
-                      <div className="bg-emerald-500/10 text-emerald-400 p-2.5 rounded-xl group-hover:scale-110 group-hover:bg-emerald-500/20 transition-all shadow-inner">
-                          <Scale size={24} />
-                      </div>
-                      <h3 className="text-slate-400 font-medium text-base">
-                          Положено компенсации
-                      </h3>
-                  </div>
-                  <div className="text-3xl lg:text-4xl font-extrabold text-emerald-400 mb-2 drop-shadow-[0_0_15px_rgba(52,211,153,0.15)]">{formatCurrency(totalComp)}</div>
-              </div>
-              {!isTwa && (
-                  <div className="mt-4 pt-4 border-t border-slate-800/80 text-emerald-500/80 text-sm font-semibold flex items-center gap-2 group-hover:text-emerald-400 transition-colors w-full">
-                      <Download size={16} /> Скачать справку
-                  </div>
-              )}
-          </motion.button>
-
-          {/* Dashboard 2: Deduction */}
-          <motion.button 
-              whileHover={{ y: -5, scale: 1.01 }} 
-              whileTap={{ scale: 0.99 }}
-              onClick={() => handleExport('ded')} 
-              className="bg-slate-900/30 backdrop-blur-xl border border-slate-800/80 rounded-3xl p-6 text-left w-full transition-all duration-300 relative overflow-hidden flex flex-col justify-between h-full group cursor-pointer hover:border-rose-500/40 hover:bg-slate-900/50 hover:shadow-[0_0_30px_rgba(251,113,133,0.08)]"
-          >
-              <div className="absolute top-0 left-0 right-0 h-[2px] bg-gradient-to-r from-rose-500/30 via-rose-500/10 to-transparent" />
-              <div className="w-full">
-                  <div className="flex items-center gap-3 mb-4">
-                      <div className="bg-rose-500/10 text-rose-400 p-2.5 rounded-xl group-hover:scale-110 group-hover:bg-rose-500/20 transition-all shadow-inner">
-                          <Scale size={24} />
-                      </div>
-                      <h3 className="text-slate-400 font-medium text-base">
-                          Подлежит удержанию
-                      </h3>
-                  </div>
-                  <div className="text-3xl lg:text-4xl font-extrabold text-rose-400 mb-2 drop-shadow-[0_0_15px_rgba(251,113,133,0.15)]">{formatCurrency(totalDed)}</div>
-              </div>
-              {!isTwa && (
-                  <div className="mt-4 pt-4 border-t border-slate-800/80 text-rose-500/80 text-sm font-semibold flex items-center gap-2 group-hover:text-rose-400 transition-colors w-full">
-                      <Download size={16} /> Скачать справку
-                  </div>
-              )}
-          </motion.button>
-
-          {/* Dashboard 3: Net Balance */}
-          <motion.button 
-              whileHover={{ y: -5, scale: 1.01 }} 
-              whileTap={{ scale: 0.99 }}
-              onClick={() => handleExport('b2c-comp')} 
-              className="bg-slate-900/30 backdrop-blur-xl border border-slate-800/80 rounded-3xl p-6 text-left w-full transition-all duration-300 relative overflow-hidden flex flex-col justify-between h-full group cursor-pointer hover:border-purple-500/40 hover:bg-slate-900/50 hover:shadow-[0_0_30px_rgba(168,85,247,0.08)]"
-          >
-              <div className="absolute top-0 left-0 right-0 h-[2px] bg-gradient-to-r from-purple-500/30 via-indigo-500/20 to-transparent" />
-              <div className="w-full">
-                  <div className="flex justify-between items-center mb-4">
-                      <div className="flex items-center gap-3">
-                          <div className="bg-purple-500/10 text-purple-400 p-2.5 rounded-xl group-hover:scale-110 group-hover:bg-purple-500/20 transition-all shadow-inner">
+      {isLocked ? (
+          <div id="tour-dashboards" className="grid grid-cols-1 md:grid-cols-3 gap-4 mb-8">
+              {/* Dashboard 1: Compensation */}
+              <motion.button 
+                  whileHover={{ y: -5, scale: 1.01 }} 
+                  whileTap={{ scale: 0.99 }}
+                  onClick={() => handleExport('comp')} 
+                  className="bg-slate-900/30 backdrop-blur-xl border border-slate-800/80 rounded-3xl p-6 text-left w-full transition-all duration-300 relative overflow-hidden flex flex-col justify-between h-full group cursor-pointer hover:border-emerald-500/40 hover:bg-slate-900/50 hover:shadow-[0_0_30px_rgba(52,211,153,0.08)]"
+              >
+                  <div className="absolute top-0 left-0 right-0 h-[2px] bg-gradient-to-r from-emerald-500/30 via-emerald-500/10 to-transparent" />
+                  <div className="w-full">
+                      <div className="flex items-center gap-3 mb-4">
+                          <div className="bg-emerald-500/10 text-emerald-400 p-2.5 rounded-xl group-hover:scale-110 group-hover:bg-emerald-500/20 transition-all shadow-inner">
                               <Scale size={24} />
                           </div>
                           <h3 className="text-slate-400 font-medium text-base">
-                              Итоговый баланс
+                              Положено компенсации
                           </h3>
                       </div>
-                      {isPositive ? (
-                          <span className="text-[9px] font-extrabold bg-emerald-500/10 text-emerald-400 px-2 py-1 rounded-md border border-emerald-500/20 tracking-wider uppercase select-none">К выплате</span>
-                      ) : (
-                          <span className="text-[9px] font-extrabold bg-rose-500/10 text-rose-400 px-2 py-1 rounded-md border border-rose-500/20 tracking-wider uppercase select-none">К удержанию</span>
-                      )}
+                      <div className="text-3xl lg:text-4xl font-extrabold text-emerald-400 mb-2 drop-shadow-[0_0_15px_rgba(52,211,153,0.15)]">{formatCurrency(totalComp)}</div>
                   </div>
-                  <div className={`text-3xl lg:text-4xl font-extrabold mb-2 drop-shadow-sm`}>
-                      {isPositive ? (
-                          <span className="text-transparent bg-clip-text bg-gradient-to-r from-emerald-400 to-blue-400 drop-shadow-[0_0_15px_rgba(52,211,153,0.15)]">
-                              {formatCurrency(Math.abs(finalBalance))}
-                          </span>
-                      ) : (
-                          <span className="text-transparent bg-clip-text bg-gradient-to-r from-rose-400 to-amber-500 drop-shadow-[0_0_15px_rgba(239,68,68,0.15)]">
-                              {formatCurrency(Math.abs(finalBalance))}
-                          </span>
-                      )}
+                  {!isTwa && (
+                      <div className="mt-4 pt-4 border-t border-slate-800/80 text-emerald-500/80 text-sm font-semibold flex items-center gap-2 group-hover:text-emerald-400 transition-colors w-full">
+                          <Download size={16} /> Скачать справку
+                      </div>
+                  )}
+              </motion.button>
+
+              {/* Dashboard 2: Deduction */}
+              <motion.button 
+                  whileHover={{ y: -5, scale: 1.01 }} 
+                  whileTap={{ scale: 0.99 }}
+                  onClick={() => handleExport('ded')} 
+                  className="bg-slate-900/30 backdrop-blur-xl border border-slate-800/80 rounded-3xl p-6 text-left w-full transition-all duration-300 relative overflow-hidden flex flex-col justify-between h-full group cursor-pointer hover:border-rose-500/40 hover:bg-slate-900/50 hover:shadow-[0_0_30px_rgba(251,113,133,0.08)]"
+              >
+                  <div className="absolute top-0 left-0 right-0 h-[2px] bg-gradient-to-r from-rose-500/30 via-rose-500/10 to-transparent" />
+                  <div className="w-full">
+                      <div className="flex items-center gap-3 mb-4">
+                          <div className="bg-rose-500/10 text-rose-400 p-2.5 rounded-xl group-hover:scale-110 group-hover:bg-rose-500/20 transition-all shadow-inner">
+                              <Scale size={24} />
+                          </div>
+                          <h3 className="text-slate-400 font-medium text-base">
+                              Подлежит удержанию
+                          </h3>
+                      </div>
+                      <div className="text-3xl lg:text-4xl font-extrabold text-rose-400 mb-2 drop-shadow-[0_0_15px_rgba(251,113,133,0.15)]">{formatCurrency(totalDed)}</div>
                   </div>
+                  {!isTwa && (
+                      <div className="mt-4 pt-4 border-t border-slate-800/80 text-rose-500/80 text-sm font-semibold flex items-center gap-2 group-hover:text-rose-400 transition-colors w-full">
+                          <Download size={16} /> Скачать справку
+                      </div>
+                  )}
+              </motion.button>
+
+              {/* Dashboard 3: Net Balance */}
+              <motion.button 
+                  whileHover={{ y: -5, scale: 1.01 }} 
+                  whileTap={{ scale: 0.99 }}
+                  onClick={() => handleExport('b2c-comp')} 
+                  className="bg-slate-900/30 backdrop-blur-xl border border-slate-800/80 rounded-3xl p-6 text-left w-full transition-all duration-300 relative overflow-hidden flex flex-col justify-between h-full group cursor-pointer hover:border-purple-500/40 hover:bg-slate-900/50 hover:shadow-[0_0_30px_rgba(168,85,247,0.08)]"
+              >
+                  <div className="absolute top-0 left-0 right-0 h-[2px] bg-gradient-to-r from-purple-500/30 via-indigo-500/20 to-transparent" />
+                  <div className="w-full">
+                      <div className="flex justify-between items-center mb-4">
+                          <div className="flex items-center gap-3">
+                              <div className="bg-purple-500/10 text-purple-400 p-2.5 rounded-xl group-hover:scale-110 group-hover:bg-purple-500/20 transition-all shadow-inner">
+                                  <Scale size={24} />
+                              </div>
+                              <h3 className="text-slate-400 font-medium text-base">
+                                  Итоговый баланс
+                              </h3>
+                          </div>
+                          {isPositive ? (
+                              <span className="text-[9px] font-extrabold bg-emerald-500/10 text-emerald-400 px-2 py-1 rounded-md border border-emerald-500/20 tracking-wider uppercase select-none">К выплате</span>
+                          ) : (
+                              <span className="text-[9px] font-extrabold bg-rose-500/10 text-rose-400 px-2 py-1 rounded-md border border-rose-500/20 tracking-wider uppercase select-none">К удержанию</span>
+                          )}
+                      </div>
+                      <div className={`text-3xl lg:text-4xl font-extrabold mb-2 drop-shadow-sm`}>
+                          {isPositive ? (
+                              <span className="text-transparent bg-clip-text bg-gradient-to-r from-emerald-400 to-blue-400 drop-shadow-[0_0_15px_rgba(52,211,153,0.15)]">
+                                  {formatCurrency(Math.abs(finalBalance))}
+                              </span>
+                          ) : (
+                              <span className="text-transparent bg-clip-text bg-gradient-to-r from-rose-400 to-amber-500 drop-shadow-[0_0_15px_rgba(239,68,68,0.15)]">
+                                  {formatCurrency(Math.abs(finalBalance))}
+                              </span>
+                          )}
+                      </div>
+                  </div>
+                  {!isTwa && (
+                      <div className="mt-4 pt-4 border-t border-slate-800/80 text-purple-400/80 text-sm font-semibold flex items-center gap-2 group-hover:text-purple-400 transition-colors w-full">
+                          <FileText size={16} /> Скачать обоснование
+                      </div>
+                  )}
+              </motion.button>
+          </div>
+      ) : (
+          <motion.div 
+              initial={{ opacity: 0, scale: 0.98 }}
+              animate={{ opacity: 1, scale: 1 }}
+              className="bg-slate-900/30 backdrop-blur-xl border border-slate-800/80 rounded-3xl p-8 text-center shadow-xl shadow-black/25 relative overflow-hidden group mb-8"
+          >
+              <div className="absolute top-0 left-0 right-0 h-[2px] bg-gradient-to-r from-blue-500/25 to-transparent" />
+              <div className="max-w-md mx-auto py-8 flex flex-col items-center gap-4">
+                  <div className="w-16 h-16 bg-blue-600/10 border border-blue-500/20 rounded-2xl flex items-center justify-center text-blue-400 animate-pulse">
+                      <CalculatorIcon size={32} />
+                  </div>
+                  <h3 className="text-xl font-bold text-white">Расчет ожидается</h3>
+                  <p className="text-sm text-slate-400 leading-relaxed">
+                      Заполните параметры сотрудника, укажите периоды выслуги и журнал выдачи. Затем нажмите кнопку **«Выполнить расчет»** для получения детального отчета и скачивания документов.
+                  </p>
               </div>
-              {!isTwa && (
-                  <div className="mt-4 pt-4 border-t border-slate-800/80 text-purple-400/80 text-sm font-semibold flex items-center gap-2 group-hover:text-purple-400 transition-colors w-full">
-                      <FileText size={16} /> Скачать обоснование
-                  </div>
-              )}
-          </motion.button>
-      </div>
+          </motion.div>
+      )}
 
       <div className="grid grid-cols-1 lg:grid-cols-12 gap-6 pb-24">
         <div className="lg:col-span-4 space-y-6">
@@ -789,28 +889,31 @@ export default function Calculator() {
                   <label className="block text-xs text-slate-400 mb-1">ФИО сотрудника</label>
                   <input 
                     type="text" 
-                    className="w-full bg-slate-950/45 backdrop-blur-md border border-slate-800/80 rounded-xl p-3 text-slate-100 placeholder-slate-500 outline-none focus:border-blue-500/50 focus:ring-1 focus:ring-blue-500/10 transition-all"
+                    className="w-full bg-slate-950/45 backdrop-blur-md border border-slate-800/80 rounded-xl p-3 text-slate-100 placeholder-slate-500 outline-none focus:border-blue-500/50 focus:ring-1 focus:ring-blue-500/10 transition-all disabled:opacity-50 disabled:cursor-not-allowed"
                     placeholder="Иванов Иван Иванович"
                     value={employeeFio}
                     onChange={(e) => setEmployeeFio(e.target.value)}
+                    disabled={isLocked}
                   />
                 </div>
                 <div>
                   <label className="block text-xs text-slate-400 mb-1">Звание</label>
                   <input 
                     type="text" 
-                    className="w-full bg-slate-950/45 backdrop-blur-md border border-slate-800/80 rounded-xl p-3 text-slate-100 placeholder-slate-500 outline-none focus:border-blue-500/50 focus:ring-1 focus:ring-blue-500/10 transition-all"
+                    className="w-full bg-slate-950/45 backdrop-blur-md border border-slate-800/80 rounded-xl p-3 text-slate-100 placeholder-slate-500 outline-none focus:border-blue-500/50 focus:ring-1 focus:ring-blue-500/10 transition-all disabled:opacity-50 disabled:cursor-not-allowed"
                     placeholder="прапорщик вн. сл."
                     value={employeeRank}
                     onChange={(e) => setEmployeeRank(e.target.value)}
+                    disabled={isLocked}
                   />
                 </div>
                 <div>
                   <label className="block text-xs text-slate-400 mb-1">Основание увольнения</label>
                   <select
-                      className="w-full bg-slate-950/45 backdrop-blur-md border border-slate-800/80 rounded-xl p-3 text-slate-100 placeholder-slate-500 outline-none focus:border-blue-500/50 focus:ring-1 focus:ring-blue-500/10 transition-all text-xs font-semibold"
+                      className="w-full bg-slate-950/45 backdrop-blur-md border border-slate-800/80 rounded-xl p-3 text-slate-100 placeholder-slate-500 outline-none focus:border-blue-500/50 focus:ring-1 focus:ring-blue-500/10 transition-all text-xs font-semibold disabled:opacity-50 disabled:cursor-not-allowed"
                       value={dismissalGroup}
                       onChange={(e) => setDismissalGroup(e.target.value)}
+                      disabled={isLocked}
                   >
                       <option value="A" className="bg-slate-900 text-slate-200">Положительные (Пенсия, ОШМ)</option>
                       <option value="B" className="bg-slate-900 text-slate-200">Отрицательные (Нарушение, суд)</option>
@@ -823,18 +926,18 @@ export default function Calculator() {
                     <label className="block text-xs text-slate-400 mb-1">Пол</label>
                     <div className="flex p-1 bg-slate-950/45 backdrop-blur-md rounded-xl border border-slate-800/80">
                         <motion.button 
-                          whileHover={{ scale: 1.02 }}
-                          whileTap={{ scale: 0.98 }}
-                          onClick={() => handleGenderChange('M')}
-                          className={`flex-1 py-2 text-xs font-bold rounded-lg transition-all cursor-pointer ${gender === 'M' ? 'bg-gradient-to-r from-blue-600 to-indigo-600 text-white shadow-[0_0_15px_rgba(79,70,229,0.3)]' : 'text-slate-400 hover:text-slate-200'}`}
+                          whileHover={isLocked ? {} : { scale: 1.02 }}
+                          whileTap={isLocked ? {} : { scale: 0.98 }}
+                          onClick={() => !isLocked && handleGenderChange('M')}
+                          className={`flex-1 py-2 text-xs font-bold rounded-lg transition-all ${isLocked ? 'cursor-not-allowed' : 'cursor-pointer'} ${gender === 'M' ? 'bg-gradient-to-r from-blue-600 to-indigo-600 text-white shadow-[0_0_15px_rgba(79,70,229,0.3)]' : 'text-slate-400 hover:text-slate-200'} ${isLocked && gender !== 'M' ? 'opacity-30' : ''}`}
                         >
                           Муж
                         </motion.button>
                         <motion.button 
-                          whileHover={{ scale: 1.02 }}
-                          whileTap={{ scale: 0.98 }}
-                          onClick={() => handleGenderChange('F')}
-                          className={`flex-1 py-2 text-xs font-bold rounded-lg transition-all cursor-pointer ${gender === 'F' ? 'bg-gradient-to-r from-blue-600 to-indigo-600 text-white shadow-[0_0_15px_rgba(79,70,229,0.3)]' : 'text-slate-400 hover:text-slate-200'}`}
+                          whileHover={isLocked ? {} : { scale: 1.02 }}
+                          whileTap={isLocked ? {} : { scale: 0.98 }}
+                          onClick={() => !isLocked && handleGenderChange('F')}
+                          className={`flex-1 py-2 text-xs font-bold rounded-lg transition-all ${isLocked ? 'cursor-not-allowed' : 'cursor-pointer'} ${gender === 'F' ? 'bg-gradient-to-r from-blue-600 to-indigo-600 text-white shadow-[0_0_15px_rgba(79,70,229,0.3)]' : 'text-slate-400 hover:text-slate-200'} ${isLocked && gender !== 'F' ? 'opacity-30' : ''}`}
                         >
                           Жен
                         </motion.button>
@@ -843,13 +946,96 @@ export default function Calculator() {
                 </div>
               </div>
             </div>
-            
+
+            {/* Cloud Archive Card */}
+            <div className="bg-slate-900/30 backdrop-blur-xl border border-slate-800/80 rounded-3xl p-5 shadow-xl shadow-black/20 relative overflow-hidden group">
+                <div className="absolute top-0 left-0 right-0 h-[2px] bg-gradient-to-r from-indigo-500/30 to-transparent" />
+                
+                <div className="flex justify-between items-center mb-5">
+                    <h2 className="text-lg font-bold text-slate-100 flex items-center gap-2">
+                        <Archive className="text-indigo-400" size={18} />
+                        Архив расчетов
+                        {user && archive.length > 0 && (
+                            <span className="text-[10px] bg-indigo-500/20 text-indigo-300 border border-indigo-500/25 px-2 py-0.5 rounded-full font-black">
+                                {archive.length}
+                            </span>
+                        )}
+                    </h2>
+                </div>
+
+                {/* Permanent "+ Новый расчет" Button */}
+                <motion.button 
+                    whileHover={{ scale: 1.02 }}
+                    whileTap={{ scale: 0.98 }}
+                    onClick={startNewCalculation}
+                    className="w-full py-3 mb-4 bg-gradient-to-r from-blue-600/15 via-indigo-600/10 to-purple-600/15 hover:from-blue-600/25 hover:to-purple-600/25 border border-blue-500/25 hover:border-blue-400 text-blue-400 hover:text-white rounded-xl text-xs font-bold transition-all flex items-center justify-center gap-2 cursor-pointer"
+                >
+                    <Plus size={14} />
+                    Новый расчет
+                </motion.button>
+
+                {!user ? (
+                    <div className="p-4 bg-slate-950/45 border border-slate-850 rounded-2xl text-center space-y-3 shadow-inner">
+                        <Lock className="w-8 h-8 text-slate-500 mx-auto opacity-60" />
+                        <p className="text-[11px] text-slate-400 leading-relaxed">
+                            Авторизуйтесь, чтобы включить облачный архив расчетов и сохранять свои справки в 1 клик.
+                        </p>
+                        <button 
+                            onClick={() => router.push('/auth')} 
+                            className="w-full py-2 bg-indigo-600 hover:bg-indigo-500 text-white font-bold rounded-lg text-xs transition-all cursor-pointer"
+                        >
+                            Войти в систему
+                        </button>
+                    </div>
+                ) : archive.length === 0 ? (
+                    <div className="p-4 bg-slate-950/20 border border-dashed border-slate-800 rounded-2xl text-center text-[11px] text-slate-500 py-6">
+                        Архив пуст. Сделайте свой первый расчет!
+                    </div>
+                ) : (
+                    <div className="space-y-2 max-h-[320px] overflow-y-auto pr-1 custom-scrollbar">
+                        {archive.map(record => {
+                            const isActive = isLocked && employeeFio.trim().toLowerCase() === record.employee_fio.trim().toLowerCase();
+                            return (
+                                <div 
+                                    key={record.id} 
+                                    onClick={() => loadFromArchive(record)}
+                                    className={`flex justify-between items-center p-3 rounded-xl transition-all cursor-pointer group text-left relative overflow-hidden ${
+                                        isActive 
+                                            ? 'bg-indigo-650/15 border border-indigo-500 shadow-[0_0_15px_rgba(99,102,241,0.12)]' 
+                                            : 'bg-slate-950/45 hover:bg-slate-950/70 border border-slate-850 hover:border-slate-750'
+                                    }`}
+                                >
+                                    {isActive && (
+                                        <div className="absolute top-0 bottom-0 left-0 w-[3px] bg-indigo-500" />
+                                    )}
+                                    <div className="flex-1 min-w-0 pr-2">
+                                        <div className={`font-bold text-xs truncate ${isActive ? 'text-indigo-300' : 'text-slate-200 group-hover:text-indigo-400 transition-colors'}`}>
+                                            {record.employee_fio}
+                                        </div>
+                                        <div className="text-[10px] text-slate-500 truncate mt-0.5">
+                                            {record.employee_rank || 'Звание не указано'} • {record.dism_date ? new Date(record.dism_date).toLocaleDateString() : 'Нейтральный'}
+                                        </div>
+                                    </div>
+                                    <button 
+                                        onClick={(e) => removeFromArchive(e, record.id)} 
+                                        className="p-1.5 text-slate-500 hover:text-rose-400 hover:bg-rose-500/10 rounded-lg transition-all shrink-0 cursor-pointer animate-none"
+                                        title="Удалить"
+                                    >
+                                        <Trash2 size={13} />
+                                    </button>
+                                </div>
+                            );
+                        })}
+                    </div>
+                )}
+            </div>
+
             {/* Periods Card */}
             <div id="tour-periods" className="bg-slate-900/30 backdrop-blur-xl border border-slate-800/80 rounded-3xl p-5 shadow-xl shadow-black/20 relative overflow-hidden group">
               <div className="absolute top-0 left-0 right-0 h-[2px] bg-gradient-to-r from-indigo-500/30 to-transparent" />
               <div className="flex justify-between items-center mb-5">
                   <h2 className="text-lg font-bold text-slate-100 flex items-center gap-2">
-                  <div className="w-1.5 h-5 bg-indigo-500 rounded-full"></div>
+                  <div className="w-1.5 h-5 bg-indigo-50 rounded-full"></div>
                   Периоды службы
                   </h2>
               </div>
@@ -868,7 +1054,7 @@ export default function Calculator() {
                               <span className="text-xs font-bold text-slate-400">
                                   Период службы ({activeNorms.find(n => n.id === period.norm)?.name?.match(/\((.*?)\)/)?.[1] || `№${index + 1}`})
                               </span>
-                              {periods.length > 1 && (
+                              {periods.length > 1 && !isLocked && (
                                   <button onClick={() => removePeriod(period.id)} className="text-rose-400 hover:text-rose-500 p-1 cursor-pointer animate-none">
                                       <Trash2 size={16} />
                                   </button>
@@ -880,18 +1066,20 @@ export default function Calculator() {
                                   <label className="block text-[9px] uppercase font-bold text-slate-500 mb-1">Начало</label>
                                   <input 
                                       type="date" 
-                                      className="w-full bg-slate-950/45 backdrop-blur-md border border-slate-800/80 rounded-xl p-2.5 text-xs text-slate-100 placeholder-slate-500 outline-none focus:border-blue-500/50 focus:ring-1 focus:ring-blue-500/10 transition-all"
+                                      className="w-full bg-slate-950/45 backdrop-blur-md border border-slate-800/80 rounded-xl p-2.5 text-xs text-slate-100 placeholder-slate-500 outline-none focus:border-blue-500/50 focus:ring-1 focus:ring-blue-500/10 transition-all disabled:opacity-50 disabled:cursor-not-allowed"
                                       value={period.start}
                                       onChange={(e) => updatePeriod(period.id, 'start', e.target.value)}
+                                      disabled={isLocked}
                                   />
                               </div>
                               <div>
                                   <label className="block text-[9px] uppercase font-bold text-slate-500 mb-1">Конец</label>
                                   <input 
                                       type="date" 
-                                      className="w-full bg-slate-950/45 backdrop-blur-md border border-slate-800/80 rounded-xl p-2.5 text-xs text-slate-100 placeholder-slate-500 outline-none focus:border-blue-500/50 focus:ring-1 focus:ring-blue-500/10 transition-all"
+                                      className="w-full bg-slate-950/45 backdrop-blur-md border border-slate-800/80 rounded-xl p-2.5 text-xs text-slate-100 placeholder-slate-500 outline-none focus:border-blue-500/50 focus:ring-1 focus:ring-blue-500/10 transition-all disabled:opacity-50 disabled:cursor-not-allowed"
                                       value={period.end}
                                       onChange={(e) => updatePeriod(period.id, 'end', e.target.value)}
+                                      disabled={isLocked}
                                   />
                               </div>
                           </div>
@@ -899,9 +1087,10 @@ export default function Calculator() {
                           <div>
                               <label className="block text-[10px] uppercase font-bold text-slate-500 mb-1">Норма</label>
                               <select 
-                                  className="w-full bg-slate-950/45 backdrop-blur-md border border-slate-800/80 rounded-xl p-2.5 text-xs text-slate-100 placeholder-slate-500 outline-none focus:border-blue-500/50 focus:ring-1 focus:ring-blue-500/10 transition-all text-xs"
+                                  className="w-full bg-slate-950/45 backdrop-blur-md border border-slate-800/80 rounded-xl p-2.5 text-xs text-slate-100 placeholder-slate-500 outline-none focus:border-blue-500/50 focus:ring-1 focus:ring-blue-500/10 transition-all text-xs disabled:opacity-50 disabled:cursor-not-allowed"
                                   value={period.norm}
                                   onChange={(e) => updatePeriod(period.id, 'norm', parseInt(e.target.value))}
+                                  disabled={isLocked}
                               >
                                   {activeNorms.map(n => <option key={n.id} value={n.id} className="bg-slate-900 text-slate-200">{n.name}</option>)}
                               </select>
@@ -914,16 +1103,18 @@ export default function Calculator() {
                       Выслуга: {formatServiceTime(totalServiceMonths)}
                   </div>
 
-                  <motion.button 
-                      type="button"
-                      whileHover={{ scale: 1.02 }}
-                      whileTap={{ scale: 0.98 }}
-                      onClick={addPeriod}
-                      className="w-full py-3.5 border border-dashed border-blue-500/40 hover:border-blue-400 rounded-xl text-blue-400 hover:text-white hover:bg-blue-600/10 transition-all flex items-center justify-center gap-2 text-xs font-bold mt-2 cursor-pointer animate-none"
-                  >
-                      <Plus size={14} />
-                      Добавить период
-                  </motion.button>
+                  {!isLocked && (
+                      <motion.button 
+                          type="button"
+                          whileHover={{ scale: 1.02 }}
+                          whileTap={{ scale: 0.98 }}
+                          onClick={addPeriod}
+                          className="w-full py-3.5 border border-dashed border-blue-500/40 hover:border-blue-400 rounded-xl text-blue-400 hover:text-white hover:bg-blue-600/10 transition-all flex items-center justify-center gap-2 text-xs font-bold mt-2 cursor-pointer animate-none"
+                      >
+                          <Plus size={14} />
+                          Добавить период
+                      </motion.button>
+                  )}
               </div>
             </div>
 
@@ -1001,92 +1192,66 @@ export default function Calculator() {
                     isPro={isPro}
                     setIsProModalOpen={setIsProModalOpen}
                     periodCount={periods.length}
+                    isLocked={isLocked}
                 />
+                
+                {isLocked ? (
+                    <motion.div 
+                        initial={{ opacity: 0, y: 10 }}
+                        animate={{ opacity: 1, y: 0 }}
+                        className="bg-slate-950/65 backdrop-blur-md border border-slate-800/85 p-5 rounded-2xl flex flex-col sm:flex-row items-center justify-between gap-4 mt-6"
+                    >
+                        <div className="flex items-center gap-3 text-left">
+                            <div className="w-10 h-10 bg-indigo-500/10 border border-indigo-500/25 rounded-xl flex items-center justify-center text-indigo-400 shrink-0">
+                                <Lock size={18} />
+                            </div>
+                            <div>
+                                <h4 className="text-sm font-bold text-white">🔒 Расчет выполнен и зафиксирован</h4>
+                                <p className="text-[11px] text-slate-400 leading-normal mt-0.5">
+                                    Изменения заблокированы во избежание ошибок. Для нового сотрудника нажмите **«Новый расчет»** в боковой панели.
+                                </p>
+                            </div>
+                        </div>
+                        {!user && (
+                            <span className="text-[10px] font-black bg-rose-500/10 border border-rose-500/25 text-rose-400 px-3 py-1.5 rounded-lg uppercase tracking-wider">
+                                Локальный режим
+                            </span>
+                        )}
+                    </motion.div>
+                ) : (
+                    <motion.button
+                        whileHover={{ scale: 1.02 }}
+                        whileTap={{ scale: 0.98 }}
+                        onClick={handlePerformCalculation}
+                        className="w-full mt-6 bg-gradient-to-r from-blue-600 to-indigo-600 hover:from-blue-500 hover:to-indigo-500 text-white font-black py-4.5 rounded-2xl shadow-lg shadow-blue-500/20 hover:shadow-blue-500/30 border border-blue-500/30 text-base uppercase tracking-wider cursor-pointer transition-all flex items-center justify-center gap-3.5 group animate-pulse"
+                    >
+                        <span>{user ? "Выполнить расчет и сохранить в облако ⚡" : "Выполнить расчет ⚡"}</span>
+                        <ArrowRight size={20} className="group-hover:translate-x-1 transition-transform" />
+                    </motion.button>
+                )}
             </div>
 
-            <div id="results-section" className="bg-slate-900/40 backdrop-blur-xl rounded-[1.75rem] border border-slate-800/80 p-6 shadow-xl shadow-black/25 relative overflow-hidden group">
-                <div className="absolute top-0 left-0 right-0 h-[2px] bg-gradient-to-r from-purple-500/30 via-purple-500/10 to-transparent" />
-                <h2 className="text-xl font-bold text-white mb-6 flex items-center gap-2">
-                    <div className="w-2 h-6 bg-purple-500 rounded-full"></div>
-                    Итоговый расчет по предметам
-                </h2>
-                <ResultsTable 
-                    results={results} 
-                    isUnlocked={isUnlocked}
-                    onUnlock={() => setIsPaywallOpen(true)}
-                    onUnlockPro={handleUnlockPro}
-                    isLoadingUnlock={isLoadingUnlock}
-                    dismissalGroup={dismissalGroup}
-                />
-            </div>
+            {isLocked && (
+                <div id="results-section" className="bg-slate-900/40 backdrop-blur-xl rounded-[1.75rem] border border-slate-800/80 p-6 shadow-xl shadow-black/25 relative overflow-hidden group">
+                    <div className="absolute top-0 left-0 right-0 h-[2px] bg-gradient-to-r from-purple-500/30 via-purple-500/10 to-transparent" />
+                    <h2 className="text-xl font-bold text-white mb-6 flex items-center gap-2">
+                        <div className="w-2 h-6 bg-purple-500 rounded-full"></div>
+                        Итоговый расчет по предметам
+                    </h2>
+                    <ResultsTable 
+                        results={results} 
+                        isUnlocked={isUnlocked}
+                        onUnlock={() => setIsPaywallOpen(true)}
+                        onUnlockPro={handleUnlockPro}
+                        isLoadingUnlock={isLoadingUnlock}
+                        dismissalGroup={dismissalGroup}
+                    />
+                </div>
+            )}
         </div>
       </div>
 
-      {/* Archive Modal */}
-      <AnimatePresence>
-          {isArchiveOpen && (
-              <motion.div 
-                  initial={{ opacity: 0 }}
-                  animate={{ opacity: 1 }}
-                  exit={{ opacity: 0 }}
-                  className="fixed inset-0 z-50 flex items-center justify-center bg-slate-950/80 backdrop-blur-sm p-4"
-              >
-                  <motion.div 
-                      initial={{ scale: 0.9, opacity: 0, y: 20 }}
-                      animate={{ scale: 1, opacity: 1, y: 0 }}
-                      exit={{ scale: 0.9, opacity: 0, y: 20 }}
-                      transition={{ type: "spring", damping: 25, stiffness: 300 }}
-                      className="bg-slate-900 border border-slate-700 rounded-2xl w-full max-w-2xl max-h-[80vh] flex flex-col shadow-2xl overflow-hidden"
-                  >
-                      <div className="flex justify-between items-center p-5 border-b border-slate-800 bg-slate-800/50">
-                          <h2 className="text-xl font-bold text-white flex items-center gap-2">
-                              <Archive className="text-indigo-400" size={24} />
-                              Архив расчетов
-                          </h2>
-                          <button onClick={() => setIsArchiveOpen(false)} className="text-slate-400 hover:text-white transition-colors">
-                              <X size={24} />
-                          </button>
-                      </div>
-                      <div className="p-5 overflow-y-auto flex-1">
-                          {archive.length === 0 ? (
-                              <div className="text-center py-10 text-slate-500">
-                                  <Archive className="w-12 h-12 mx-auto mb-3 opacity-20" />
-                                  Архив пуст. Сохраните первый расчет!
-                              </div>
-                          ) : (
-                              <div className="space-y-3">
-                                  <AnimatePresence>
-                                      {archive.map(record => (
-                                          <motion.div 
-                                              key={record.id} 
-                                              initial={{ opacity: 0, x: -20 }}
-                                              animate={{ opacity: 1, x: 0 }}
-                                              exit={{ opacity: 0, x: 20, scale: 0.9 }}
-                                              className="flex justify-between items-center p-4 bg-slate-800/50 hover:bg-slate-800 rounded-xl border border-slate-700/50 transition-colors cursor-pointer group" 
-                                              onClick={() => loadFromArchive(record)}
-                                          >
-                                              <div>
-                                                  <div className="font-bold text-slate-200 text-lg group-hover:text-indigo-400 transition-colors">{record.employee_fio}</div>
-                                                  <div className="text-sm text-slate-400">{record.employee_rank || 'Звание не указано'} • Уволен: {record.dism_date || 'Дата не указана'}</div>
-                                              </div>
-                                              <div className="flex items-center gap-4">
-                                                  <div className="text-xs text-slate-500 text-right hidden sm:block">
-                                                      Сохранен:<br/>{new Date(record.created_at).toLocaleDateString()}
-                                                  </div>
-                                                  <button onClick={(e) => removeFromArchive(e, record.id)} className="p-2 text-slate-500 hover:bg-red-500/20 hover:text-red-400 rounded-lg transition-colors">
-                                                      <Trash2 size={18} />
-                                                  </button>
-                                              </div>
-                                          </motion.div>
-                                      ))}
-                                  </AnimatePresence>
-                              </div>
-                          )}
-                      </div>
-                  </motion.div>
-              </motion.div>
-          )}
-      </AnimatePresence>
+
 
       <ProModal 
         isOpen={isProModalOpen} 
@@ -1184,40 +1349,21 @@ export default function Calculator() {
         )}
       </AnimatePresence>
 
-      {/* Floating Bottom Bar */}
-      <div className="fixed bottom-0 left-0 right-0 p-4 bg-[var(--background)]/80 backdrop-blur-lg border-t border-[var(--tw-hint)]/20 shadow-[0_-10px_40px_rgba(0,0,0,0.1)] z-40">
-          <div className="max-w-5xl mx-auto flex gap-3">
-              {isTwa ? (
+      {/* Floating Bottom Bar (Only for Telegram Web App) */}
+      {isTwa && (
+          <div className="fixed bottom-0 left-0 right-0 p-4 bg-[var(--background)]/85 backdrop-blur-lg border-t border-[var(--tw-hint)]/20 shadow-2xl z-40">
+              <div className="max-w-5xl mx-auto flex gap-3">
                   <motion.button 
                     type="button"
                     whileTap={{ scale: 0.95 }} 
                     onClick={sendToTelegramBot} 
-                    className="flex-1 flex justify-center items-center gap-2 bg-[var(--tw-button-bg)] text-[var(--tw-button-text)] p-3.5 rounded-xl font-bold transition-all shadow-lg"
+                    className="flex-1 flex justify-center items-center gap-2 bg-[var(--tw-button-bg)] text-[var(--tw-button-text)] p-3.5 rounded-xl font-bold transition-all shadow-lg cursor-pointer"
                   >
                       Отправить расчет боту
                   </motion.button>
-              ) : (
-                  <>
-                      <motion.button 
-                        type="button"
-                        whileTap={{ scale: 0.95 }} 
-                        onClick={() => setIsArchiveOpen(true)} 
-                        className="flex-[0.3] flex justify-center items-center bg-[var(--tw-bg-base)] text-[var(--foreground)] p-3.5 rounded-xl font-medium transition-all shadow-sm border border-[var(--tw-hint)]/20"
-                      >
-                          <Archive size={20} />
-                      </motion.button>
-                      <motion.button 
-                        type="button"
-                        whileTap={{ scale: 0.95 }} 
-                        onClick={saveToArchive} 
-                        className="flex-1 flex justify-center items-center gap-2 bg-[var(--tw-button-bg)] text-[var(--tw-button-text)] p-3.5 rounded-xl font-bold transition-all shadow-lg"
-                      >
-                          <Save size={18} /> Сохранить в облако
-                      </motion.button>
-                  </>
-              )}
+              </div>
           </div>
-      </div>
+      )}
     </div>
   );
 }

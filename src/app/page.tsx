@@ -5,6 +5,60 @@ import { motion } from 'framer-motion';
 import { useRouter } from 'next/navigation';
 import { ShieldCheck, Calculator, Clock, Scale, ArrowRight, FileText, CheckCircle2, ChevronRight, Zap, Smartphone, MessageSquare, X } from 'lucide-react';
  
+interface DynamicPriceProps {
+  originalPrice: string;
+  periodText: string;
+  delay?: number;
+}
+
+function DynamicPrice({ originalPrice, periodText, delay = 0 }: DynamicPriceProps) {
+  return (
+    <div className="flex flex-col items-start gap-1 mb-6 relative">
+      <div className="flex items-center gap-3 relative">
+        {/* Original Price (will be crossed out) */}
+        <span className="text-2xl md:text-3xl font-extrabold text-slate-500 relative select-none">
+          {originalPrice}
+          {/* Animated strike-through line */}
+          <motion.span
+            initial={{ width: 0 }}
+            whileInView={{ width: '100%' }}
+            viewport={{ once: true }}
+            transition={{ delay: delay, duration: 0.6, ease: "easeInOut" }}
+            className="absolute left-0 top-1/2 h-[2px] bg-rose-500 rounded-full"
+          />
+        </span>
+        
+        {/* Arrow to new price */}
+        <motion.span 
+          initial={{ opacity: 0, x: -5 }}
+          whileInView={{ opacity: 1, x: 0 }}
+          viewport={{ once: true }}
+          transition={{ delay: delay + 0.4, duration: 0.3 }}
+          className="text-slate-400 font-bold"
+        >
+          ➔
+        </motion.span>
+
+        {/* Free price */}
+        <motion.span 
+          initial={{ opacity: 0, scale: 0.8 }}
+          whileInView={{ opacity: 1, scale: 1 }}
+          viewport={{ once: true }}
+          transition={{ delay: delay + 0.5, duration: 0.4, type: "spring" }}
+          className="text-4xl md:text-5xl font-black text-transparent bg-clip-text bg-gradient-to-r from-emerald-400 to-teal-300 drop-shadow-[0_2px_8px_rgba(52,211,153,0.3)] animate-pulse"
+        >
+          0 ₽
+        </motion.span>
+      </div>
+      
+      {/* Description */}
+      <span className="text-slate-400 font-bold text-xs">
+        {periodText} — <span className="text-emerald-400 font-extrabold">бесплатно до 1 июля</span>
+      </span>
+    </div>
+  );
+}
+
 export default function LandingPage() {
   const router = useRouter();
   const [excelTab, setExcelTab] = useState<'comp' | 'ded'>('comp');
@@ -650,25 +704,27 @@ export default function LandingPage() {
             </h2>
           </motion.div>
 
-          {/* Guaranteed Calculations Hybrid Billing Banner */}
+          {/* Beta Testing and Free Promo Banner */}
           <motion.div 
             initial={{ opacity: 0, y: 15 }}
             whileInView={{ opacity: 1, y: 0 }}
             viewport={{ once: true }}
             transition={{ delay: 0.1 }}
-            className="max-w-4xl mx-auto mb-16 bg-gradient-to-r from-blue-500/10 via-indigo-500/5 to-purple-500/10 border border-blue-500/20 p-6 rounded-3xl text-center backdrop-blur-md relative overflow-hidden group shadow-lg"
+            className="max-w-4xl mx-auto mb-16 bg-gradient-to-r from-indigo-500/10 via-purple-500/5 to-pink-500/10 border border-indigo-500/20 p-6 rounded-3xl text-center backdrop-blur-md relative overflow-hidden group shadow-lg"
           >
-            <div className="absolute top-0 left-0 right-0 h-[1px] bg-gradient-to-r from-transparent via-blue-500/35 to-transparent" />
+            <div className="absolute top-0 left-0 right-0 h-[1.5px] bg-gradient-to-r from-transparent via-indigo-500/35 to-transparent" />
             <div className="flex flex-col sm:flex-row items-center justify-center gap-3">
-              <span className="bg-emerald-500 text-slate-950 font-black px-3 py-1 rounded-full text-[10px] uppercase tracking-wider shadow-md shadow-emerald-500/20 animate-pulse">
-                Уникальная гарантия 🛡️
+              <span className="bg-amber-400 text-slate-950 font-black px-3 py-1 rounded-full text-[10px] uppercase tracking-wider shadow-md shadow-amber-500/20 animate-pulse">
+                Бета-тестирование 🧪
               </span>
               <span className="text-base font-extrabold text-slate-100">
-                PRO-подписка никогда не сгорит просто так!
+                Пользуйтесь всем сервисом абсолютно бесплатно до 1 июля 2026 года!
               </span>
             </div>
             <p className="text-sm text-slate-300 mt-3 max-w-3xl mx-auto leading-relaxed">
-              Мы гарантируем ценность: ваши средства активны до тех пор, пока вы не совершите **минимум 5 расчетов** (для месячной подписки) или **30 расчетов** (для полугодовой подписки). Если за месяц у вас никто не уволился — подписка остается активной до проведения расчетов!
+              Наш проект запущен в режиме открытого бета-тестирования, чтобы дать вам максимальную пользу и довести функционал до совершенства. Мы отключили все платежи.
+              Если вы нашли ошибку, неточность в расчете или у вас есть пожелания — пожалуйста, напишите в службу поддержки через кнопку на панели калькулятора. 
+              <span className="text-emerald-400 font-bold block mt-2 text-xs md:text-sm">💬 Помогите сделать наш проект лучше! Желаем вам приятного пользования и очень ждем вашу обратную связь!</span>
             </p>
           </motion.div>
           
@@ -686,10 +742,7 @@ export default function LandingPage() {
               <div className="relative z-10 flex-1 flex flex-col">
                 <h3 className="text-2xl font-bold text-white mb-1">Разовый</h3>
                 <div className="text-sm text-purple-300 font-bold mb-4">Для увольняющихся</div>
-                <div className="flex items-baseline gap-2 mb-6">
-                  <span className="text-4xl font-extrabold text-white tracking-tight">390</span>
-                  <span className="text-slate-400 font-bold text-sm">руб. / разово</span>
-                </div>
+                <DynamicPrice originalPrice="390 руб." periodText="Разовый доступ" delay={0.1} />
                 <div className="text-purple-400 font-medium text-xs mb-6 leading-relaxed bg-purple-500/10 p-4 rounded-xl border border-purple-500/20 flex-grow">
                   Заплатите 390 руб. и получите справку с обоснованием для спора с бухгалтерией. Это поможет сэкономить десятки тысяч рублей на недополученной вещевке.<br/><br/>
                   <span className="text-white font-bold mb-1 block">Внимание:</span> 
@@ -746,10 +799,7 @@ export default function LandingPage() {
               <div className="relative z-10 flex-1 flex flex-col mt-4">
                 <h3 className="text-2xl font-bold text-white mb-1">Для тыловиков и ревизоров</h3>
                 <div className="text-sm text-blue-300 font-bold mb-4">Ежемесячная подписка</div>
-                <div className="flex items-baseline gap-2 mb-6">
-                  <span className="text-5xl font-extrabold text-white tracking-tight">990</span>
-                  <span className="text-slate-400 font-bold text-sm">руб. / мес.</span>
-                </div>
+                <DynamicPrice originalPrice="990 руб." periodText="Ежемесячная подписка" delay={0.6} />
                 <div className="text-blue-300 font-medium text-xs mb-6 leading-relaxed bg-blue-500/10 p-4 rounded-xl border border-blue-500/20 flex-grow">
                   Идеальный инструмент, который позволит вам быстро, чётко и безошибочно рассчитывать компенсации. Получите точный расчёт, который поможет не попасться на штрафы по проверке КРО.
                   <div className="mt-3 text-emerald-400 font-bold flex items-start gap-1">
@@ -802,10 +852,7 @@ export default function LandingPage() {
               <div className="relative z-10 flex-1 flex flex-col mt-4">
                 <h3 className="text-2xl font-bold text-white mb-2">PRO на 6 месяцев</h3>
                 <div className="text-sm text-emerald-300 font-bold mb-4 font-sans">Пакетное предложение</div>
-                <div className="flex items-baseline gap-2 mb-6">
-                  <span className="text-4xl font-extrabold text-white tracking-tight">3999</span>
-                  <span className="text-slate-400 font-bold text-sm">руб. / за 6 мес.</span>
-                </div>
+                <DynamicPrice originalPrice="3999 руб." periodText="Подписка на 6 месяцев" delay={1.1} />
                 <div className="text-emerald-400 font-medium text-xs mb-6 leading-relaxed bg-emerald-500/10 p-4 rounded-xl border border-emerald-500/20 flex-grow">
                   Идеальный решение для ревизоров (КРО). Экономьте десятки часов на рутинных проверках. Находите любые ошибки в расчетах за считанные секунды!
                   <div className="mt-3 text-emerald-400 font-bold flex items-start gap-1">

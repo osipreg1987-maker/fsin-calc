@@ -863,7 +863,11 @@ export default function Calculator() {
                     <div className="space-y-3">
                         <div className="flex items-center justify-between text-xs">
                             <span className="text-slate-400">Режим:</span>
-                            <span className="text-amber-400 font-extrabold uppercase tracking-wider bg-amber-500/10 border border-amber-500/20 px-2 py-0.5 rounded-md text-[10px]">PRO Активен</span>
+                            {subscription?.plan_type === 'single' ? (
+                                <span className="text-blue-400 font-extrabold uppercase tracking-wider bg-blue-500/10 border border-blue-500/20 px-2 py-0.5 rounded-md text-[10px]">Разовый PRO</span>
+                            ) : (
+                                <span className="text-amber-400 font-extrabold uppercase tracking-wider bg-amber-500/10 border border-amber-500/20 px-2 py-0.5 rounded-md text-[10px]">PRO Активен</span>
+                            )}
                         </div>
                         
                         {subscription?.pro_until && (

@@ -9,6 +9,7 @@ type Subscription = {
   pro_until: string | null;
   pro_calculations_made?: number;
   guaranteed_calculations?: number;
+  plan_type?: 'free' | 'single' | 'monthly' | 'half-year';
   referral_code?: string | null;
   referred_by_id?: string | null;
   referral_reward_claimed?: boolean;
@@ -69,13 +70,24 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
       }
 
       const hasGuaranteedLeft = (data.guaranteed_calculations || 0) > (data.pro_calculations_made || 0);
-      const isProActive = data.is_pro && (!isExpired || hasGuaranteedLeft);
+      
+      let isProActive = false;
+      if (data.is_pro) {
+        if (data.plan_type === 'single') {
+          // Для разового тарифа: активен только если время подписки не вышло И остался неиспользованный расчет
+          isProActive = !isExpired && hasGuaranteedLeft;
+        } else {
+          // Для обычных тарифов: безлимитный доступ пока идет подписка ИЛИ пока не израсходован гарантийный пул после окончания
+          isProActive = !isExpired || hasGuaranteedLeft;
+        }
+      }
 
       setSubscription({
         is_pro: isProActive,
         pro_until: data.pro_until,
         pro_calculations_made: data.pro_calculations_made || 0,
         guaranteed_calculations: data.guaranteed_calculations || 0,
+        plan_type: data.plan_type || 'free',
         referral_code: data.referral_code,
         referred_by_id: data.referred_by_id,
         referral_reward_claimed: data.referral_reward_claimed,
@@ -83,7 +95,7 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
         telegram_id: data.telegram_id
       });
     } else {
-      setSubscription({ is_pro: false, pro_until: null, pro_calculations_made: 0, guaranteed_calculations: 0, telegram_id: null });
+      setSubscription({ is_pro: false, pro_until: null, pro_calculations_made: 0, guaranteed_calculations: 0, plan_type: 'free', telegram_id: null });
     }
   };
 

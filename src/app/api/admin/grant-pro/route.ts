@@ -31,9 +31,9 @@ export async function POST(req: Request) {
             // Выдаем PRO на 30 дней от текущего момента
             const until = new Date();
             until.setDate(until.getDate() + 30);
-            updateData = { is_pro: true, pro_until: until.toISOString() };
+            updateData = { is_pro: true, pro_until: until.toISOString(), plan_type: 'monthly' };
         } else if (action === 'revoke') {
-            updateData = { is_pro: false, pro_until: null };
+            updateData = { is_pro: false, pro_until: null, plan_type: 'free' };
         }
 
         if (guaranteedCalculations !== undefined) {

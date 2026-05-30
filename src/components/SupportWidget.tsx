@@ -375,15 +375,24 @@ export default function SupportWidget() {
                                         )}
                                     </motion.button>
 
-                                    <div className="text-center pt-2">
-                                        <a 
-                                            href="https://t.me/fsin_calc_bot" 
-                                            target="_blank" 
-                                            rel="noreferrer"
-                                            className="text-xs text-sky-400 hover:text-sky-300 font-medium inline-flex items-center gap-1 transition-colors"
-                                        >
-                                            <MessageSquare size={12} /> Или написать в Telegram напрямую
-                                        </a>
+                                    <div className="text-center pt-2 flex flex-col gap-2 justify-center border-t border-slate-900/60 mt-3 pt-3">
+                                        <p className="text-[10px] text-slate-500 uppercase tracking-wider font-bold">Альтернативные каналы связи</p>
+                                        <div className="flex flex-col gap-2">
+                                            <a 
+                                                href="https://t.me/fsin_calc_bot" 
+                                                target="_blank" 
+                                                rel="noreferrer"
+                                                className="w-full py-2 px-3 bg-sky-500/10 hover:bg-sky-500/20 border border-sky-500/20 hover:border-sky-500/40 text-sky-400 rounded-xl text-xs font-semibold flex items-center justify-center gap-1.5 transition-all cursor-pointer"
+                                            >
+                                                <MessageSquare size={13} /> Написать в Telegram
+                                            </a>
+                                            <a 
+                                                href="mailto:support@fsin-calc.pro" 
+                                                className="w-full py-2 px-3 bg-slate-900 hover:bg-slate-800/80 border border-slate-800 text-slate-350 rounded-xl text-xs font-semibold flex items-center justify-center gap-1.5 transition-all cursor-pointer"
+                                            >
+                                                <Mail size={13} /> Написать на email: support@fsin-calc.pro
+                                            </a>
+                                        </div>
                                     </div>
                                 </motion.form>
                             ) : (

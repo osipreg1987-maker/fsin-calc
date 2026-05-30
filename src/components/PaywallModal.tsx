@@ -5,6 +5,7 @@ import React, { useState } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { X, Check } from 'lucide-react';
 import { formatCurrency } from '../lib/helpers';
+import { useAuth } from '../context/AuthContext';
 
 interface PaywallModalProps {
   isOpen: boolean;
@@ -26,6 +27,13 @@ export default function PaywallModal({
   finalBalance
 }: PaywallModalProps) {
   const [selectedPlan, setSelectedPlan] = useState<'single' | 'monthly'>('single');
+  const { subscription } = useAuth();
+  const isReferred = !!(subscription?.referred_by_id && !subscription?.referral_reward_claimed);
+
+  const price = isReferred ? '590 ₽' : '790 ₽';
+  const originalPrice = isReferred ? '790 ₽' : '990 ₽';
+  const ribbonText = isReferred ? 'Скидка друга 200 ₽' : 'Скидка 20%';
+  const subtext = isReferred ? '🎁 Применена скидка от друга!' : '🎁 Скидка за привязку Telegram!';
 
   return (
     <AnimatePresence>
@@ -106,7 +114,7 @@ export default function PaywallModal({
                 className={`cursor-pointer text-left p-4.5 rounded-2xl border-2 transition-all duration-300 relative overflow-hidden flex flex-col justify-between ${selectedPlan === 'monthly' ? 'border-amber-500 bg-amber-500/10 shadow-[0_0_20px_rgba(245,158,11,0.2)]' : 'border-slate-800 bg-slate-950/45 hover:border-slate-700'}`}
               >
                 <div className="absolute top-0 right-0 bg-gradient-to-l from-rose-500 to-amber-500 text-white text-[8px] font-black px-2.5 py-0.5 rounded-bl-xl uppercase tracking-wider">
-                  Скидка 20%
+                  {ribbonText}
                 </div>
                 {selectedPlan === 'monthly' && (
                   <span className="absolute bottom-3.5 right-3.5 w-4 h-4 rounded-full bg-amber-500 border border-amber-400 flex items-center justify-center text-[10px] text-slate-950">✓</span>
@@ -116,15 +124,15 @@ export default function PaywallModal({
                     🔥 Безлимитный PRO (Месяц)
                   </div>
                   <div className="text-2xl font-black text-white mt-1 flex items-baseline gap-1.5">
-                    <span>790 ₽</span>
-                    <span className="text-xs text-slate-500 line-through font-bold">990 ₽</span>
+                    <span>{price}</span>
+                    <span className="text-xs text-slate-500 line-through font-bold">{originalPrice}</span>
                   </div>
                   <p className="text-[11px] text-slate-400 mt-2.5 font-medium leading-relaxed">
                     <strong>Полный безлимит</strong> расчетов. Документы в архиве хранятся постоянно, пока активна подписка PRO.
                   </p>
                 </div>
                 <div className="text-[9px] text-rose-400 font-bold mt-4 bg-rose-500/10 border border-rose-500/20 px-2 py-0.5 rounded-md w-fit">
-                  🎁 Скидка за привязку Telegram!
+                  {subtext}
                 </div>
               </div>
             </div>
@@ -168,7 +176,7 @@ export default function PaywallModal({
               ) : selectedPlan === 'single' ? (
                 <span>Разблокировать расчет за 390 ₽</span>
               ) : (
-                <span>Активировать PRO за 790 ₽</span>
+                <span>Активировать PRO за {price}</span>
               )}
             </motion.button>
 
@@ -176,7 +184,9 @@ export default function PaywallModal({
             <p className="text-[10px] text-slate-500 italic mt-4 text-center">
               {selectedPlan === 'single' 
                 ? 'Разовый расчет. Доступ к скачиванию документов в вашем архиве предоставляется на 6 месяцев.' 
-                : 'Специальная акция: скидка 20% активирована. Хранение архива и доступ к PRO-функциям — постоянно на период действия подписки.'}
+                : isReferred 
+                  ? 'Специальная акция: применена реферальная скидка от вашего друга. Хранение архива и доступ к PRO-функциям — постоянно на период действия подписки.'
+                  : 'Специальная акция: скидка 20% активирована. Хранение архива и доступ к PRO-функциям — постоянно на период действия подписки.'}
             </p>
           </motion.div>
         </motion.div>

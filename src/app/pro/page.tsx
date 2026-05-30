@@ -12,6 +12,13 @@ export default function ProPage() {
   const [isLoading, setIsLoading] = useState(false);
 
   const isPro = subscription?.is_pro;
+  const isReferred = !!(subscription?.referred_by_id && !subscription?.referral_reward_claimed);
+
+  const monthlyPrice = isReferred ? '590 ₽' : '990 ₽';
+  const monthlyOriginalPrice = isReferred ? '990 ₽' : null;
+
+  const halfYearPrice = isReferred ? '2 990 ₽' : '3 999 ₽';
+  const halfYearOriginalPrice = isReferred ? '3 999 ₽' : null;
 
   const handleCheckout = async (planType: string = 'monthly') => {
     if (!user) {
@@ -134,15 +141,17 @@ export default function ProPage() {
             {/* Spotlight line */}
             <div className="absolute top-0 left-0 right-0 h-[2px] bg-gradient-to-r from-blue-500/40 via-indigo-500/30 to-transparent" />
             
-            <div className="absolute top-4 right-4 bg-blue-500 text-white text-[9px] font-extrabold px-2.5 py-1 rounded-full uppercase tracking-wider shadow-md shadow-blue-500/30">
-              Популярный
+            <div className="absolute top-4 right-4 bg-gradient-to-r from-blue-600 to-indigo-600 text-white text-[9px] font-extrabold px-2.5 py-1 rounded-full uppercase tracking-wider shadow-md shadow-blue-500/30">
+              {isReferred ? '🎁 Скидка друга' : 'Популярный'}
             </div>
             
             <div className="text-xl font-bold text-blue-400 mb-2 flex items-center gap-2">
               <Crown size={20} className="text-blue-400" /> Для тыловиков
             </div>
             <div className="text-sm text-blue-300/80 font-semibold mb-4 font-sans">Ежемесячная подписка</div>
-            <div className="text-3xl font-extrabold text-white mb-6">990 ₽ <span className="text-sm text-slate-500 font-bold">/ месяц</span></div>
+            <div className="text-3xl font-extrabold text-white mb-6">
+              {monthlyPrice} {monthlyOriginalPrice && <span className="text-sm text-slate-500 font-bold line-through ml-2">{monthlyOriginalPrice}</span>} <span className="text-sm text-slate-500 font-bold">/ месяц</span>
+            </div>
             
             <div className="space-y-4 mb-8 flex-grow">
               <Feature text="Безлимитная генерация всех справок" included />
@@ -173,14 +182,21 @@ export default function ProPage() {
             initial={{ x: 20, opacity: 0 }} 
             animate={{ x: 0, opacity: 1 }} 
             transition={{ delay: 0.4 }}
-            className="bg-slate-900/30 backdrop-blur-xl border border-slate-800/80 rounded-3xl p-8 flex flex-col transition-all duration-300 hover:border-emerald-500/30 hover:bg-slate-900/50 shadow-xl group relative"
+            className="bg-slate-900/30 backdrop-blur-xl border border-slate-800/80 rounded-3xl p-8 flex flex-col transition-all duration-300 hover:border-emerald-500/30 hover:bg-slate-900/50 shadow-xl group relative overflow-hidden"
           >
             <div className="absolute top-0 left-0 right-0 h-[2px] bg-gradient-to-r from-emerald-500/20 to-transparent" />
+            {isReferred && (
+              <div className="absolute top-0 right-0 bg-gradient-to-l from-emerald-500 to-teal-500 text-white text-[8px] font-black px-2.5 py-0.5 rounded-bl-xl uppercase tracking-wider animate-pulse">
+                Скидка друга 1009 ₽
+              </div>
+            )}
             <div className="text-xl font-bold text-emerald-400 mb-2 flex items-center gap-2">
               PRO на 6 месяцев
             </div>
             <div className="text-sm text-emerald-300/80 font-semibold mb-4">Пакетное предложение</div>
-            <div className="text-3xl font-extrabold text-white mb-6">3 999 ₽ <span className="text-sm text-slate-500 font-bold">/ 6 месяцев</span></div>
+            <div className="text-3xl font-extrabold text-white mb-6">
+              {halfYearPrice} {halfYearOriginalPrice && <span className="text-sm text-slate-500 font-bold line-through ml-2">{halfYearOriginalPrice}</span>} <span className="text-sm text-slate-500 font-bold">/ 6 месяцев</span>
+            </div>
             
             <div className="space-y-4 mb-8 flex-grow">
               <Feature text="Десятки часов сэкономленного времени" included />

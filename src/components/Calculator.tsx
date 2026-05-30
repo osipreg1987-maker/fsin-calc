@@ -18,7 +18,7 @@ import { generateWordReport } from '../lib/reportGenerator';
 import { parseDate } from '../lib/constants';
 import { useAuth } from '../context/AuthContext';
 import { supabase } from '../lib/supabaseClient';
-import { useRouter } from 'next/navigation';
+import { useRouter, useSearchParams } from 'next/navigation';
 
 export default function Calculator() {
   const [employeeFio, setEmployeeFio] = useState('');
@@ -47,6 +47,11 @@ export default function Calculator() {
   const [isLoadingUnlock, setIsLoadingUnlock] = useState(false);
   const [isPaywallOpen, setIsPaywallOpen] = useState(false);
 
+  const [copied, setCopied] = useState(false);
+  const [showJustPaidModal, setShowJustPaidModal] = useState(false);
+  const [justPaidPlanType, setJustPaidPlanType] = useState<'monthly' | 'half-year' | null>(null);
+
+  const searchParams = useSearchParams();
   const { user, subscription, signOut, isLoading } = useAuth();
   const router = useRouter();
 
@@ -132,6 +137,38 @@ export default function Calculator() {
           setTimeout(startTour, 1500);
       }
   }, []);
+
+  useEffect(() => {
+    if (typeof window !== 'undefined') {
+      const ref = searchParams.get('ref');
+      if (ref) {
+        localStorage.setItem('fsin_ref_code', ref);
+      }
+      
+      if (searchParams.get('just_paid') === 'true') {
+        const plan = searchParams.get('planType') as 'monthly' | 'half-year';
+        setJustPaidPlanType(plan);
+        setShowJustPaidModal(true);
+        // Clean up search params gracefully without full reload
+        const newUrl = window.location.pathname;
+        window.history.replaceState({}, '', newUrl);
+      }
+    }
+  }, [searchParams]);
+
+  const getReferralLink = () => {
+    if (typeof window === 'undefined') return '';
+    const code = subscription?.referral_code || '';
+    return `${window.location.origin}/auth?ref=${code}`;
+  };
+
+  const handleCopyReferralLink = () => {
+    const link = getReferralLink();
+    if (!link) return;
+    navigator.clipboard.writeText(link);
+    setCopied(true);
+    setTimeout(() => setCopied(false), 2000);
+  };
 
   const startTour = () => {
       const driverObj = driver({
@@ -858,6 +895,61 @@ export default function Calculator() {
                   </motion.button>
               </div>
             </div>
+
+            {/* Referral Program Widget */}
+            <div className="bg-slate-900/30 backdrop-blur-xl border border-slate-800/80 rounded-3xl p-5 shadow-xl shadow-black/20 relative overflow-hidden group">
+              <div className="absolute top-0 left-0 right-0 h-[2px] bg-gradient-to-r from-purple-500/30 via-indigo-500/10 to-transparent" />
+              <h2 className="text-lg font-bold text-slate-100 mb-2 flex items-center gap-2">
+                <div className="w-1.5 h-5 bg-gradient-to-br from-purple-500 to-indigo-500 rounded-full"></div>
+                {isPro ? 'Продлить PRO бесплатно 👥' : 'Получить PRO бесплатно 👥'}
+              </h2>
+              <p className="text-xs text-slate-400 mb-4 leading-relaxed">
+                {isPro 
+                  ? 'Порекомендуйте калькулятор сослуживцам! За каждого друга вы получите до 3 месяцев безлимитного PRO бесплатно, а ваш друг — скидку до 1000 ₽!' 
+                  : 'Позовите коллегу на службу! Друг получит скидку до 1000 ₽ на PRO подписку, а вы — 1 месяц безлимитного PRO бесплатно, когда он сделает любую оплату подписки!'
+                }
+              </p>
+              
+              {!user ? (
+                <button 
+                  onClick={() => router.push('/auth')} 
+                  className="w-full py-2.5 bg-indigo-600/20 hover:bg-indigo-600/30 border border-indigo-500/30 hover:border-indigo-500/50 text-indigo-300 font-bold rounded-xl text-xs transition-all cursor-pointer text-center"
+                >
+                  Войти в систему, чтобы пригласить друзей
+                </button>
+              ) : (
+                <div className="space-y-4">
+                  <div>
+                    <label className="block text-[9px] uppercase font-bold text-slate-500 mb-1">Ваша ссылка для приглашения:</label>
+                    <div className="flex gap-2">
+                      <input 
+                        type="text" 
+                        readOnly 
+                        value={getReferralLink()} 
+                        className="flex-1 bg-slate-950/45 backdrop-blur-md border border-slate-800/80 rounded-lg p-2 text-xs text-slate-300 outline-none select-all"
+                      />
+                      <button 
+                        onClick={handleCopyReferralLink}
+                        className="bg-indigo-600 hover:bg-indigo-500 text-white px-3 py-2 rounded-lg text-xs font-bold transition-all shrink-0 cursor-pointer flex items-center justify-center min-w-[90px]"
+                      >
+                        {copied ? 'Скопировано!' : 'Копировать'}
+                      </button>
+                    </div>
+                  </div>
+                  
+                  {subscription?.referral_code && (
+                    <div className="pt-3 border-t border-slate-800/60 flex justify-between items-center text-xs">
+                      <div className="text-slate-400">
+                        Друзей пришло: <strong className="text-slate-200 font-bold">{subscription.referred_friends_count || 0}</strong>
+                      </div>
+                      <div className="text-emerald-400 font-bold">
+                        Бонус: +{subscription.referred_friends_count || 0} мес. PRO
+                      </div>
+                    </div>
+                  )}
+                </div>
+              )}
+            </div>
         </div>
         
         <div className="lg:col-span-8 space-y-8">
@@ -980,6 +1072,86 @@ export default function Calculator() {
         resultsCount={results.length}
         finalBalance={finalBalance}
       />
+
+      <AnimatePresence>
+        {showJustPaidModal && (
+          <motion.div
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            exit={{ opacity: 0 }}
+            className="fixed inset-0 z-[100] flex items-center justify-center bg-slate-950/85 backdrop-blur-md p-4 overflow-y-auto"
+          >
+            <motion.div
+              initial={{ scale: 0.9, opacity: 0, y: 20 }}
+              animate={{ scale: 1, opacity: 1, y: 0 }}
+              exit={{ scale: 0.9, opacity: 0, y: 20 }}
+              transition={{ type: "spring", damping: 25, stiffness: 300 }}
+              className="bg-slate-900 border-2 border-amber-500/30 rounded-[2.5rem] w-full max-w-lg shadow-[0_20px_50px_rgba(245,158,11,0.25)] overflow-hidden relative z-10 p-6 md:p-8 text-center"
+            >
+              <div className="absolute top-5 right-5 z-20">
+                <button 
+                  onClick={() => setShowJustPaidModal(false)} 
+                  className="text-slate-400 hover:text-white bg-slate-800/40 hover:bg-slate-800 p-2 rounded-full transition-all cursor-pointer"
+                >
+                  <X size={18} />
+                </button>
+              </div>
+
+              {/* Glowing lights */}
+              <div className="absolute top-[-10%] left-[50%] translate-x-[-50%] w-64 h-64 bg-amber-500/10 rounded-full blur-[60px] pointer-events-none" />
+
+              <div className="w-16 h-16 bg-amber-500/15 text-amber-400 border border-amber-500/25 rounded-2xl mx-auto flex items-center justify-center mb-6 shadow-inner animate-bounce">
+                <Crown size={32} />
+              </div>
+
+              <h2 className="text-2xl font-black text-white leading-tight">
+                Вы теперь в команде PRO! 👑
+              </h2>
+              <p className="text-xs text-slate-400 mt-2 leading-relaxed">
+                Поздравляем! Вам открыт полный безлимитный доступ ко всем расчетам, архивам и мгновенному скачиванию документов в Word и Excel.
+              </p>
+
+              <div className="my-6 p-4 bg-slate-950/45 border border-slate-800/80 rounded-2xl text-left relative overflow-hidden">
+                <div className="absolute top-0 right-0 bg-gradient-to-l from-indigo-500 to-purple-600 text-white text-[8px] font-black px-2.5 py-0.5 rounded-bl-xl uppercase tracking-wider">
+                  Подарок
+                </div>
+                <h4 className="text-xs font-bold text-indigo-400 uppercase tracking-wider flex items-center gap-1.5">
+                  🎁 Понравился калькулятор?
+                </h4>
+                <p className="text-[11px] text-slate-300 mt-2 font-medium leading-relaxed">
+                  Порекомендуйте калькулятор сослуживцам!
+                  За каждого приглашенного друга вы получите до **3 месяцев PRO бесплатно** в подарок, а ваш друг — скидку до **1000 ₽** на подписку!
+                </p>
+                <div className="mt-4 space-y-2">
+                  <span className="text-[9px] uppercase font-bold text-slate-500 block">Ваша реферальная ссылка:</span>
+                  <div className="flex gap-2">
+                    <input 
+                      type="text" 
+                      readOnly 
+                      value={getReferralLink()} 
+                      className="flex-1 bg-slate-900 border border-slate-800 rounded-lg px-2.5 py-1.5 text-xs text-slate-300 focus:outline-none select-all"
+                    />
+                    <button 
+                      onClick={handleCopyReferralLink}
+                      className="bg-indigo-600 hover:bg-indigo-500 text-white px-3 py-1.5 rounded-lg text-xs font-bold transition-all shrink-0 cursor-pointer flex items-center gap-1 min-w-[90px] justify-center animate-none"
+                    >
+                      {copied ? <Check size={12} className="text-white mr-1" /> : null}
+                      <span>{copied ? 'Скопировано' : 'Копировать'}</span>
+                    </button>
+                  </div>
+                </div>
+              </div>
+
+              <button
+                onClick={() => setShowJustPaidModal(false)}
+                className="w-full bg-gradient-to-tr from-amber-500 to-yellow-500 hover:from-amber-450 hover:to-yellow-450 text-slate-950 font-black py-3.5 px-4 rounded-xl text-xs uppercase tracking-wider cursor-pointer shadow-md transition-all font-bold"
+              >
+                Отлично, к расчетам!
+              </button>
+            </motion.div>
+          </motion.div>
+        )}
+      </AnimatePresence>
 
       {/* Floating Bottom Bar */}
       <div className="fixed bottom-0 left-0 right-0 p-4 bg-[var(--background)]/80 backdrop-blur-lg border-t border-[var(--tw-hint)]/20 shadow-[0_-10px_40px_rgba(0,0,0,0.1)] z-40">

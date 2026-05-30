@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from 'react';
+import { useState, Suspense } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { useAuth } from '../../context/AuthContext';
 import { useRouter } from 'next/navigation';
@@ -51,7 +51,13 @@ export default function CalculatorPage() {
         </motion.div>
 
         {/* Main Content */}
-        <Calculator />
+        <Suspense fallback={
+          <div className="text-center py-20 bg-slate-900/20 rounded-3xl border border-slate-850 animate-pulse text-slate-500">
+            Инициализация профессионального калькулятора...
+          </div>
+        }>
+          <Calculator />
+        </Suspense>
       </div>
     </div>
   );

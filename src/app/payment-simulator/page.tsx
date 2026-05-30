@@ -41,6 +41,34 @@ function PaymentSimulatorContent() {
         console.log("Вызов RPC simulate_payment для PRO подписки");
         const result = await supabase.rpc('simulate_payment');
         error = result.error;
+
+        // Если это тариф на 6 месяцев, выставляем правильный pro_until на полгода
+        if (planType === 'half-year' && !error) {
+          const { data: { user } } = await supabase.auth.getUser();
+          if (user) {
+            const sixMonthsLater = new Date();
+            sixMonthsLater.setMonth(sixMonthsLater.getMonth() + 6);
+            await supabase
+              .from('subscriptions')
+              .update({
+                is_pro: true,
+                pro_until: sixMonthsLater.toISOString()
+              })
+              .eq('user_id', user.id);
+          }
+        }
+
+        // Вызываем обработку реферального бонуса для пригласившего
+        if (!error) {
+          const { data: { user } } = await supabase.auth.getUser();
+          if (user) {
+            console.log("Вызов RPC process_referral_reward...");
+            await supabase.rpc('process_referral_reward', {
+              friend_id: user.id,
+              plan_type: planType
+            });
+          }
+        }
       }
       
       if (error) {
@@ -50,9 +78,9 @@ function PaymentSimulatorContent() {
 
       setStatus('success');
       
-      // Возвращаем в калькулятор
+      // Возвращаем в калькулятор с реферальным флагом успешной оплаты
       setTimeout(() => {
-        router.push('/calc');
+        router.push(`/calc?just_paid=true&planType=${planType}`);
         router.refresh(); 
       }, 2000);
       

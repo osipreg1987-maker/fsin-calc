@@ -3,11 +3,33 @@
 import { useEffect, useState } from 'react';
 import { motion } from 'framer-motion';
 import { useRouter } from 'next/navigation';
-import { ShieldCheck, Calculator, Clock, Scale, ArrowRight, FileText, CheckCircle2, ChevronRight, Zap, Smartphone, MessageSquare } from 'lucide-react';
+import { ShieldCheck, Calculator, Clock, Scale, ArrowRight, FileText, CheckCircle2, ChevronRight, Zap, Smartphone, MessageSquare, X } from 'lucide-react';
  
 export default function LandingPage() {
   const router = useRouter();
   const [excelTab, setExcelTab] = useState<'comp' | 'ded'>('comp');
+  const [activeImage, setActiveImage] = useState<{ src: string; title: string } | null>(null);
+
+  useEffect(() => {
+    if (activeImage) {
+      document.body.style.overflow = 'hidden';
+    } else {
+      document.body.style.overflow = '';
+    }
+    return () => {
+      document.body.style.overflow = '';
+    };
+  }, [activeImage]);
+
+  useEffect(() => {
+    const handleKeyDown = (e: KeyboardEvent) => {
+      if (e.key === 'Escape') {
+        setActiveImage(null);
+      }
+    };
+    window.addEventListener('keydown', handleKeyDown);
+    return () => window.removeEventListener('keydown', handleKeyDown);
+  }, []);
 
   useEffect(() => {
     if (typeof window !== 'undefined') {
@@ -299,7 +321,14 @@ export default function LandingPage() {
                 </div>
               </div>
               
-              <div className="flex-1 my-3 rounded-xl overflow-hidden border border-slate-800/60 relative aspect-[4/3.1] bg-slate-950/80 flex items-center justify-center">
+              <div 
+                onClick={() => setActiveImage(
+                  excelTab === 'comp' 
+                    ? { src: '/images/excel_compensation.png', title: 'Справка на выплату в Excel' }
+                    : { src: '/images/excel_deduction.png', title: 'Справка на удержание в Excel' }
+                )}
+                className="flex-1 my-3 rounded-xl overflow-hidden border border-slate-800/60 relative aspect-[4/3.1] bg-slate-950/80 flex items-center justify-center cursor-zoom-in"
+              >
                 <img 
                   src={excelTab === 'comp' ? '/images/excel_compensation.png' : '/images/excel_deduction.png'} 
                   alt={excelTab === 'comp' ? 'Справка на выплату Excel' : 'Справка на удержание Excel'} 
@@ -308,8 +337,9 @@ export default function LandingPage() {
               </div>
 
               <div className="text-center pt-1 border-t border-slate-900/60">
-                <span className="text-[10px] text-slate-455 font-bold">
-                  📊 Реальный скриншот сгенерированного документа {excelTab === 'comp' ? '(на выплату)' : '(на удержание)'}
+                <span className="text-[10px] text-slate-455 font-bold flex items-center justify-center gap-1.5">
+                  <span>📊 Реальный скриншот сгенерированного документа {excelTab === 'comp' ? '(на выплату)' : '(на удержание)'}</span>
+                  <span className="text-blue-400 font-medium">(нажмите для увеличения)</span>
                 </span>
               </div>
             </div>
@@ -340,7 +370,10 @@ export default function LandingPage() {
                 </span>
               </div>
               
-              <div className="flex-1 my-3 rounded-xl overflow-hidden border border-slate-800/60 relative aspect-[1/1.25] bg-slate-950/80 flex items-center justify-center">
+              <div 
+                onClick={() => setActiveImage({ src: '/images/raport_word.png', title: 'Готовый рапорт на компенсацию' })}
+                className="flex-1 my-3 rounded-xl overflow-hidden border border-slate-800/60 relative aspect-[1/1.25] bg-slate-950/80 flex items-center justify-center cursor-zoom-in"
+              >
                 <img 
                   src="/images/raport_word.png" 
                   alt="Готовый рапорт на компенсацию" 
@@ -349,8 +382,9 @@ export default function LandingPage() {
               </div>
 
               <div className="text-center pt-1 border-t border-slate-900/60">
-                <span className="text-[10px] text-purple-400 font-bold">
-                  📄 Реальный скриншот сгенерированного рапорта
+                <span className="text-[10px] text-purple-400 font-bold flex items-center justify-center gap-1.5">
+                  <span>📄 Реальный скриншот сгенерированного рапорта</span>
+                  <span className="text-purple-300 font-medium">(нажмите для увеличения)</span>
                 </span>
               </div>
             </div>
@@ -451,7 +485,10 @@ export default function LandingPage() {
                 </span>
               </div>
               
-              <div className="flex-1 my-3 rounded-xl overflow-hidden border border-slate-800/60 relative aspect-[4/3.1] bg-slate-950/80 flex items-center justify-center">
+              <div 
+                onClick={() => setActiveImage({ src: '/images/detailed_results.png', title: 'Детальные результаты расчета' })}
+                className="flex-1 my-3 rounded-xl overflow-hidden border border-slate-800/60 relative aspect-[4/3.1] bg-slate-950/80 flex items-center justify-center cursor-zoom-in"
+              >
                 <img 
                   src="/images/detailed_results.png" 
                   alt="Детальные результаты аудита и расчета" 
@@ -460,8 +497,9 @@ export default function LandingPage() {
               </div>
 
               <div className="text-center pt-1 border-t border-slate-900/60">
-                <span className="text-[10px] text-emerald-400 font-bold">
-                  🛡️ Реальный скриншот подробных результатов расчета в калькуляторе
+                <span className="text-[10px] text-emerald-400 font-bold flex items-center justify-center gap-1.5">
+                  <span>🛡️ Реальный скриншот подробных результатов расчета в калькуляторе</span>
+                  <span className="text-emerald-300 font-medium">(нажмите для увеличения)</span>
                 </span>
               </div>
             </div>
@@ -492,7 +530,10 @@ export default function LandingPage() {
                 </span>
               </div>
               
-              <div className="flex-1 my-3 rounded-xl overflow-hidden border border-slate-800/60 relative aspect-[1/1.25] bg-slate-950/80 flex items-center justify-center">
+              <div 
+                onClick={() => setActiveImage({ src: '/images/decree_150.png', title: 'Постановление Правительства РФ № 150' })}
+                className="flex-1 my-3 rounded-xl overflow-hidden border border-slate-800/60 relative aspect-[1/1.25] bg-slate-950/80 flex items-center justify-center cursor-zoom-in"
+              >
                 <img 
                   src="/images/decree_150.png" 
                   alt="Постановление Правительства РФ № 150" 
@@ -501,8 +542,9 @@ export default function LandingPage() {
               </div>
 
               <div className="text-center pt-1 border-t border-slate-900/60">
-                <span className="text-[10px] text-blue-400 font-bold">
-                  ⚖️ Официальный текст Постановления Правительства РФ № 150
+                <span className="text-[10px] text-blue-400 font-bold flex items-center justify-center gap-1.5">
+                  <span>⚖️ Официальный текст Постановления Правительства РФ № 150</span>
+                  <span className="text-blue-300 font-medium">(нажмите для увеличения)</span>
                 </span>
               </div>
             </div>
@@ -818,6 +860,49 @@ export default function LandingPage() {
           </div>
         </div>
       </footer>
+
+      {/* Lightbox / Modal for Image Preview */}
+      {activeImage && (
+        <div 
+          onClick={() => setActiveImage(null)}
+          className="fixed inset-0 z-[100] flex items-center justify-center bg-slate-950/90 backdrop-blur-md p-4 md:p-8 transition-opacity duration-300 cursor-zoom-out"
+        >
+          <motion.div 
+            initial={{ scale: 0.95, opacity: 0 }}
+            animate={{ scale: 1, opacity: 1 }}
+            onClick={(e) => e.stopPropagation()}
+            className="relative max-w-4xl w-full bg-slate-900/80 border border-slate-800/80 rounded-3xl p-3 md:p-4 shadow-2xl flex flex-col items-center gap-4 overflow-hidden backdrop-blur-2xl cursor-default"
+          >
+            {/* Header Controls */}
+            <div className="w-full flex justify-between items-center px-2 pb-2 border-b border-slate-800/60">
+              <span className="text-sm md:text-base font-extrabold text-slate-100 flex items-center gap-2">
+                <ShieldCheck size={16} className="text-blue-400" />
+                {activeImage.title}
+              </span>
+              <button 
+                onClick={() => setActiveImage(null)}
+                className="w-8 h-8 rounded-full bg-slate-950 border border-slate-850 hover:border-slate-700 hover:bg-slate-900 text-slate-400 hover:text-white flex items-center justify-center transition-all cursor-pointer shadow-md"
+              >
+                <X size={16} />
+              </button>
+            </div>
+            
+            {/* Image Box */}
+            <div className="w-full max-h-[70vh] flex justify-center items-center overflow-auto rounded-2xl border border-slate-850/80 bg-slate-950/40 relative p-1">
+              <img 
+                src={activeImage.src} 
+                alt={activeImage.title} 
+                className="max-w-full max-h-[68vh] object-contain rounded-xl select-none filter drop-shadow-2xl"
+              />
+            </div>
+            
+            {/* Helper Hint */}
+            <div className="text-[10px] text-slate-500 font-bold uppercase tracking-wider flex items-center gap-1.5">
+              <span>💡 Нажмите ESC или кликните в стороне для закрытия</span>
+            </div>
+          </motion.div>
+        </div>
+      )}
     </div>
   );
 }

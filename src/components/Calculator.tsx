@@ -52,6 +52,7 @@ export default function Calculator() {
   const [copied, setCopied] = useState(false);
   const [showJustPaidModal, setShowJustPaidModal] = useState(false);
   const [justPaidPlanType, setJustPaidPlanType] = useState<'monthly' | 'half-year' | null>(null);
+  const [isActivatingPro, setIsActivatingPro] = useState(false);
 
   const searchParams = useSearchParams();
   const { user, subscription, signOut, isLoading, fetchSubscription } = useAuth();
@@ -152,10 +153,22 @@ export default function Calculator() {
         setIsPaywallOpen(true);
       }
       
-      if (searchParams.get('just_paid') === 'true') {
+      if (searchParams.get('just_paid') === 'true' && user) {
         const plan = searchParams.get('planType') as 'monthly' | 'half-year';
         setJustPaidPlanType(plan);
-        setShowJustPaidModal(true);
+        setIsActivatingPro(true);
+        
+        const activate = async () => {
+          try {
+            await fetchSubscription(user.id);
+          } catch (e) {
+            console.error("Ошибка при получении новой подписки:", e);
+          }
+          await new Promise(resolve => setTimeout(resolve, 2500));
+          setIsActivatingPro(false);
+          setShowJustPaidModal(true);
+        };
+        activate();
       }
       
       if (ref || searchParams.get('just_paid') === 'true' || buyPro) {
@@ -164,7 +177,7 @@ export default function Calculator() {
         window.history.replaceState({}, '', newUrl);
       }
     }
-  }, [searchParams]);
+  }, [searchParams, user]);
 
   const getReferralLink = () => {
     if (typeof window === 'undefined') return '';
@@ -1457,6 +1470,49 @@ export default function Calculator() {
                 Отлично, к расчетам!
               </button>
             </motion.div>
+          </motion.div>
+        )}
+      </AnimatePresence>
+
+      {/* Dynamic Fullscreen Activation Loader */}
+      <AnimatePresence>
+        {isActivatingPro && (
+          <motion.div
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            exit={{ opacity: 0 }}
+            className="fixed inset-0 z-[150] flex flex-col items-center justify-center bg-slate-950/95 backdrop-blur-lg text-center p-6"
+          >
+            {/* Ambient Purple Glow */}
+            <div className="absolute w-80 h-80 rounded-full bg-purple-600/10 blur-[100px] pointer-events-none animate-pulse" />
+            
+            <div className="relative flex flex-col items-center max-w-sm mx-auto space-y-6 z-10">
+              {/* Pulsing Glowing Crown Badge */}
+              <motion.div
+                animate={{ scale: [1, 1.1, 1], rotate: [0, 5, -5, 0] }}
+                transition={{ repeat: Infinity, duration: 2.5, ease: "easeInOut" }}
+                className="w-20 h-20 rounded-2xl bg-gradient-to-tr from-amber-500/20 to-yellow-500/25 border-2 border-amber-500/40 flex items-center justify-center text-amber-400 shadow-[0_0_30px_rgba(245,158,11,0.2)]"
+              >
+                <Crown size={38} className="animate-pulse" />
+              </motion.div>
+
+              <div className="space-y-2">
+                <h2 className="text-2xl font-black text-white tracking-wide">Активация статуса PRO</h2>
+                <p className="text-sm text-slate-400">
+                  Связываемся с платежной системой и обновляем ваш профиль. Пожалуйста, подождите...
+                </p>
+              </div>
+
+              {/* Glowing Loader */}
+              <div className="w-48 h-1.5 bg-slate-800 rounded-full overflow-hidden relative border border-slate-700/30">
+                <motion.div
+                  initial={{ left: "-100%" }}
+                  animate={{ left: "100%" }}
+                  transition={{ repeat: Infinity, duration: 1.8, ease: "easeInOut" }}
+                  className="absolute top-0 bottom-0 w-1/2 bg-gradient-to-r from-blue-500 via-indigo-500 to-purple-500 rounded-full"
+                />
+              </div>
+            </div>
           </motion.div>
         )}
       </AnimatePresence>

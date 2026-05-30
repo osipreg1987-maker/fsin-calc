@@ -1,19 +1,34 @@
 "use client";
 
-import { useState } from 'react';
+import { useState, useEffect, Suspense } from 'react';
 import { supabase } from '../../lib/supabaseClient';
-import { useRouter } from 'next/navigation';
+import { useRouter, useSearchParams } from 'next/navigation';
 import { motion, AnimatePresence } from 'framer-motion';
 import { Lock, Mail, ArrowRight, Loader2, AlertCircle } from 'lucide-react';
 
-export default function AuthPage() {
+function AuthContent() {
   const [isLogin, setIsLogin] = useState(true);
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [message, setMessage] = useState<string | null>(null);
+  const [rememberMe, setRememberMe] = useState(true);
   const router = useRouter();
+  const searchParams = useSearchParams();
+
+  useEffect(() => {
+    if (typeof window !== 'undefined') {
+      const ref = searchParams.get('ref');
+      if (ref) {
+        localStorage.setItem('fsin_ref_code', ref);
+      }
+      const savedEmail = localStorage.getItem('fsin_saved_email');
+      if (savedEmail) {
+        setEmail(savedEmail);
+      }
+    }
+  }, [searchParams]);
 
   const handleAuth = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -22,6 +37,14 @@ export default function AuthPage() {
     setMessage(null);
 
     try {
+      if (typeof window !== 'undefined') {
+        if (rememberMe) {
+          localStorage.setItem('fsin_saved_email', email);
+        } else {
+          localStorage.removeItem('fsin_saved_email');
+        }
+      }
+
       if (isLogin) {
         const { error } = await supabase.auth.signInWithPassword({
           email,
@@ -134,6 +157,37 @@ export default function AuthPage() {
             </div>
           </div>
 
+          {isLogin && (
+            <div className="flex items-center justify-between text-xs pt-1 select-none">
+              <label className="flex items-center gap-2 text-slate-400 cursor-pointer">
+                <input
+                  type="checkbox"
+                  checked={rememberMe}
+                  onChange={(e) => setRememberMe(e.target.checked)}
+                  className="w-4 h-4 rounded bg-slate-950 border border-slate-800 text-indigo-600 focus:ring-indigo-500 focus:ring-offset-slate-900 transition-colors cursor-pointer"
+                />
+                Запомнить меня
+              </label>
+              <button 
+                type="button" 
+                onClick={async () => {
+                  if (!email) {
+                    setError('Пожалуйста, сначала введите ваш Email');
+                    return;
+                  }
+                  const { error } = await supabase.auth.resetPasswordForEmail(email, {
+                    redirectTo: `${window.location.origin}/auth`,
+                  });
+                  if (error) setError(error.message);
+                  else setMessage('Инструкция по восстановлению отправлена на вашу почту!');
+                }}
+                className="text-indigo-400 hover:text-indigo-300 font-semibold transition-colors cursor-pointer"
+              >
+                Забыли пароль?
+              </button>
+            </div>
+          )}
+
           <button
             type="submit"
             disabled={loading}
@@ -204,5 +258,20 @@ export default function AuthPage() {
         </div>
       </motion.div>
     </div>
+  );
+}
+
+export default function AuthPage() {
+  return (
+    <Suspense fallback={
+      <div className="min-h-screen bg-slate-950 text-slate-300 flex items-center justify-center">
+        <div className="text-center space-y-4">
+          <div className="w-8 h-8 border-4 border-indigo-500 border-t-transparent rounded-full animate-spin mx-auto" />
+          <p className="text-sm font-medium">Загрузка авторизации...</p>
+        </div>
+      </div>
+    }>
+      <AuthContent />
+    </Suspense>
   );
 }

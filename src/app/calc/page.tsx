@@ -32,13 +32,25 @@ export default function CalculatorPage() {
         >
           <div className="absolute top-0 left-0 w-full h-1 bg-gradient-to-r from-blue-500 via-indigo-500 to-purple-500"></div>
           <div className="flex flex-col md:flex-row justify-between items-start md:items-center gap-6">
-            <div>
-              <h1 className="text-3xl md:text-4xl font-black text-transparent bg-clip-text bg-gradient-to-r from-blue-400 via-indigo-300 to-purple-400 tracking-tight mb-2">
-                ФСИН
-              </h1>
-              <p className="text-sm md:text-base text-slate-300 font-semibold max-w-3xl leading-relaxed">
-                Калькулятор расчета компенсации за неполученное вещевое довольствие в период прохождения службы
-              </p>
+            <div className="flex flex-col sm:flex-row items-start sm:items-center gap-5">
+              <div className="space-y-1.5 text-left">
+                <h1 className="text-2xl md:text-3xl font-black text-transparent bg-clip-text bg-gradient-to-r from-blue-400 via-indigo-300 to-purple-400 tracking-tight leading-tight">
+                  ФСИН: калькулятор расчета компенсации
+                </h1>
+                <p className="text-[11px] md:text-xs text-slate-400 font-bold max-w-2xl leading-normal uppercase tracking-wider">
+                  за неполученное вещевое довольствие в период прохождения службы
+                </p>
+              </div>
+              
+              {/* Место под эмблему ФСИН */}
+              <div className="relative w-14 h-14 md:w-16 md:h-16 shrink-0 rounded-2xl bg-slate-900/50 backdrop-blur-md border border-slate-800 p-2 flex items-center justify-center shadow-lg shadow-black/20 overflow-hidden group">
+                  <div className="absolute inset-0 bg-blue-500/5 group-hover:bg-blue-500/10 transition-colors pointer-events-none" />
+                  <img 
+                    src="/images/fsin_emblem.png" 
+                    alt="Эмблема ФСИН" 
+                    className="w-full h-full object-contain filter drop-shadow-[0_0_8px_rgba(59,130,246,0.35)] transition-transform duration-300 group-hover:scale-105"
+                  />
+              </div>
             </div>
             {isAdmin && (
               <button 

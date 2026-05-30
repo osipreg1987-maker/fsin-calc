@@ -1,12 +1,13 @@
 "use client";
  
-import { useEffect } from 'react';
+import { useEffect, useState } from 'react';
 import { motion } from 'framer-motion';
 import { useRouter } from 'next/navigation';
 import { ShieldCheck, Calculator, Clock, Scale, ArrowRight, FileText, CheckCircle2, ChevronRight, Zap, Smartphone, MessageSquare } from 'lucide-react';
  
 export default function LandingPage() {
   const router = useRouter();
+  const [excelTab, setExcelTab] = useState<'comp' | 'ded'>('comp');
 
   useEffect(() => {
     if (typeof window !== 'undefined') {
@@ -271,61 +272,45 @@ export default function LandingPage() {
             className="lg:col-span-6 w-full relative flex justify-center"
           >
             <div className="absolute inset-0 bg-gradient-to-r from-blue-500/10 to-indigo-500/10 rounded-3xl blur-3xl opacity-60" />
-            <div className="relative w-full max-w-lg bg-slate-900/40 backdrop-blur-xl border border-slate-800/80 rounded-3xl p-6 shadow-2xl overflow-hidden group">
-              <div className="absolute top-0 right-0 w-32 h-32 bg-blue-500/5 rounded-full blur-2xl group-hover:bg-blue-500/10 transition-colors" />
+            <div className="relative w-full max-w-lg bg-slate-900/40 backdrop-blur-xl border border-slate-800/80 rounded-3xl p-4 shadow-2xl overflow-hidden group flex flex-col justify-between" style={{ minHeight: '430px' }}>
               
-              <div className="flex justify-between items-center pb-4 mb-4 border-b border-slate-800/60">
+              <div className="flex justify-between items-center pb-3 border-b border-slate-800/60">
                 <div className="flex items-center gap-1.5">
-                  <div className="w-3 h-3 rounded-full bg-emerald-500/80" />
-                  <span className="text-xs text-slate-400 font-mono">Справка_вещевка_тыл.xlsx</span>
-                </div>
-                <span className="text-[10px] text-slate-500 font-bold bg-slate-950 px-2 py-0.5 rounded border border-slate-850">
-                  EXCEL MOCKUP
-                </span>
-              </div>
-              
-              <div className="space-y-2.5 font-mono text-[10px]">
-                <div className="grid grid-cols-12 gap-1 pb-1.5 border-b border-slate-800 text-slate-500 font-bold">
-                  <div className="col-span-5">Предмет имущества</div>
-                  <div className="col-span-2 text-center">Срок</div>
-                  <div className="col-span-2 text-right">Сумма</div>
-                  <div className="col-span-3 text-right">Компенс.</div>
-                </div>
-                <div className="grid grid-cols-12 gap-1 text-slate-300">
-                  <div className="col-span-5 font-sans font-extrabold text-xs text-slate-200">Куртка зимняя черная</div>
-                  <div className="col-span-2 text-center text-rose-450 font-bold">3 г.</div>
-                  <div className="col-span-2 text-right text-slate-400">10 800 ₽</div>
-                  <div className="col-span-3 text-right text-blue-450 font-bold">4 200 ₽</div>
-                </div>
-                <div className="grid grid-cols-12 gap-1 text-slate-300">
-                  <div className="col-span-5 font-sans font-extrabold text-xs text-slate-200">Костюм летний (куртка, брюки)</div>
-                  <div className="col-span-2 text-center text-rose-450 font-bold">2 г.</div>
-                  <div className="col-span-2 text-right text-slate-400">6 200 ₽</div>
-                  <div className="col-span-3 text-right text-blue-450 font-bold">3 100 ₽</div>
-                </div>
-                <div className="grid grid-cols-12 gap-1 text-slate-350">
-                  <div className="col-span-5 font-sans font-bold text-xs text-slate-400">Ботинки с высокими берцами</div>
-                  <div className="col-span-2 text-center text-emerald-400">2 г.</div>
-                  <div className="col-span-2 text-right text-slate-500">4 500 ₽</div>
-                  <div className="col-span-3 text-right text-slate-500">0 ₽</div>
-                </div>
-                <div className="h-6 border-b border-dashed border-slate-800 flex items-center justify-center">
-                  <span className="text-[9px] text-slate-600 tracking-wider">... еще 24 позиции ...</span>
-                </div>
-                <div className="pt-2 flex justify-between items-center font-sans font-extrabold text-sm text-slate-200">
-                  <span>ИТОГО К ВЫПЛАТЕ:</span>
-                  <span className="text-emerald-400 bg-emerald-500/10 border border-emerald-500/20 px-2 py-0.5 rounded text-xs">
-                    84 350 ₽
+                  <div className="w-3.5 h-3.5 rounded-full bg-emerald-500/80 flex items-center justify-center text-[10px] text-white font-black">X</div>
+                  <span className="text-xs text-slate-400 font-bold font-mono">
+                    {excelTab === 'comp' ? 'Spravka_Kompensaciya.xls' : 'Spravka_Uderzhanie.xls'}
                   </span>
                 </div>
+                
+                {/* Вкладки переключения */}
+                <div className="flex gap-1 bg-slate-950 p-1 rounded-lg border border-slate-850 z-20">
+                  <button 
+                    onClick={() => setExcelTab('comp')}
+                    className={`px-2.5 py-1 rounded-md text-[9px] font-black uppercase tracking-wider transition-all cursor-pointer ${excelTab === 'comp' ? 'bg-emerald-500/20 text-emerald-400 border border-emerald-500/30' : 'text-slate-500 hover:text-slate-400 border border-transparent'}`}
+                  >
+                    Выплата
+                  </button>
+                  <button 
+                    onClick={() => setExcelTab('ded')}
+                    className={`px-2.5 py-1 rounded-md text-[9px] font-black uppercase tracking-wider transition-all cursor-pointer ${excelTab === 'ded' ? 'bg-rose-500/20 text-rose-400 border border-rose-500/30' : 'text-slate-500 hover:text-slate-400 border border-transparent'}`}
+                  >
+                    Удержание
+                  </button>
+                </div>
+              </div>
+              
+              <div className="flex-1 my-3 rounded-xl overflow-hidden border border-slate-800/60 relative aspect-[4/3.1] bg-slate-950/80 flex items-center justify-center">
+                <img 
+                  src={excelTab === 'comp' ? '/images/excel_compensation.png' : '/images/excel_deduction.png'} 
+                  alt={excelTab === 'comp' ? 'Справка на выплату Excel' : 'Справка на удержание Excel'} 
+                  className="w-full h-full object-contain object-top transition-transform duration-500 group-hover:scale-103" 
+                />
               </div>
 
-              <div className="absolute inset-0 bg-slate-950/85 backdrop-blur-sm opacity-0 group-hover:opacity-100 transition-opacity duration-300 flex flex-col justify-center items-center p-6 text-center select-none">
-                <FileText className="text-blue-400 w-12 h-12 mb-3 animate-pulse" />
-                <h4 className="text-white font-bold text-base mb-1">Скриншот готовой справки Excel</h4>
-                <p className="text-xs text-slate-400 max-w-xs">
-                  Сюда будет вставлен реальный скриншот сгенерированного файла Excel с детальными расчетами.
-                </p>
+              <div className="text-center pt-1 border-t border-slate-900/60">
+                <span className="text-[10px] text-slate-455 font-bold">
+                  📊 Реальный скриншот сгенерированного документа {excelTab === 'comp' ? '(на выплату)' : '(на удержание)'}
+                </span>
               </div>
             </div>
           </motion.div>
@@ -344,56 +329,29 @@ export default function LandingPage() {
             className="lg:col-span-6 w-full relative flex justify-center order-2 lg:order-1"
           >
             <div className="absolute inset-0 bg-gradient-to-r from-purple-500/10 to-pink-500/10 rounded-3xl blur-3xl opacity-60" />
-            <div className="relative w-full max-w-md bg-slate-900/40 backdrop-blur-xl border border-slate-800/80 rounded-3xl p-6 shadow-2xl overflow-hidden group aspect-[1/1.3] flex flex-col justify-between">
-              
+            <div className="relative w-full max-w-md bg-slate-900/40 backdrop-blur-xl border border-slate-800/80 rounded-3xl p-4 shadow-2xl overflow-hidden group flex flex-col justify-between" style={{ minHeight: '430px' }}>
               <div className="flex justify-between items-center pb-3 border-b border-slate-800/60">
                 <div className="flex items-center gap-1.5">
                   <FileText size={16} className="text-purple-400" />
-                  <span className="text-xs text-slate-400 font-mono">Рапорт_на_выплату.docx</span>
+                  <span className="text-xs text-slate-400 font-mono">Raport_Kompensaciya.docx</span>
                 </div>
                 <span className="text-[10px] text-slate-500 font-bold bg-slate-950 px-2 py-0.5 rounded border border-slate-850">
-                  WORD TEMPLATE
+                  WORD REPORT
                 </span>
               </div>
-
-              <div className="flex-1 my-4 p-4.5 bg-slate-950/40 border border-slate-850 rounded-2xl flex flex-col justify-between text-[8px] font-sans text-slate-400 relative">
-                <div className="absolute bottom-6 right-6 border-2 border-emerald-500/30 rounded-full px-2 py-1 transform rotate-12 flex flex-col items-center gap-0.5 select-none bg-slate-950/80">
-                  <CheckCircle2 size={12} className="text-emerald-400" />
-                  <span className="text-[7px] text-emerald-400 font-black tracking-widest uppercase">Готов к печати</span>
-                </div>
-
-                <div className="space-y-1.5 self-end w-2/3 text-right">
-                  <div className="h-2 w-full bg-slate-800 rounded-sm" />
-                  <div className="h-2 w-5/6 bg-slate-800 rounded-sm self-end" />
-                  <div className="h-2 w-3/4 bg-slate-800 rounded-sm self-end" />
-                </div>
-                
-                <div className="space-y-2 my-6">
-                  <div className="h-3 w-16 bg-slate-700 rounded-sm mx-auto font-black text-center flex items-center justify-center text-[8px] text-white">РАПОРТ</div>
-                  <div className="h-2 w-full bg-slate-850 rounded-sm" />
-                  <div className="h-2 w-11/12 bg-slate-850 rounded-sm" />
-                  <div className="h-2 w-full bg-slate-850 rounded-sm" />
-                  <div className="h-2 w-4/5 bg-slate-850 rounded-sm" />
-                </div>
-
-                <div className="flex justify-between items-center pt-2 border-t border-slate-800/40">
-                  <div className="h-2 w-16 bg-slate-800 rounded-sm" />
-                  <div className="h-2 w-12 bg-slate-800 rounded-sm" />
-                </div>
+              
+              <div className="flex-1 my-3 rounded-xl overflow-hidden border border-slate-800/60 relative aspect-[1/1.25] bg-slate-950/80 flex items-center justify-center">
+                <img 
+                  src="/images/raport_word.png" 
+                  alt="Готовый рапорт на компенсацию" 
+                  className="w-full h-full object-contain object-top transition-transform duration-500 group-hover:scale-103" 
+                />
               </div>
 
-              <div className="text-center">
-                <span className="text-[10px] text-purple-400 font-bold bg-purple-500/10 px-3 py-1 rounded-full border border-purple-500/20">
-                  📄 Скачать рапорт в 1 клик
+              <div className="text-center pt-1 border-t border-slate-900/60">
+                <span className="text-[10px] text-purple-400 font-bold">
+                  📄 Реальный скриншот сгенерированного рапорта
                 </span>
-              </div>
-
-              <div className="absolute inset-0 bg-slate-950/85 backdrop-blur-sm opacity-0 group-hover:opacity-100 transition-opacity duration-300 flex flex-col justify-center items-center p-6 text-center select-none">
-                <FileText className="text-purple-400 w-12 h-12 mb-3 animate-pulse" />
-                <h4 className="text-white font-bold text-base mb-1">Скриншот готового рапорта</h4>
-                <p className="text-xs text-slate-400 max-w-xs">
-                  Сюда будет вставлен скриншот сгенерированного рапорта Word/PDF, полностью заполненного по вашим параметрам.
-                </p>
               </div>
             </div>
           </motion.div>
@@ -482,49 +440,29 @@ export default function LandingPage() {
             className="lg:col-span-6 w-full relative flex justify-center"
           >
             <div className="absolute inset-0 bg-gradient-to-r from-emerald-500/10 to-teal-500/10 rounded-3xl blur-3xl opacity-60" />
-            <div className="relative w-full max-w-lg bg-slate-900/40 backdrop-blur-xl border border-slate-800/80 rounded-3xl p-6 shadow-2xl overflow-hidden group">
-              <div className="flex justify-between items-center pb-4 mb-4 border-b border-slate-800/60">
-                <span className="text-xs text-slate-400 font-bold font-mono">Анализ расхождения сумм</span>
+            <div className="relative w-full max-w-lg bg-slate-900/40 backdrop-blur-xl border border-slate-800/80 rounded-3xl p-4 shadow-2xl overflow-hidden group flex flex-col justify-between" style={{ minHeight: '430px' }}>
+              <div className="flex justify-between items-center pb-3 border-b border-slate-800/60">
+                <div className="flex items-center gap-1.5">
+                  <ShieldCheck size={16} className="text-emerald-400" />
+                  <span className="text-xs text-slate-400 font-mono">Online_Audit_Detail.png</span>
+                </div>
                 <span className="text-[10px] text-emerald-400 font-bold bg-emerald-500/10 px-2 py-0.5 rounded border border-emerald-500/20 uppercase">
-                  КРО АУДИТ
+                  ДЕТАЛЬНЫЙ АУДИТ
                 </span>
               </div>
-
-              <div className="space-y-4">
-                <div className="flex items-center justify-between p-3.5 rounded-2xl bg-rose-500/5 border border-rose-500/10">
-                  <div>
-                    <span className="text-[10px] text-slate-500 uppercase font-black block">Расчет бухгалтерии (ручной)</span>
-                    <span className="text-lg font-black text-rose-450">32 500 ₽</span>
-                  </div>
-                  <div className="text-[10px] bg-rose-500/10 text-rose-400 px-2.5 py-1 rounded-lg border border-rose-500/20 font-bold">
-                    ⚠️ Утеряно 18 позиций
-                  </div>
-                </div>
-
-                <div className="flex items-center justify-between p-3.5 rounded-2xl bg-emerald-500/5 border border-emerald-500/20">
-                  <div>
-                    <span className="text-[10px] text-slate-400 uppercase font-black block">Профессиональный расчет</span>
-                    <span className="text-lg font-black text-emerald-400">84 350 ₽</span>
-                  </div>
-                  <div className="text-[10px] bg-emerald-500/10 text-emerald-400 px-2.5 py-1 rounded-lg border border-emerald-500/20 font-bold">
-                    🛡️ 100% точно по нормам
-                  </div>
-                </div>
-
-                <div className="bg-slate-950 border border-slate-800 p-3 rounded-2xl flex justify-between items-center font-sans text-xs">
-                  <span className="text-slate-400 font-medium">Разница в пользу сотрудника:</span>
-                  <span className="text-emerald-400 font-black text-sm animate-pulse">
-                    +51 850 ₽ 🚀
-                  </span>
-                </div>
+              
+              <div className="flex-1 my-3 rounded-xl overflow-hidden border border-slate-800/60 relative aspect-[4/3.1] bg-slate-950/80 flex items-center justify-center">
+                <img 
+                  src="/images/detailed_results.png" 
+                  alt="Детальные результаты аудита и расчета" 
+                  className="w-full h-full object-contain object-top transition-transform duration-500 group-hover:scale-103" 
+                />
               </div>
 
-              <div className="absolute inset-0 bg-slate-950/85 backdrop-blur-sm opacity-0 group-hover:opacity-100 transition-opacity duration-300 flex flex-col justify-center items-center p-6 text-center select-none">
-                <Clock className="text-emerald-400 w-12 h-12 mb-3 animate-pulse" />
-                <h4 className="text-white font-bold text-base mb-1">Скриншот аудита КРО</h4>
-                <p className="text-xs text-slate-400 max-w-xs">
-                  Сюда будет вставлен скриншот сопоставления расчетов и поиска неучтенных выплат в реальном времени.
-                </p>
+              <div className="text-center pt-1 border-t border-slate-900/60">
+                <span className="text-[10px] text-emerald-400 font-bold">
+                  🛡️ Реальный скриншот подробных результатов расчета в калькуляторе
+                </span>
               </div>
             </div>
           </motion.div>
@@ -543,60 +481,29 @@ export default function LandingPage() {
             className="lg:col-span-6 w-full relative flex justify-center order-2 lg:order-1"
           >
             <div className="absolute inset-0 bg-gradient-to-r from-blue-600/10 to-indigo-600/10 rounded-3xl blur-2xl opacity-60" />
-            <div className="relative w-full max-w-md bg-slate-900/40 backdrop-blur-xl border border-slate-800/80 rounded-3xl p-6 shadow-2xl overflow-hidden group aspect-[1/1.3] flex flex-col justify-between">
-              
+            <div className="relative w-full max-w-md bg-slate-900/40 backdrop-blur-xl border border-slate-800/80 rounded-3xl p-4 shadow-2xl overflow-hidden group flex flex-col justify-between" style={{ minHeight: '430px' }}>
               <div className="flex justify-between items-center pb-3 border-b border-slate-800/60">
                 <div className="flex items-center gap-1.5">
                   <ShieldCheck size={16} className="text-blue-400" />
-                  <span className="text-xs text-slate-400 font-mono">Нормативные_акты.pdf</span>
+                  <span className="text-xs text-slate-400 font-mono">Decree_150_Official.pdf</span>
                 </div>
                 <span className="text-[10px] text-slate-500 font-bold bg-slate-950 px-2 py-0.5 rounded border border-slate-850">
                   OFFICIAL DECREE
                 </span>
               </div>
-
-              <div className="flex-1 my-4 p-4.5 bg-slate-950/60 border border-slate-850 rounded-2xl flex flex-col justify-between text-[8px] font-sans text-slate-400 relative">
-                <div className="absolute top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 opacity-5 pointer-events-none">
-                  <Scale size={120} className="text-white" />
-                </div>
-
-                <div className="space-y-2">
-                  <div className="h-3 w-3/4 bg-slate-700 rounded-sm mx-auto font-black text-center flex items-center justify-center text-[7px] text-white">ПРАВИТЕЛЬСТВО РОССИЙСКОЙ ФЕДЕРАЦИИ</div>
-                  <div className="h-2 w-20 bg-slate-800 rounded-sm mx-auto" />
-                </div>
-
-                <div className="space-y-2.5 my-4">
-                  <div className="h-1.5 w-full bg-slate-800 rounded-sm" />
-                  <div className="h-1.5 w-11/12 bg-slate-800 rounded-sm" />
-                  <div className="h-1.5 w-full bg-slate-800 rounded-sm" />
-                  <div className="h-1.5 w-4/5 bg-slate-800 rounded-sm" />
-                  <div className="h-1.5 w-full bg-slate-800 rounded-sm" />
-                  <div className="h-1.5 w-9/10 bg-slate-800 rounded-sm" />
-                </div>
-
-                <div className="flex justify-between items-center pt-2 border-t border-slate-800/40">
-                  <div className="flex flex-col gap-0.5">
-                    <span className="text-[6px] text-slate-500">Гербовая печать</span>
-                    <div className="w-6 h-6 rounded-full border border-blue-500/20 bg-blue-500/5 flex items-center justify-center">
-                      <Scale size={10} className="text-blue-400" />
-                    </div>
-                  </div>
-                  <div className="h-2 w-16 bg-slate-800 rounded-sm self-end" />
-                </div>
+              
+              <div className="flex-1 my-3 rounded-xl overflow-hidden border border-slate-800/60 relative aspect-[1/1.25] bg-slate-950/80 flex items-center justify-center">
+                <img 
+                  src="/images/decree_150.png" 
+                  alt="Постановление Правительства РФ № 150" 
+                  className="w-full h-full object-contain object-top transition-transform duration-500 group-hover:scale-103" 
+                />
               </div>
 
-              <div className="text-center">
-                <span className="text-[10px] text-blue-400 font-bold bg-blue-500/10 px-3 py-1 rounded-full border border-blue-500/20">
-                  ⚖️ Проверено юристами УИС
+              <div className="text-center pt-1 border-t border-slate-900/60">
+                <span className="text-[10px] text-blue-400 font-bold">
+                  ⚖️ Официальный текст Постановления Правительства РФ № 150
                 </span>
-              </div>
-
-              <div className="absolute inset-0 bg-slate-950/85 backdrop-blur-sm opacity-0 group-hover:opacity-100 transition-opacity duration-300 flex flex-col justify-center items-center p-6 text-center select-none">
-                <ShieldCheck className="text-blue-400 w-12 h-12 mb-3 animate-pulse" />
-                <h4 className="text-white font-bold text-base mb-1">Скан нормативно-правового акта</h4>
-                <p className="text-xs text-slate-400 max-w-xs">
-                  Сюда будет вставлен скан официального приказа ФСИН или Постановления Правительства с гербовой печатью.
-                </p>
               </div>
             </div>
           </motion.div>

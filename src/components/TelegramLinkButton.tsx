@@ -6,6 +6,7 @@ import { motion } from 'framer-motion';
 import { MessageCircle, Loader2, Check } from 'lucide-react';
 import { useAuth } from '../context/AuthContext';
 import { supabase } from '../lib/supabaseClient';
+import { getApiUrl } from '../lib/api';
 
 export default function TelegramLinkButton() {
     const { user, subscription, fetchSubscription } = useAuth();
@@ -40,7 +41,7 @@ export default function TelegramLinkButton() {
         
         try {
             // Запрашиваем генерацию токена
-            const res = await fetch('/api/telegram/link', {
+            const res = await fetch(getApiUrl('/api/telegram/link'), {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json' },
                 body: JSON.stringify({ userId: user.id })

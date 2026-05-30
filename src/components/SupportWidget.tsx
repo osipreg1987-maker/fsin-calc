@@ -5,6 +5,7 @@ import React, { useState, useEffect, useRef } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { Headphones, X, Send, MessageSquare, Loader2, Mail, User, HelpCircle, CornerDownLeft } from 'lucide-react';
 import { supabase } from '../lib/supabaseClient';
+import { getApiUrl } from '../lib/api';
 
 export default function SupportWidget() {
     const [isOpen, setIsOpen] = useState(false);
@@ -128,7 +129,7 @@ export default function SupportWidget() {
 
         setIsInitializing(true);
         try {
-            const res = await fetch('/api/support/send', {
+            const res = await fetch(getApiUrl('/api/support/send'), {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json' },
                 body: JSON.stringify({
@@ -176,7 +177,7 @@ export default function SupportWidget() {
         }]);
 
         try {
-            const res = await fetch('/api/support/send', {
+            const res = await fetch(getApiUrl('/api/support/send'), {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json' },
                 body: JSON.stringify({

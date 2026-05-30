@@ -1,0 +1,6 @@
+{
+  "appId": "ru.fsincalculator.app",
+  "appName": "FSIN Calc Pro",
+  "webDir": "out",
+  "bundledWebRuntime": false
+}

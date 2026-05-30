@@ -27,7 +27,7 @@ export default function LandingPage() {
       <nav className="sticky top-4 z-50 max-w-7xl mx-auto my-4 bg-slate-950/45 backdrop-blur-md border border-slate-800/80 rounded-2xl p-4 md:px-8 shadow-lg shadow-black/30 flex justify-between items-center transition-all duration-300">
         <div className="flex items-center gap-2 font-bold text-xl tracking-wide">
           <Scale className="text-blue-400" />
-          <span className="text-slate-100">ФСИН <span className="text-blue-400">Калькулятор Pro</span></span>
+          <span className="text-slate-100">ФСИН <span className="text-blue-400">Вещевка</span></span>
         </div>
         <motion.button 
           whileHover={{ scale: 1.05 }}
@@ -477,7 +477,7 @@ export default function LandingPage() {
 
                 <div className="flex items-center justify-between p-3.5 rounded-2xl bg-emerald-500/5 border border-emerald-500/20">
                   <div>
-                    <span className="text-[10px] text-slate-400 uppercase font-black block">ФСИН Калькулятор Pro</span>
+                    <span className="text-[10px] text-slate-400 uppercase font-black block">ФСИН: Вещевка Pro</span>
                     <span className="text-lg font-black text-emerald-400">84 350 ₽</span>
                   </div>
                   <div className="text-[10px] bg-emerald-500/10 text-emerald-400 px-2.5 py-1 rounded-lg border border-emerald-500/20 font-bold">
@@ -876,7 +876,7 @@ export default function LandingPage() {
         <div className="max-w-7xl mx-auto flex flex-col items-center gap-6">
           <div className="flex items-center gap-2 font-bold text-xl text-slate-300">
             <Scale className="text-blue-500" />
-            ФСИН Калькулятор Pro
+            ФСИН Вещевка
           </div>
           <p className="text-slate-500">© {new Date().getFullYear()} Все расчеты носят информационный характер.</p>
           <div className="bg-slate-900/40 backdrop-blur-md border border-slate-850 px-6 py-3.5 rounded-2xl text-sm text-slate-300 flex items-center gap-2 shadow-inner shadow-black/10">

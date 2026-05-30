@@ -33,10 +33,12 @@ export default function CalculatorPage() {
           <div className="absolute top-0 left-0 w-full h-1 bg-gradient-to-r from-blue-500 via-indigo-500 to-purple-500"></div>
           <div className="flex flex-col md:flex-row justify-between items-start md:items-center gap-6">
             <div>
-              <h1 className="text-3xl md:text-4xl font-extrabold text-transparent bg-clip-text bg-gradient-to-r from-blue-400 to-purple-400 tracking-tight mb-2">
-                ФСИН Калькулятор Pro
+              <h1 className="text-3xl md:text-4xl font-black text-transparent bg-clip-text bg-gradient-to-r from-blue-400 via-indigo-300 to-purple-400 tracking-tight mb-2">
+                ФСИН
               </h1>
-              <p className="text-slate-400">Вещевое довольствие и компенсации</p>
+              <p className="text-sm md:text-base text-slate-300 font-semibold max-w-3xl leading-relaxed">
+                Калькулятор расчета компенсации за неполученное вещевое довольствие в период прохождения службы
+              </p>
             </div>
             {isAdmin && (
               <button 

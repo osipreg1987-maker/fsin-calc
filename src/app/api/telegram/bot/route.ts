@@ -65,7 +65,7 @@ bot.start(async (ctx) => {
             ctx.reply("❌ Произошла ошибка: " + String(e));
         }
     } else {
-        const baseUrl = process.env.NEXT_PUBLIC_SITE_URL || 'https://fsin-calc.vercel.app';
+        const baseUrl = process.env.NEXT_PUBLIC_SITE_URL || 'https://www.fsin-calculator.ru';
         const webAppUrl = `${baseUrl}/calc`;
         const mainMenu = Markup.keyboard([
             [Markup.button.webApp('🧮 Открыть калькулятор', webAppUrl)],
@@ -176,7 +176,7 @@ bot.hears('🎧 Поддержка', (ctx) => {
 
 // Шаблон рапорта
 bot.hears('📄 Шаблон рапорта', async (ctx) => {
-    const baseUrl = process.env.NEXT_PUBLIC_SITE_URL || 'https://fsin-calc.vercel.app';
+    const baseUrl = process.env.NEXT_PUBLIC_SITE_URL || 'https://www.fsin-calculator.ru';
     const fileUrl = `${baseUrl}/Рапорт_на_компенсацию.docx`;
     try {
         await ctx.replyWithDocument(
@@ -212,7 +212,7 @@ bot.command('broadcast', async (ctx) => {
 
 // Команда /calc
 bot.command('calc', (ctx) => {
-    const baseUrl = process.env.NEXT_PUBLIC_SITE_URL || 'https://fsin-calc.vercel.app';
+    const baseUrl = process.env.NEXT_PUBLIC_SITE_URL || 'https://www.fsin-calculator.ru';
     const webAppUrl = `${baseUrl}/calc`;
     const mainMenu = Markup.keyboard([
         [Markup.button.webApp('🧮 Открыть калькулятор', webAppUrl)],

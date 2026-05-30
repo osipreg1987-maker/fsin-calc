@@ -47,20 +47,13 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
       if (typeof window !== 'undefined') {
         const savedRefCode = localStorage.getItem('fsin_ref_code');
         if (savedRefCode && !data.referred_by_id) {
-          // Ищем владельца реферального кода
-          const { data: referrerSub } = await supabase
-            .from('subscriptions')
-            .select('user_id')
-            .eq('referral_code', savedRefCode)
-            .single();
+          // Вызываем RPC-функцию для безопасной привязки на стороне базы данных (обходим RLS)
+          const { data: isLinked } = await supabase.rpc('link_referral_code', {
+            user_id_param: userId,
+            referral_code_param: savedRefCode
+          });
 
-          if (referrerSub && referrerSub.user_id !== userId) {
-            // Связываем реферала
-            await supabase
-              .from('subscriptions')
-              .update({ referred_by_id: referrerSub.user_id })
-              .eq('user_id', userId);
-            
+          if (isLinked) {
             localStorage.removeItem('fsin_ref_code');
             // Перезапрашиваем данные после обновления
             setTimeout(() => fetchSubscription(userId), 200);

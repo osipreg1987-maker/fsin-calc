@@ -26,26 +26,17 @@ function PaymentSimulatorContent() {
     try {
       let error;
       
-      if (planType === 'single' && archiveId) {
-        // Разблокировка конкретного расчета в архиве
-        console.log(`Разблокировка расчета в архиве ID: ${archiveId}`);
-        const result = await supabase
-          .from('archives')
-          .update({ is_unlocked: true })
-          .eq('id', archiveId)
-          .select();
-          
-        error = result.error;
-      } else {
-        // Вызываем SQL-функцию (RPC) для безопасного обновления подписки пользователя (PRO)
-        console.log("Вызов RPC simulate_payment для PRO подписки");
-        const result = await supabase.rpc('simulate_payment');
-        error = result.error;
+      // Вызываем SQL-функцию (RPC) для безопасного обновления подписки пользователя (PRO)
+      console.log("Вызов RPC simulate_payment для PRO подписки");
+      const result = await supabase.rpc('simulate_payment');
+      error = result.error;
 
-        // Если это тариф на 6 месяцев, выставляем правильный pro_until на полгода
-        if (planType === 'half-year' && !error) {
-          const { data: { user } } = await supabase.auth.getUser();
-          if (user) {
+      // Если платеж прошел успешно, обновляем сроки и начисляем лимиты
+      if (!error) {
+        const { data: { user } } = await supabase.auth.getUser();
+        if (user) {
+          // 1. Выставляем дату окончания (30 дней для single/monthly, 6 месяцев для half-year)
+          if (planType === 'half-year') {
             const sixMonthsLater = new Date();
             sixMonthsLater.setMonth(sixMonthsLater.getMonth() + 6);
             await supabase
@@ -55,27 +46,38 @@ function PaymentSimulatorContent() {
                 pro_until: sixMonthsLater.toISOString()
               })
               .eq('user_id', user.id);
+          } else {
+            const thirtyDaysLater = new Date();
+            thirtyDaysLater.setDate(thirtyDaysLater.getDate() + 30);
+            await supabase
+              .from('subscriptions')
+              .update({
+                is_pro: true,
+                pro_until: thirtyDaysLater.toISOString()
+              })
+              .eq('user_id', user.id);
           }
-        }
 
-        // Начисляем гарантированные расчеты (5 для месячного, 30 для полугодового)
-        if (!error) {
-          const { data: { user } } = await supabase.auth.getUser();
-          if (user) {
-            const amount = planType === 'half-year' ? 30 : 5;
-            console.log(`Начисление ${amount} гарантированных расчетов...`);
-            await supabase.rpc('add_guaranteed_calculations', {
-              user_id_param: user.id,
-              amount_param: amount
-            });
+          // 2. Начисляем гарантированные расчеты (+1 для single, +5 для monthly, +30 для half-year)
+          const amount = planType === 'half-year' ? 30 : (planType === 'monthly' ? 5 : 1);
+          console.log(`Начисление ${amount} гарантированных расчетов для тарифа ${planType}...`);
+          await supabase.rpc('add_guaranteed_calculations', {
+            user_id_param: user.id,
+            amount_param: amount
+          });
+
+          // 3. Если куплен разовый расчет под конкретный архив, разблокируем эту запись
+          if (planType === 'single' && archiveId) {
+            console.log(`Разблокировка конкретной записи в архиве: ${archiveId}`);
+            await supabase
+              .from('archives')
+              .update({ is_unlocked: true })
+              .eq('id', archiveId);
           }
-        }
 
-        // Вызываем обработку реферального бонуса для пригласившего
-        if (!error) {
-          const { data: { user } } = await supabase.auth.getUser();
-          if (user) {
-            console.log("Вызов RPC process_referral_reward...");
+          // 4. Начисляем реферальный бонус пригласившему (только для полноценных PRO подписок)
+          if (planType !== 'single') {
+            console.log("Вызов RPC process_referral_reward для реферера...");
             await supabase.rpc('process_referral_reward', {
               friend_id: user.id,
               plan_type: planType

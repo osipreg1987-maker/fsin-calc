@@ -4,8 +4,6 @@
 import React from 'react';
 
 export default function IssueLogTable({ groupedItems, itemTotals, setItemTotals, customPrices, setCustomPrices, results, dismissalGroup, isPro, setIsProModalOpen }: any) {
-  const blurClass = !isPro ? "blur-[4px] select-none pointer-events-none opacity-50" : "";
-
   return (
     <div className="overflow-x-auto w-full relative">
         <table className="w-full text-left border-collapse text-sm">
@@ -47,9 +45,8 @@ export default function IssueLogTable({ groupedItems, itemTotals, setItemTotals,
                                         />
                                     </td>
                                     <td className="py-2 px-3 text-right relative">
-                                        {!isPro && <div className="absolute inset-0 z-10 cursor-pointer" onClick={() => setIsProModalOpen(true)} title="Доступно в PRO"></div>}
                                         {hasDeduction && (
-                                            <div className={`flex flex-col gap-1.5 items-end ${blurClass}`}>
+                                            <div className="flex flex-col gap-1.5 items-end">
                                                 <span className="text-[10px] font-bold text-rose-400 tracking-wider">НЕДОНОС: {dedMonthsTotal} МЕС.</span>
                                                 <input 
                                                     type="number" 

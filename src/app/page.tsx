@@ -890,6 +890,39 @@ export default function LandingPage() {
             </motion.div>
 
           </div>
+
+          {/* Telegram Promo Banner in Pricing Section */}
+          <motion.div 
+            initial={{ opacity: 0, y: 15 }}
+            whileInView={{ opacity: 1, y: 0 }}
+            viewport={{ once: true }}
+            className="max-w-4xl mx-auto mt-12 bg-sky-950/30 border border-sky-500/20 p-6 rounded-3xl flex flex-col md:flex-row items-center justify-between gap-6 shadow-lg shadow-black/20 text-left relative overflow-hidden group backdrop-blur-md"
+          >
+            {/* Spotlight highlight */}
+            <div className="absolute top-0 right-0 bg-[#0088cc] text-white text-[8px] font-black px-3 py-1 rounded-bl-xl uppercase tracking-wider select-none animate-pulse">
+              Скидка 20% ⚡
+            </div>
+            <div className="space-y-1.5 flex-1">
+              <h4 className="text-sm md:text-base font-extrabold text-sky-400 flex items-center gap-2">
+                <span className="w-2.5 h-2.5 rounded-full bg-sky-400 animate-ping" />
+                🔗 Привяжите Telegram — получите скидку 20% на PRO-подписку!
+              </h4>
+              <p className="text-xs text-slate-350 leading-relaxed font-normal">
+                Привяжите аккаунт Telegram в личном кабинете калькулятора, и цены на PRO мгновенно пересчитаются с автоматической скидкой 20%: 
+                1 месяц PRO — всего за <strong>790 ₽</strong> (вместо 990 ₽), а 6 месяцев PRO — за <strong>3 190 ₽</strong> (вместо 3 999 ₽)!
+              </p>
+            </div>
+            <motion.button 
+              whileHover={{ scale: 1.03 }}
+              whileTap={{ scale: 0.97 }}
+              onClick={() => router.push('/calc?buy_pro=true')}
+              className="bg-[#0088cc] hover:bg-[#0077b3] text-white font-black px-6 py-3 rounded-2xl text-xs uppercase tracking-wider flex items-center gap-2 shrink-0 cursor-pointer shadow-lg shadow-[#0088cc]/20 border border-sky-400/30"
+            >
+              <span>Получить скидку 20%</span>
+              <ArrowRight size={14} />
+            </motion.button>
+          </motion.div>
+
         </div>
       </section>
 

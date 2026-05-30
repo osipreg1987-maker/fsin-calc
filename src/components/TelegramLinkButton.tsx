@@ -1,18 +1,38 @@
 // @ts-nocheck
 "use client";
 
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { motion } from 'framer-motion';
 import { MessageCircle, Loader2, Check } from 'lucide-react';
 import { useAuth } from '../context/AuthContext';
 import { supabase } from '../lib/supabaseClient';
 
 export default function TelegramLinkButton() {
-    const { user, subscription } = useAuth();
+    const { user, subscription, fetchSubscription } = useAuth();
     const [isLoading, setIsLoading] = useState(false);
     
     // Если Telegram уже привязан, показываем галочку
     const isLinked = subscription?.telegram_id ? true : false;
+
+    // Автоматическая проверка привязки при фокусе и поллинг
+    useEffect(() => {
+        if (!user || isLinked) return;
+        
+        const handleFocus = () => {
+            fetchSubscription(user.id);
+        };
+        
+        window.addEventListener('focus', handleFocus);
+        
+        const interval = setInterval(() => {
+            fetchSubscription(user.id);
+        }, 3000);
+        
+        return () => {
+            window.removeEventListener('focus', handleFocus);
+            clearInterval(interval);
+        };
+    }, [user, isLinked, fetchSubscription]);
 
     const handleLink = async () => {
         if (!user) return;

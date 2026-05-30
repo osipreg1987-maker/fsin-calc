@@ -52,7 +52,7 @@ export default function Calculator() {
   const [justPaidPlanType, setJustPaidPlanType] = useState<'monthly' | 'half-year' | null>(null);
 
   const searchParams = useSearchParams();
-  const { user, subscription, signOut, isLoading } = useAuth();
+  const { user, subscription, signOut, isLoading, fetchSubscription } = useAuth();
   const router = useRouter();
 
   const isPro = subscription?.is_pro || false;
@@ -479,11 +479,38 @@ export default function Calculator() {
       }
   };
 
-  const handleExport = (type: 'comp' | 'ded' | 'b2c-comp') => {
+  const incrementCalculationsCount = async () => {
+      if (!user || !isPro) return;
+      
+      // Генерируем уникальный ключ для текущего расчета (ФИО + Дата + Группа)
+      const hash = `${(employeeFio || 'unnamed').trim().toLowerCase()}_${dismDate || 'nodate'}_${dismissalGroup || 'V'}`;
+      
+      try {
+          const { data, error } = await supabase.rpc('log_pro_calculation', {
+              user_id_param: user.id,
+              employee_hash_param: hash
+          });
+          if (error) {
+              console.error("Ошибка логирования расчета в Supabase:", error);
+          } else if (data === true) {
+              console.log("Успешно залогирован новый уникальный расчет. Лимит списан.");
+              // Обновляем данные подписки
+              fetchSubscription(user.id);
+          }
+      } catch (e) {
+          console.error("Ошибка вызова log_pro_calculation:", e);
+      }
+  };
+
+  const handleExport = async (type: 'comp' | 'ded' | 'b2c-comp') => {
       if (!isUnlocked) {
           setIsPaywallOpen(true);
           return;
       }
+      
+      // Запускаем инкремент счетчика уникальных расчетов для PRO
+      await incrementCalculationsCount();
+
       exportToExcel(type, {
           results,
           instData,
@@ -493,11 +520,15 @@ export default function Calculator() {
       });
   };
 
-  const handleReportExport = () => {
+  const handleReportExport = async () => {
       if (!isUnlocked) {
           setIsPaywallOpen(true);
           return;
       }
+
+      // Запускаем инкремент счетчика уникальных расчетов для PRO
+      await incrementCalculationsCount();
+
       generateWordReport({
           results,
           instData,

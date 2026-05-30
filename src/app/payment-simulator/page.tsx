@@ -58,6 +58,19 @@ function PaymentSimulatorContent() {
           }
         }
 
+        // Начисляем гарантированные расчеты (5 для месячного, 30 для полугодового)
+        if (!error) {
+          const { data: { user } } = await supabase.auth.getUser();
+          if (user) {
+            const amount = planType === 'half-year' ? 30 : 5;
+            console.log(`Начисление ${amount} гарантированных расчетов...`);
+            await supabase.rpc('add_guaranteed_calculations', {
+              user_id_param: user.id,
+              amount_param: amount
+            });
+          }
+        }
+
         // Вызываем обработку реферального бонуса для пригласившего
         if (!error) {
           const { data: { user } } = await supabase.auth.getUser();

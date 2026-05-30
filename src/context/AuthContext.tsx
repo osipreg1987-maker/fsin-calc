@@ -7,6 +7,8 @@ import { User } from '@supabase/supabase-js';
 type Subscription = {
   is_pro: boolean;
   pro_until: string | null;
+  pro_calculations_made?: number;
+  guaranteed_calculations?: number;
   referral_code?: string | null;
   referred_by_id?: string | null;
   referral_reward_claimed?: boolean;
@@ -18,6 +20,7 @@ type AuthContextType = {
   subscription: Subscription | null;
   isLoading: boolean;
   signOut: () => Promise<void>;
+  fetchSubscription: (userId: string) => Promise<void>;
 };
 
 const AuthContext = createContext<AuthContextType>({
@@ -25,6 +28,7 @@ const AuthContext = createContext<AuthContextType>({
   subscription: null,
   isLoading: true,
   signOut: async () => {},
+  fetchSubscription: async () => {},
 });
 
 export function AuthProvider({ children }: { children: React.ReactNode }) {
@@ -63,16 +67,21 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
         }
       }
 
+      const hasGuaranteedLeft = (data.guaranteed_calculations || 0) > (data.pro_calculations_made || 0);
+      const isProActive = data.is_pro && (!isExpired || hasGuaranteedLeft);
+
       setSubscription({
-        is_pro: data.is_pro && !isExpired,
+        is_pro: isProActive,
         pro_until: data.pro_until,
+        pro_calculations_made: data.pro_calculations_made || 0,
+        guaranteed_calculations: data.guaranteed_calculations || 0,
         referral_code: data.referral_code,
         referred_by_id: data.referred_by_id,
         referral_reward_claimed: data.referral_reward_claimed,
         referred_friends_count: data.referred_friends_count || 0
       });
     } else {
-      setSubscription({ is_pro: false, pro_until: null });
+      setSubscription({ is_pro: false, pro_until: null, pro_calculations_made: 0, guaranteed_calculations: 0 });
     }
   };
 
@@ -107,10 +116,11 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
   };
 
   return (
-    <AuthContext.Provider value={{ user, subscription, isLoading, signOut }}>
+    <AuthContext.Provider value={{ user, subscription, isLoading, signOut, fetchSubscription }}>
       {children}
     </AuthContext.Provider>
   );
 }
 
 export const useAuth = () => useContext(AuthContext);
+

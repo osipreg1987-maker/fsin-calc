@@ -18,6 +18,15 @@ export default function LandingPage() {
   return (
     <div className="min-h-screen bg-slate-950 text-slate-200 font-sans selection:bg-blue-500/30 overflow-hidden relative">
       
+      {/* Promo Announcement Banner */}
+      <div className="w-full bg-gradient-to-r from-indigo-950 via-purple-900/90 to-indigo-950 border-b border-indigo-500/20 py-2.5 px-4 text-center text-xs md:text-sm font-semibold text-slate-200 flex items-center justify-center gap-2 relative z-50">
+        <span className="flex items-center gap-1 text-amber-400">
+          <Zap size={14} className="animate-pulse" />
+          <strong className="font-black uppercase tracking-wide bg-amber-500/20 px-2 py-0.5 rounded text-[10px]">Акция</strong>
+        </span>
+        <span>Пользуйтесь всеми функциями <span className="text-amber-300 font-extrabold">PRO</span> совершенно бесплатно до <span className="text-white font-extrabold underline decoration-indigo-400 underline-offset-2">1 июля 2026 года</span> в честь запуска сервиса! 🎁</span>
+      </div>
+      
       {/* Premium Decorative Ambient Floating Lights */}
       <div className="fixed top-[-10%] left-[-10%] w-[50vw] h-[50vw] max-w-[600px] rounded-full bg-blue-600/10 blur-[130px] pointer-events-none animate-float-1 z-0" />
       <div className="fixed bottom-[-10%] right-[-10%] w-[50vw] h-[50vw] max-w-[600px] rounded-full bg-purple-600/10 blur-[130px] pointer-events-none animate-float-2 z-0" />

@@ -621,6 +621,20 @@ export default function Calculator() {
 
   return (
     <div className="space-y-8">
+      {/* Promo Announcement Banner */}
+      <motion.div 
+        initial={{ opacity: 0, y: -10 }}
+        animate={{ opacity: 1, y: 0 }}
+        className="w-full bg-gradient-to-r from-indigo-950 via-purple-900/60 to-indigo-950 border border-indigo-500/20 p-4 rounded-2xl text-center text-xs md:text-sm font-semibold text-slate-200 flex flex-col sm:flex-row items-center justify-center gap-2.5 shadow-lg shadow-indigo-950/20"
+      >
+        <span className="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full text-[10px] font-black bg-amber-400/10 text-amber-400 border border-amber-400/20 uppercase tracking-wider animate-pulse">
+          <Crown size={12} /> Акция
+        </span>
+        <span>
+          Дарим полный <span className="text-amber-300 font-black">PRO-доступ</span> всем пользователям совершенно бесплатно до <span className="text-white font-black underline decoration-indigo-400 underline-offset-4">1 июля 2026 года</span> в честь открытия сервиса! 🎁
+        </span>
+      </motion.div>
+
       {/* Header and Export Buttons */}
       {!isTwa && (
       <div className="flex flex-col md:flex-row justify-between items-start md:items-center gap-4 mb-6">

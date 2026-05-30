@@ -209,20 +209,20 @@ export default function SupportWidget() {
 
     return (
         <div className="fixed bottom-6 right-6 z-50 font-sans select-none">
-            {/* Анимированный триггер чата (Круглая кнопка) */}
+            {/* Анимированный триггер чата (Увеличенная заметная кнопка-капсула) */}
             <motion.button
-                whileHover={{ scale: 1.08 }}
-                whileTap={{ scale: 0.92 }}
+                whileHover={{ scale: 1.05 }}
+                whileTap={{ scale: 0.95 }}
                 onClick={() => setIsOpen(!isOpen)}
-                className={`relative flex items-center justify-center w-14 h-14 rounded-full text-white cursor-pointer shadow-lg transition-all duration-300 ${
+                className={`relative flex items-center justify-center text-white cursor-pointer shadow-lg transition-all duration-300 ${
                     isOpen 
-                        ? 'bg-rose-500 hover:bg-rose-600 shadow-rose-500/20' 
-                        : 'bg-gradient-to-tr from-blue-600 to-indigo-600 hover:from-blue-500 hover:to-indigo-500 shadow-blue-500/30'
+                        ? 'w-12 h-12 rounded-full bg-rose-500 hover:bg-rose-600 shadow-rose-500/20' 
+                        : 'h-12 px-5 rounded-full bg-gradient-to-tr from-blue-600 via-indigo-600 to-purple-600 hover:from-blue-500 hover:to-purple-500 shadow-[0_0_20px_rgba(79,70,229,0.35)] flex items-center gap-2 border border-indigo-500/20'
                 }`}
             >
                 {/* Эффект пульсирующего свечения вокруг кнопки */}
                 {!isOpen && (
-                    <span className="absolute -inset-1 rounded-full bg-blue-500/30 animate-pulse pointer-events-none" />
+                    <span className="absolute -inset-1 rounded-full bg-blue-500/25 animate-pulse pointer-events-none" />
                 )}
 
                 {/* Непрочитанные сообщения */}
@@ -242,18 +242,19 @@ export default function SupportWidget() {
                             exit={{ rotate: 90, opacity: 0 }}
                             transition={{ duration: 0.2 }}
                         >
-                            <X size={24} />
+                            <X size={20} />
                         </motion.div>
                     ) : (
                         <motion.div
                             key="open"
-                            initial={{ rotate: 90, opacity: 0 }}
-                            animate={{ rotate: 0, opacity: 1 }}
-                            exit={{ rotate: -90, opacity: 0 }}
+                            initial={{ opacity: 0, x: -10 }}
+                            animate={{ opacity: 1, x: 0 }}
+                            exit={{ opacity: 0, x: 10 }}
                             transition={{ duration: 0.2 }}
-                            className="flex items-center justify-center"
+                            className="flex items-center gap-2 font-bold text-xs uppercase tracking-wider"
                         >
-                            <Headphones size={24} />
+                            <Headphones size={16} />
+                            <span>Поддержка</span>
                         </motion.div>
                     )}
                 </AnimatePresence>
